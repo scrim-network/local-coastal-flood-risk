@@ -32,6 +32,12 @@ convert_mhw_to_msl = function(mhw_levels){
   mhw_levels + (MHW - MSL)
 }
 
+convert_mhhw_to_msl = function(mhhw_levels){
+  MHHW = 7.14
+  MSL = 5.74
+  mhhw_levels + (MHHW - MSL)
+}
+
 # colors ------------------------------------------------------------------
 seq_color = function(num, maincol){
   col_fun <- colorRampPalette(c("white", maincol, "black"))
@@ -91,20 +97,21 @@ par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
                            "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
-                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2013", 
+                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
                            "Srikrishnan et al.\nin prep. S 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep. S",
                            "Observations"),
        lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
        col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
        bty='n', ncol=6, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA), pt.cex = c(NA,NA,NA,1,NA,1,2,1,2,1,NA,1))
-gradient.rect(3.5,1.5,5.5,3, col=col_grad, gradient="x")
-arrows(5.25, 0.5, 5.5, 0.5, length=0.075)
-text(4.5,0.5, "Emission scenario")
+gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
+arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
+text(8.5,0.5, "Higher scenario")
 
-legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI"),
-       lty=c(3,NA), lwd=c(2,NA), pch=c(NA,22), 
-       col=c(noaa_cols[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_noaa_cols[7]), pt.cex = c(NA,2))
+legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI",
+                              "Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
+       lty=c(3,NA,1,NA), lwd=c(2,NA,2,NA), pch=c(NA,22,NA,22), 
+       col=c(noaa_cols[2], "black", BrBG[2], "black"), bty='n', horiz=TRUE, 
+       pt.bg=c(NA,trans_noaa_cols[7],NA,trans_BrBG[2]), pt.cex = c(NA,2,NA,2))
 
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
 plot(density(kopp14_rcp85_2030ft), xlab="Projected sea level in 2030 (ft)", ylab="Probability density", yaxt="n", 
@@ -156,6 +163,9 @@ polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 
 polygon(y = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
+
+polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
+        x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, obs, pch = 19)
 
 SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2030, make.plot=FALSE)
@@ -164,9 +174,9 @@ lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, co
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
+lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12_rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
-points(NOAA_rp, NOAA_rl, pch=20, col=BrBG[2])
 
 # ----------------------------------------------------------------------
 # PLACE HOLDER
@@ -240,13 +250,16 @@ polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 
 polygon(x = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
         y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
+
+polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
+        y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
+lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
 lines(tebaldi12_rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
 points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
-points(NOAA_rl, 1/NOAA_rp, pch=20, col=BrBG[2])
 
 # ----------------------------------------------------------------------
 # PLACE HOLDER
@@ -311,20 +324,21 @@ par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
                            "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
-                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2013", 
+                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
                            "Srikrishnan et al.\nin prep. S 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep. S",
                            "Observations"),
        lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
        col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
        bty='n', ncol=6, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA), pt.cex = c(NA,NA,NA,1,NA,1,2,1,2,1,NA,1))
-gradient.rect(3.5,1.5,5.5,3, col=col_grad, gradient="x")
-arrows(5.25, 0.5, 5.5, 0.5, length=0.075)
-text(4.5,0.5, "Emission scenario")
+gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
+arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
+text(8.5,0.5, "Higher scenario")
 
-legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI"),
-       lty=c(3,NA), lwd=c(2,NA), pch=c(NA,22), 
-       col=c(noaa_cols[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_noaa_cols[7]), pt.cex = c(NA,2))
+legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI",
+                              "Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
+       lty=c(3,NA,1,NA), lwd=c(2,NA,2,NA), pch=c(NA,22,NA,22), 
+       col=c(noaa_cols[2], "black", BrBG[2], "black"), bty='n', horiz=TRUE, 
+       pt.bg=c(NA,trans_noaa_cols[7],NA,trans_BrBG[2]), pt.cex = c(NA,2,NA,2))
 
 # Plot LSLR in 2050
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
@@ -377,6 +391,9 @@ polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 
 polygon(y = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
+
+polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
+        x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, obs, pch = 19)
 
 SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2050, make.plot=FALSE)
@@ -385,9 +402,9 @@ lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, co
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
+lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12_rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
-points(NOAA_rp, NOAA_rl, pch=20, col=BrBG[2])
 
 # ----------------------------------------------------------------------
 # PLACE HOLDER
@@ -461,13 +478,16 @@ polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 
 polygon(x = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
         y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
+
+polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
+        y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
+lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
 lines(tebaldi12_rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
 points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
-points(NOAA_rl, 1/NOAA_rp, pch=20, col=BrBG[2])
 
 # ----------------------------------------------------------------------
 # PLACE HOLDER
@@ -529,20 +549,21 @@ par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
                            "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
-                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2013", 
+                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
                            "Srikrishnan et al.\nin prep. S 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep. S",
                            "Observations"),
        lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
        col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
        bty='n', ncol=6, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA), pt.cex = c(NA,NA,NA,1,NA,1,2,1,2,1,NA,1))
-gradient.rect(3.5,1.5,5.5,3, col=col_grad, gradient="x")
-arrows(5.25, 0.5, 5.5, 0.5, length=0.075)
-text(4.5,0.5, "Emission scenario")
+gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
+arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
+text(8.5,0.5, "Higher scenario")
 
-legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI"),
-       lty=c(3,NA), lwd=c(2,NA), pch=c(NA,22), 
-       col=c(noaa_cols[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_noaa_cols[7]), pt.cex = c(NA,2))
+legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI",
+                              "Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
+       lty=c(3,NA,1,NA), lwd=c(2,NA,2,NA), pch=c(NA,22,NA,22), 
+       col=c(noaa_cols[2], "black", BrBG[2], "black"), bty='n', horiz=TRUE, 
+       pt.bg=c(NA,trans_noaa_cols[7],NA,trans_BrBG[2]), pt.cex = c(NA,2,NA,2))
 
 # Plot LSLR in 2060
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
@@ -595,6 +616,9 @@ polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 
 polygon(y = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
+
+polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
+        x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, obs, pch = 19)
 
 SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2060, make.plot=FALSE)
@@ -603,9 +627,9 @@ lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, co
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
+lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12_rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
-points(NOAA_rp, NOAA_rl, pch=20, col=BrBG[2])
 
 # ----------------------------------------------------------------------
 # PLACE HOLDER
@@ -679,13 +703,16 @@ polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 
 polygon(x = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
         y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
+
+polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
+        y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
+lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
 lines(tebaldi12_rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
 points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
-points(NOAA_rl, 1/NOAA_rp, pch=20, col=BrBG[2])
 
 # ----------------------------------------------------------------------
 # PLACE HOLDER
@@ -747,20 +774,21 @@ par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
                            "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
-                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2013", 
+                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
                            "Srikrishnan et al.\nin prep. S 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep. S",
                            "Observations"),
        lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
        col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
        bty='n', ncol=6, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA), pt.cex = c(NA,NA,NA,1,NA,1,2,1,2,1,NA,1))
-gradient.rect(3.5,1.5,5.5,3, col=col_grad, gradient="x")
-arrows(5.25, 0.5, 5.5, 0.5, length=0.075)
-text(4.5,0.5, "Emission scenario")
+gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
+arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
+text(8.5,0.5, "Higher scenario")
 
-legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI"),
-       lty=c(3,NA), lwd=c(2,NA), pch=c(NA,22), 
-       col=c(noaa_cols[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_noaa_cols[7]), pt.cex = c(NA,2))
+legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI",
+                              "Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
+       lty=c(3,NA,1,NA), lwd=c(2,NA,2,NA), pch=c(NA,22,NA,22), 
+       col=c(noaa_cols[2], "black", BrBG[2], "black"), bty='n', horiz=TRUE, 
+       pt.bg=c(NA,trans_noaa_cols[7],NA,trans_BrBG[2]), pt.cex = c(NA,2,NA,2))
 
 # Plot LSLR in 2100
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
@@ -813,6 +841,9 @@ polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 
 polygon(y = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
+
+polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
+        x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, obs, pch = 19)
 
 SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2100, make.plot=FALSE)
@@ -821,9 +852,9 @@ lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, co
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
+lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12_rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
-points(NOAA_rp, NOAA_rl, pch=20, col=BrBG[2])
 
 # ----------------------------------------------------------------------
 # PLACE HOLDER
@@ -897,13 +928,16 @@ polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 
 polygon(x = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
         y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
+
+polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
+        y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
+lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
 lines(tebaldi12_rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
 points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
-points(NOAA_rl, 1/NOAA_rp, pch=20, col=BrBG[2])
 
 # ----------------------------------------------------------------------
 # PLACE HOLDER
@@ -1182,11 +1216,11 @@ plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
                            "Wong & Keller\n2017 no FD", "Sweet et al. 2017", 
                            "Parris et al. 2012", 
-                           "USACE 2013", "Hall et al. 2016"),
+                           "USACE 2014", "Hall et al. 2016"),
        lty=c(1,1,1,NA,NA,NA,NA), lwd=c(2,2,2,NA,NA,NA,NA), pch=c(NA,NA,NA,19,19,19,19), 
        col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], BrBG[2], RdBu[10], RdGy[9]),
        bty='n')
 gradient.rect(-0.35,5,8,5.25, col=col_grad, gradient="x")
 arrows(6.75, 4.75, 8, 4.75, length=0.075)
-text(3.5,4.75, "Emission scenario")
+text(3.5,4.75, "Higher scenario")
 dev.off()
