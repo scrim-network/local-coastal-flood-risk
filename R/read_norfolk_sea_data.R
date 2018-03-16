@@ -27,6 +27,12 @@ convert_mhw_to_msl = function(mhw_levels){
   MSL = 5.74
   mhw_levels + (MHW - MSL)
 }
+
+convert_mhhw_to_msl = function(mhhw_levels){
+  MHHW = 7.14
+  MSL = 5.74
+  mhhw_levels + (MHHW - MSL)
+}
 #   -----------------------------------------------------------------------
 
 
@@ -254,8 +260,15 @@ avg_level = convert_m_to_ft(NOAA_methodGEV$avg_level)
 return_period = NOAA_methodGEV$return_period
 obs = convert_m_to_ft(NOAA_methodGEV$obs)
 
+# USACE sea-level calculator
 NOAA_rp = c(1,2,5,10,20,50,100)
 NOAA_rl = c(2.85,3.84,4.55,5.07,5.62,6.40,7.05)
+
+# Meters above MHHW; Loc = 0.678 ± 0.041, scale = 0.170 ± 0.031, 
+# shape = 0.120 ± 0.163 (in meters, with 95% Confidence interval)
+zervas_2013 = data.frame(mle = c(0.441, 0.742, 1.117, 1.722), min_95 = c(0.381, 0.697, 1.018, 1.422),
+                         max_95 = c(0.480, 0.792, 1.279, 2.387), aep = c(0.99, 0.5, 0.1, 0.01))
+zervas_2013[,1:3] = convert_mhhw_to_msl(convert_m_to_ft(zervas_2013[,1:3]))
 
 # Load storm surge data from Vivek et al. in prep.
 stationary = readRDS("norfolk_MCMC-stationary.rds")
