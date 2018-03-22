@@ -74,13 +74,13 @@ NO_fdyn_rcp85 <- ncvar_get(fid1,"LocalSeaLevel_RCP85")
 NO_fdyn_proj <- ncvar_get(fid1,"time_proj")
 nc_close(fid1)
 
-# Read in data from the USACE Sea level calculator for Sewells Point
-# This data includes: NOAA et al. 2012, USACE 2013, CARSWG 2016, and NOAA et al. 2017
-# Data is ft above 1992, so 0cm is 1992
-NOAA_etal_2017 = read.csv("NOAA_etal_2017_SewellsPoint.csv", skip=1, header=TRUE) 
-SL_calculator = read.csv("USACE_SL_Calculator_SewellsPoint.csv", skip=1, header=TRUE)
-NOAA_etal_2017 = as.matrix(NOAA_etal_2017)
-SL_calculator = as.matrix(SL_calculator)
+# # Read in data from the USACE Sea level calculator for Sewells Point
+# # This data includes: NOAA et al. 2012, USACE 2013, CARSWG 2016, and NOAA et al. 2017
+# # Data is ft above 1992, so 0cm is 1992
+# NOAA_etal_2017 = read.csv("NOAA_etal_2017_SewellsPoint.csv", skip=1, header=TRUE) 
+# SL_calculator = read.csv("USACE_SL_Calculator_SewellsPoint.csv", skip=1, header=TRUE)
+# NOAA_etal_2017 = as.matrix(NOAA_etal_2017)
+# SL_calculator = as.matrix(SL_calculator)
 
 # Convert to feet ---------------------------------------------------------
 # Kopp and Wong & Keller have different numbers of samples. Using the Kopp data randomly 
@@ -142,82 +142,39 @@ NO_fd_rcp85_2060ft = convert_m_to_ft(NO_fdyn_rcp85[match(2060, NO_fdyn_proj), ])
 NO_fd_rcp85_2100ft = convert_m_to_ft(NO_fdyn_rcp85[match(2100, NO_fdyn_proj), ]) + BKkopp_subsid_2100
 
 # Convert baseline to 2000 ------------------------------------------------
-NOAA_etal_2017_ref2000 = NOAA_etal_2017[,2:22] - NOAA_etal_2017[match(2000, NOAA_etal_2017[,1]),2:22]
-SL_calculator_ref2000 = SL_calculator[,2:13] - SL_calculator[match(2000, SL_calculator[,1]),2:13]
+# Read in data from the USACE Sea level calculator for Sewells Point
+# This data includes: NOAA et al. 2012, USACE 2013, CARSWG 2016, and NOAA et al. 2017
+# Data is ft above 1992, so 0cm is 1992
+SL_calculator = read.csv("USACE_SL_Calculator_SewellsPoint.csv", skip=1, header=TRUE)
+SL_calculator = as.matrix(SL_calculator)
+SL_calculator_ref2000 = SL_calculator
+for(i in 2:13){
+  SL_calculator_ref2000[,i] = SL_calculator[,i] - SL_calculator[match(2000, SL_calculator[,1]),i]
+}
+
+NOAA_etal_2017 = read.csv("NOAA_etal_2017_SewellsPoint.csv", skip=1, header=TRUE) 
+NOAA_etal_2017 = as.matrix(NOAA_etal_2017)
+NOAA_etal_2017_ref2000 = NOAA_etal_2017
+for(i in 2:22){
+  NOAA_etal_2017_ref2000[,i] = NOAA_etal_2017[,i] - NOAA_etal_2017[match(2000, NOAA_etal_2017[,1]),i]
+}
 
 # Extract specific years --------------------------------------------------
-match2030 = match(2030, SL_calculator[,1])
-match2050 = match(2050, SL_calculator[,1])
-match2060 = match(2060, SL_calculator[,1])
-match2100 = match(2100, SL_calculator[,1])
+match_SLC = match(c(2030,2050,2060,2100), SL_calculator[,1])
+match_NOAA17 = match(c(2030,2050,2060,2100), NOAA_etal_2017[,1])
 
-N_match2030 = match(2030, NOAA_etal_2017[,1])
-N_match2050 = match(2050, NOAA_etal_2017[,1])
-N_match2060 = match(2060, NOAA_etal_2017[,1])
-N_match2100 = match(2100, NOAA_etal_2017[,1])
+noaa2012 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 2:5]), t_2050 = c(SL_calculator_ref2000[match_SLC[2], 2:5]),
+                      t_2060 = c(SL_calculator_ref2000[match_SLC[3], 2:5]), t_2100 = c(SL_calculator_ref2000[match_SLC[4], 2:5]), row.names = NULL)
 
-noaa2012_2030 = c(SL_calculator[match2030, 2], SL_calculator[match2030, 3], SL_calculator[match2030, 4], 
-                  SL_calculator[match2030, 5])
-noaa2012_2050 = c(SL_calculator[match2050, 2], SL_calculator[match2050, 3], SL_calculator[match2050, 4], 
-                  SL_calculator[match2050, 5])
-noaa2012_2060 = c(SL_calculator[match2060, 2], SL_calculator[match2060, 3], SL_calculator[match2060, 4], 
-                  SL_calculator[match2060, 5])
-noaa2012_2100 = c(SL_calculator[match2100, 2], SL_calculator[match2100, 3], SL_calculator[match2100, 4], 
-                  SL_calculator[match2100, 5])
+usace2013 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 6:8]), t_2050 = c(SL_calculator_ref2000[match_SLC[2], 6:8]),
+                      t_2060 = c(SL_calculator_ref2000[match_SLC[3], 6:8]), t_2100 = c(SL_calculator_ref2000[match_SLC[4], 6:8]), row.names = NULL)
 
-usace2013_2030 = c(SL_calculator[match2030, 6], SL_calculator[match2030, 7], SL_calculator[match2030, 8])
-usace2013_2050 = c(SL_calculator[match2050, 6], SL_calculator[match2050, 7], SL_calculator[match2050, 8])
-usace2013_2060 = c(SL_calculator[match2060, 6], SL_calculator[match2060, 7], SL_calculator[match2060, 8])
-usace2013_2100 = c(SL_calculator[match2100, 6], SL_calculator[match2100, 7], SL_calculator[match2100, 8])
+carswg2016 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 9:13]), t_2050 = c(SL_calculator_ref2000[match_SLC[2], 9:13]),
+                       t_2060 = c(SL_calculator_ref2000[match_SLC[3], 9:13]), t_2100 = c(SL_calculator_ref2000[match_SLC[4], 9:13]), row.names = NULL)
 
-carswg2016_2030 = c(SL_calculator[match2030, 9], SL_calculator[match2030, 10], SL_calculator[match2030, 11], 
-                    SL_calculator[match2030, 12], SL_calculator[match2030, 13])
-carswg2016_2050 = c(SL_calculator[match2050, 9], SL_calculator[match2050, 10], SL_calculator[match2050, 11], 
-                    SL_calculator[match2050, 12], SL_calculator[match2050, 13])
-carswg2016_2060 = c(SL_calculator[match2060, 9], SL_calculator[match2060, 10], SL_calculator[match2060, 11], 
-                    SL_calculator[match2060, 12], SL_calculator[match2060, 13])
-carswg2016_2100 = c(SL_calculator[match2100, 9], SL_calculator[match2100, 10], SL_calculator[match2100, 11], 
-                    SL_calculator[match2100, 12], SL_calculator[match2100, 13])
-
-noaa2017_2030_17 = c(NOAA_etal_2017[N_match2030, 2], NOAA_etal_2017[N_match2030, 5], NOAA_etal_2017[N_match2030, 8],
-                     NOAA_etal_2017[N_match2030, 11], NOAA_etal_2017[N_match2030, 14], NOAA_etal_2017[N_match2030, 17],
-                     NOAA_etal_2017[N_match2030, 20])
-noaa2017_2030_50 = c(NOAA_etal_2017[N_match2030, 3], NOAA_etal_2017[N_match2030, 6], NOAA_etal_2017[N_match2030, 9],
-                     NOAA_etal_2017[N_match2030, 12], NOAA_etal_2017[N_match2030, 15], NOAA_etal_2017[N_match2030, 18],
-                     NOAA_etal_2017[N_match2030, 21])
-noaa2017_2030_83 = c(NOAA_etal_2017[N_match2030, 4], NOAA_etal_2017[N_match2030, 7], NOAA_etal_2017[N_match2030, 10],
-                     NOAA_etal_2017[N_match2030, 13], NOAA_etal_2017[N_match2030, 16], NOAA_etal_2017[N_match2030, 19],
-                     NOAA_etal_2017[N_match2030, 22])
-
-noaa2017_2050_17 = c(NOAA_etal_2017[N_match2050, 2], NOAA_etal_2017[N_match2050, 5], NOAA_etal_2017[N_match2050, 8],
-                     NOAA_etal_2017[N_match2050, 11], NOAA_etal_2017[N_match2050, 14], NOAA_etal_2017[N_match2050, 17],
-                     NOAA_etal_2017[N_match2050, 20])
-noaa2017_2050_50 = c(NOAA_etal_2017[N_match2050, 3], NOAA_etal_2017[N_match2050, 6], NOAA_etal_2017[N_match2050, 9],
-                     NOAA_etal_2017[N_match2050, 12], NOAA_etal_2017[N_match2050, 15], NOAA_etal_2017[N_match2050, 18],
-                     NOAA_etal_2017[N_match2050, 21])
-noaa2017_2050_83 = c(NOAA_etal_2017[N_match2050, 4], NOAA_etal_2017[N_match2050, 7], NOAA_etal_2017[N_match2050, 10],
-                     NOAA_etal_2017[N_match2050, 13], NOAA_etal_2017[N_match2050, 16], NOAA_etal_2017[N_match2050, 19],
-                     NOAA_etal_2017[N_match2050, 22])
-
-noaa2017_2060_17 = c(NOAA_etal_2017[N_match2060, 2], NOAA_etal_2017[N_match2060, 5], NOAA_etal_2017[N_match2060, 8],
-                     NOAA_etal_2017[N_match2060, 11], NOAA_etal_2017[N_match2060, 14], NOAA_etal_2017[N_match2060, 17],
-                     NOAA_etal_2017[N_match2060, 20])
-noaa2017_2060_50 = c(NOAA_etal_2017[N_match2060, 3], NOAA_etal_2017[N_match2060, 6], NOAA_etal_2017[N_match2060, 9],
-                     NOAA_etal_2017[N_match2060, 12], NOAA_etal_2017[N_match2060, 15], NOAA_etal_2017[N_match2060, 18],
-                     NOAA_etal_2017[N_match2060, 21])
-noaa2017_2060_83 = c(NOAA_etal_2017[N_match2060, 4], NOAA_etal_2017[N_match2060, 7], NOAA_etal_2017[N_match2060, 10],
-                     NOAA_etal_2017[N_match2060, 13], NOAA_etal_2017[N_match2060, 16], NOAA_etal_2017[N_match2060, 19],
-                     NOAA_etal_2017[N_match2060, 22])
-
-noaa2017_2100_17 = c(NOAA_etal_2017[N_match2100, 2], NOAA_etal_2017[N_match2100, 5], NOAA_etal_2017[N_match2100, 8],
-                     NOAA_etal_2017[N_match2100, 11], NOAA_etal_2017[N_match2100, 14], NOAA_etal_2017[N_match2100, 17],
-                     NOAA_etal_2017[N_match2100, 20])
-noaa2017_2100_50 = c(NOAA_etal_2017[N_match2100, 3], NOAA_etal_2017[N_match2100, 6], NOAA_etal_2017[N_match2100, 9],
-                     NOAA_etal_2017[N_match2100, 12], NOAA_etal_2017[N_match2100, 15], NOAA_etal_2017[N_match2100, 18],
-                     NOAA_etal_2017[N_match2100, 21])
-noaa2017_2100_83 = c(NOAA_etal_2017[N_match2100, 4], NOAA_etal_2017[N_match2100, 7], NOAA_etal_2017[N_match2100, 10],
-                     NOAA_etal_2017[N_match2100, 13], NOAA_etal_2017[N_match2100, 16], NOAA_etal_2017[N_match2100, 19],
-                     NOAA_etal_2017[N_match2100, 22])
+# Medians are in columns 3,6,9,12,15,18, and 21; hence sequence from 3 to 21 by 3.
+noaa2017 = data.frame(t_2030 = c(NOAA_etal_2017_ref2000[match_NOAA17[1], seq(3,21,3)]), t_2050 = c(NOAA_etal_2017_ref2000[match_NOAA17[2], seq(3,21,3)]),
+                        t_2060 = c(NOAA_etal_2017_ref2000[match_NOAA17[3], seq(3,21,3)]), t_2100 = c(NOAA_etal_2017_ref2000[match_NOAA17[4], seq(3,21,3)]), row.names = NULL)
 
 # Storm Surge -------------------------------------------------------------
 USACE_EWL = read.csv("USACE_ExtremeWaterLevels_SewellsPoint.csv", skip=2, header=TRUE) 
