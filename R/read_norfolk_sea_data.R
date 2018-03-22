@@ -247,10 +247,8 @@ NOAA_methodGEV = read.csv("NOAA_method_stormsurge_sewellspoint.csv")
 USACE_EWL = read.csv("USACE_ExtremeWaterLevels_SewellsPoint.csv", skip=2, header=TRUE) 
 USACE_rp = as.numeric(as.character(USACE_EWL$Datum_EWL[8:14]))
 
-tebaldi12 = read.csv("SewellsPoint_allrpsGPD_Tebaldi_etal_2012.csv", header=TRUE)
-tebaldi12_rl_50 = convert_mhw_to_msl(convert_m_to_ft(tebaldi12$rl))
-tebaldi12_rl_025 = convert_mhw_to_msl(convert_m_to_ft(tebaldi12$lower))
-tebaldi12_rl_975 = convert_mhw_to_msl(convert_m_to_ft(tebaldi12$upper))
+tebaldi12 = read.csv("SewellsPoint_allrpsGPD_Tebaldi_etal_2012.csv", col.names=c("rp", "rl_50", "rp.1", "rl_025", "rl_975"))
+tebaldi12[,c(2,4,5)] = convert_mhw_to_msl(convert_m_to_ft(tebaldi12[,c(2,4,5)]))
 
 annual_exceed = NOAA_methodGEV$aep
 return_level = convert_m_to_ft(NOAA_methodGEV$return_level)
@@ -472,24 +470,24 @@ NOfd_r85_2100_SSN = NO_fd_rcp85_2100ft + nonstat_brick2100
 
 #add Tebadli et al 100-yr return period to kopp
 # RCP26
-k14_r26_2030_Teb = kopp14_rcp45_2030ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
-k14_r26_2050_Teb = kopp14_rcp45_2050ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
-k14_r26_2060_Teb = kopp14_rcp45_2060ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
-k14_r26_2100_Teb = kopp14_rcp45_2100ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
+k14_r26_2030_Teb = kopp14_rcp45_2030ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r26_2050_Teb = kopp14_rcp45_2050ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r26_2060_Teb = kopp14_rcp45_2060ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r26_2100_Teb = kopp14_rcp45_2100ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
 # RCP45
-k14_r45_2030_Teb = kopp14_rcp45_2030ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
-k14_r45_2050_Teb = kopp14_rcp45_2050ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)] 
-k14_r45_2060_Teb = kopp14_rcp45_2060ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
-k14_r45_2100_Teb = kopp14_rcp45_2100ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
+k14_r45_2030_Teb = kopp14_rcp45_2030ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r45_2050_Teb = kopp14_rcp45_2050ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)] 
+k14_r45_2060_Teb = kopp14_rcp45_2060ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r45_2100_Teb = kopp14_rcp45_2100ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
 # RCP60
-k14_r60_2030_Teb = kopp14_rcp60_2030ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
-k14_r60_2050_Teb = kopp14_rcp60_2050ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)] 
-k14_r60_2060_Teb = kopp14_rcp60_2060ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
-k14_r60_2100_Teb = kopp14_rcp60_2100ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)] 
+k14_r60_2030_Teb = kopp14_rcp60_2030ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r60_2050_Teb = kopp14_rcp60_2050ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)] 
+k14_r60_2060_Teb = kopp14_rcp60_2060ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r60_2100_Teb = kopp14_rcp60_2100ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)] 
 # RCP85
-k14_r85_2030_Teb = kopp14_rcp85_2030ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
-k14_r85_2050_Teb = kopp14_rcp85_2050ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)] 
-k14_r85_2060_Teb = kopp14_rcp85_2060ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
-k14_r85_2100_Teb = kopp14_rcp85_2100ft + tebaldi12_rl_50[which(tebaldi12$rp == 100)]
+k14_r85_2030_Teb = kopp14_rcp85_2030ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r85_2050_Teb = kopp14_rcp85_2050ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)] 
+k14_r85_2060_Teb = kopp14_rcp85_2060ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r85_2100_Teb = kopp14_rcp85_2100ft + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
 
 

@@ -161,7 +161,7 @@ SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
 polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         x = c(1/SF_Srikrishnan_stationary25$sf, rev(1/SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
-polygon(y = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
+polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
 polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
@@ -175,7 +175,7 @@ SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
 lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
-lines(tebaldi12$rp, tebaldi12_rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
+lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
@@ -248,7 +248,7 @@ polygon(x = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstati
 polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
-polygon(x = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
+polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
 polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
@@ -258,7 +258,7 @@ points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
 lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
-lines(tebaldi12_rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
+lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
 points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
@@ -389,7 +389,7 @@ SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
 polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         x = c(1/SF_Srikrishnan_stationary25$sf, rev(1/SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
-polygon(y = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
+polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
 polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
@@ -403,7 +403,7 @@ SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
 lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
-lines(tebaldi12$rp, tebaldi12_rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
+lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
@@ -476,7 +476,7 @@ polygon(x = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstati
 polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
-polygon(x = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
+polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
 polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
@@ -486,7 +486,7 @@ points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
 lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
-lines(tebaldi12_rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
+lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
 points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
@@ -614,7 +614,7 @@ SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
 polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         x = c(1/SF_Srikrishnan_stationary25$sf, rev(1/SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
-polygon(y = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
+polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
 polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
@@ -628,7 +628,7 @@ SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
 lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
-lines(tebaldi12$rp, tebaldi12_rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
+lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
@@ -701,7 +701,7 @@ polygon(x = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstati
 polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
-polygon(x = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
+polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
 polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
@@ -711,7 +711,7 @@ points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
 lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
-lines(tebaldi12_rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
+lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
 points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
@@ -839,7 +839,7 @@ SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
 polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         x = c(1/SF_Srikrishnan_stationary25$sf, rev(1/SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
-polygon(y = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
+polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
 polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
@@ -853,7 +853,7 @@ SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
 lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
-lines(tebaldi12$rp, tebaldi12_rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
+lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
@@ -926,7 +926,7 @@ polygon(x = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstati
 polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
-polygon(x = c(tebaldi12_rl_025, rev(tebaldi12_rl_975)), 
+polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
 polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
@@ -936,7 +936,7 @@ points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
 lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
-lines(tebaldi12_rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
+lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
 points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
