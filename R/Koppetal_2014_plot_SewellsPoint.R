@@ -142,7 +142,7 @@ points(carswg2016_2030, rep(5.5, 5), col=RdGy[7:11], pch=19)
 points(noaa2017_2030_50, rep(5, length(noaa2017_2030_50)), col=noaa_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
-plot(1/annual_exceed, return_level, log = "x", type = "n", xlim = c(1, 90),
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2.85, 12), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
@@ -166,7 +166,7 @@ polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)),
 
 polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
         x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(NOAA_methodGEV$return_obs, obs, pch = 19)
+points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
 SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2030, make.plot=FALSE)
 lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, col=noaa_cols[2], lwd=2, lty=3)
@@ -235,7 +235,7 @@ SF_NO_fd_rcp26_2030ft = plot.sf(NO_fd_rcp26_2030ft, make.plot=FALSE)
 lines(SF_NO_fd_rcp26_2030ft$sf.num, SF_NO_fd_rcp26_2030ft$sf, col=PRGn[5], lwd=2)
 
 #   -----------------------------------------------------------------------
-plot(return_level, annual_exceed, log = "y", type = "n",bty="l",
+plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
      yaxt = 'n', cex=1, xlim = c(2.85, 12), ylim=c(0.011,1),
      ylab = "Probability of exceedance", xlab = "Storm surge (ft MSL)")
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
@@ -253,7 +253,7 @@ polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)),
 
 polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
         y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
+points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
@@ -264,7 +264,7 @@ points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
 # ----------------------------------------------------------------------
 # PLACE HOLDER
 par(mgp=c(2,0.5,0), mar=c(3.5,3.5,1,1))
-plot(return_level, annual_exceed, log = "y", type = "n", ylim = c(0.011, 1),
+plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n", ylim = c(0.011, 1),
      xlim = c(2.85, 12), 
      yaxt = 'n', cex=1, bty="l",
      ylab = "Probability of exceedance", 
@@ -370,7 +370,7 @@ points(carswg2016_2050, rep(2.75, 5), col=RdGy[7:11], pch=19)
 points(noaa2017_2050_50, rep(2.5, length(noaa2017_2050_50)), col=noaa_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
-plot(1/annual_exceed, return_level, log = "x", type = "n", xlim = c(1, 90),
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2.85, 12), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
@@ -394,7 +394,7 @@ polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)),
 
 polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
         x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(NOAA_methodGEV$return_obs, obs, pch = 19)
+points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
 SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2050, make.plot=FALSE)
 lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, col=noaa_cols[2], lwd=2, lty=3)
@@ -463,7 +463,7 @@ SF_NO_fd_rcp26_2050ft = plot.sf(NO_fd_rcp26_2050ft, make.plot=FALSE)
 lines(SF_NO_fd_rcp26_2050ft$sf.num, SF_NO_fd_rcp26_2050ft$sf, col=PRGn[5], lwd=2)
 
 #   -----------------------------------------------------------------------
-plot(return_level, annual_exceed, log = "y", type = "n",bty="l",
+plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
      yaxt = 'n', cex=1, xlim = c(2.85, 12), ylim=c(0.011,1),
      ylab = "Probability of exceedance", xlab = "Storm surge (ft MSL)")
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
@@ -481,7 +481,7 @@ polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)),
 
 polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
         y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
+points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
@@ -492,7 +492,7 @@ points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
 # ----------------------------------------------------------------------
 # PLACE HOLDER
 par(mgp=c(2,0.5,0), mar=c(3.5,3.5,1,1))
-plot(return_level, annual_exceed, log = "y", type = "n",bty="l",
+plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
      yaxt = 'n', cex=1, xlim = c(2.85, 15), ylim=c(0.011,1),
      ylab = "Probability of exceedance", xlab = "Projected sea+surge level (ft)")
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
@@ -595,7 +595,7 @@ points(carswg2016_2060, rep(2.25, 5), col=RdGy[7:11], pch=19)
 points(noaa2017_2060_50, rep(2, length(noaa2017_2060_50)), col=noaa_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
-plot(1/annual_exceed, return_level, log = "x", type = "n", xlim = c(1, 90),
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2.25, 12), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
@@ -619,7 +619,7 @@ polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)),
 
 polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
         x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(NOAA_methodGEV$return_obs, obs, pch = 19)
+points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
 SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2060, make.plot=FALSE)
 lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, col=noaa_cols[2], lwd=2, lty=3)
@@ -688,7 +688,7 @@ SF_NO_fd_rcp26_2060ft = plot.sf(NO_fd_rcp26_2060ft, make.plot=FALSE)
 lines(SF_NO_fd_rcp26_2060ft$sf.num, SF_NO_fd_rcp26_2060ft$sf, col=PRGn[5], lwd=2)
 
 #   -----------------------------------------------------------------------
-plot(return_level, annual_exceed, log = "y", type = "n",bty="l",
+plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
      yaxt = 'n', cex=1, xlim = c(2.25, 12), ylim=c(0.011,1),
      ylab = "Probability of exceedance", xlab = "Storm surge (ft MSL)")
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
@@ -706,7 +706,7 @@ polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)),
 
 polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
         y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
+points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
@@ -717,7 +717,7 @@ points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
 # ----------------------------------------------------------------------
 # PLACE HOLDER
 par(mgp=c(2,0.5,0), mar=c(3.5,3.5,1,1))
-plot(return_level, annual_exceed, log = "y", type = "n",bty="l",
+plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
      yaxt = 'n', cex=1, xlim = c(2.25, 20), ylim=c(0.011,1),
      ylab = "Probability of exceedance", xlab = "Projected sea+surge level (ft)")
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
@@ -820,7 +820,7 @@ points(carswg2016_2100, rep(1.15, 5), col=RdGy[7:11], pch=19)
 points(noaa2017_2100_50, rep(1, length(noaa2017_2100_50)), col=noaa_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
-plot(1/annual_exceed, return_level, log = "x", type = "n", xlim = c(1, 90),
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2, 13), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
@@ -844,7 +844,7 @@ polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)),
 
 polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
         x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(NOAA_methodGEV$return_obs, obs, pch = 19)
+points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
 SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2100, make.plot=FALSE)
 lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, col=noaa_cols[2], lwd=2, lty=3)
@@ -913,7 +913,7 @@ SF_NO_fd_rcp26_2100ft = plot.sf(NO_fd_rcp26_2100ft, make.plot=FALSE)
 lines(SF_NO_fd_rcp26_2100ft$sf.num, SF_NO_fd_rcp26_2100ft$sf, col=PRGn[5], lwd=2)
 
 #   -----------------------------------------------------------------------
-plot(return_level, annual_exceed, log = "y", type = "n",bty="l",
+plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
      yaxt = 'n', cex=1, xlim = c(2, 13), ylim=c(0.011,1),
      ylab = "Probability of exceedance", xlab = "Storm surge (ft MSL)")
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
@@ -931,7 +931,7 @@ polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)),
 
 polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
         y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(obs, 1/NOAA_methodGEV$return_obs, pch = 19)
+points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
 lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
@@ -942,7 +942,7 @@ points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
 # ----------------------------------------------------------------------
 # PLACE HOLDER
 par(mgp=c(2,0.5,0), mar=c(3.5,3.5,1,1))
-plot(return_level, annual_exceed, log = "y", type = "n",bty="l",
+plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
      yaxt = 'n', cex=1, xlim = c(2, 25), ylim=c(0.011,1),
      ylab = "Probability of exceedance", xlab = "Projected sea+surge level (ft)")
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)

@@ -243,20 +243,14 @@ noaa2017_2100_83 = c(NOAA_etal_2017[N_match2100, 4], NOAA_etal_2017[N_match2100,
                      NOAA_etal_2017[N_match2100, 22])
 
 # Storm Surge -------------------------------------------------------------
-NOAA_methodGEV = read.csv("NOAA_method_stormsurge_sewellspoint.csv")
 USACE_EWL = read.csv("USACE_ExtremeWaterLevels_SewellsPoint.csv", skip=2, header=TRUE) 
 USACE_rp = as.numeric(as.character(USACE_EWL$Datum_EWL[8:14]))
 
 tebaldi12 = read.csv("SewellsPoint_allrpsGPD_Tebaldi_etal_2012.csv", col.names=c("rp", "rl_50", "rp.1", "rl_025", "rl_975"))
 tebaldi12[,c(2,4,5)] = convert_mhw_to_msl(convert_m_to_ft(tebaldi12[,c(2,4,5)]))
 
-annual_exceed = NOAA_methodGEV$aep
-return_level = convert_m_to_ft(NOAA_methodGEV$return_level)
-min_95 = convert_m_to_ft(NOAA_methodGEV$min_level)
-max_95 = convert_m_to_ft(NOAA_methodGEV$max_level)
-avg_level = convert_m_to_ft(NOAA_methodGEV$avg_level)
-return_period = NOAA_methodGEV$return_period
-obs = convert_m_to_ft(NOAA_methodGEV$obs)
+NOAA_methodGEV = read.csv("NOAA_method_stormsurge_sewellspoint.csv")
+NOAA_methodGEV[,c(3,4,5,6,9)] = convert_m_to_ft(NOAA_methodGEV[,c(3,4,5,6,9)])
 
 # USACE sea-level calculator
 NOAA_rp = c(1,2,5,10,20,50,100)
