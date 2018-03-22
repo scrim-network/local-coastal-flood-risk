@@ -114,12 +114,12 @@ legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et
        pt.bg=c(NA,trans_noaa_cols[7],NA,trans_BrBG[2]), pt.cex = c(NA,2,NA,2))
 
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
-plot(density(kopp14_rcp85_2030ft), xlab="Projected sea level in 2030 (ft)", ylab="Probability density", yaxt="n", 
+plot(density(kopp14_rcp85$t_2030), xlab="Projected sea level in 2030 (ft)", ylab="Probability density", yaxt="n", 
      main="",col=RdGy[1], lwd=2, xlim=c(-0.2,2), ylim = c(0, 6.75), bty="l")
 title(main="a.", adj=0)
-lines(density(kopp14_rcp60_2030ft), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45_2030ft), col=RdGy[3], lwd=2)
-lines(density(kopp14_rcp26_2030ft), col=RdGy[4], lwd=2)
+lines(density(kopp14_rcp60$t_2030), col=RdGy[2], lwd=2)
+lines(density(kopp14_rcp45$t_2030), col=RdGy[3], lwd=2)
+lines(density(kopp14_rcp26$t_2030), col=RdGy[4], lwd=2)
 
 lines(density(brickfd_rcp85_2030ft), col=BrBG[11], lwd=2)
 lines(density(brickfd_rcp60_2030ft), col=BrBG[10], lwd=2)
@@ -204,16 +204,16 @@ lines(density(NOfd_r26_2030_SS), col=PRGn[5], lwd=2)
 
 # ----------------------------------------------------------------------
 par(mgp=c(2,.5,0), mar=c(3.5,4,1,1))
-plot.sf(kopp14_rcp85_2030ft, ylab = "Probability of exceedance", xlab = "Projected sea level in 2030 (ft)",
+plot.sf(kopp14_rcp85$t_2030, ylab = "Probability of exceedance", xlab = "Projected sea level in 2030 (ft)",
         yaxt = "n", yaxs = 'i', typ="l", lwd=2, lty=1, bty="l",
         ylim = c(10^-4, 10^0+0.25), xlim=c(0,1.8), col=RdGy[1])
 title(main="d.", adj=0)
 
-SF_kopp14_rcp60_2030ft = plot.sf(kopp14_rcp60_2030ft, make.plot=FALSE)
+SF_kopp14_rcp60_2030ft = plot.sf(kopp14_rcp60$t_2030, make.plot=FALSE)
 lines(SF_kopp14_rcp60_2030ft$sf.num, SF_kopp14_rcp60_2030ft$sf, col=RdGy[2], lwd=2)
-SF_kopp14_rcp45_2030ft = plot.sf(kopp14_rcp45_2030ft, make.plot=FALSE)
+SF_kopp14_rcp45_2030ft = plot.sf(kopp14_rcp45$t_2030, make.plot=FALSE)
 lines(SF_kopp14_rcp45_2030ft$sf.num, SF_kopp14_rcp45_2030ft$sf, col=RdGy[3], lwd=2)
-SF_kopp14_rcp26_2030ft = plot.sf(kopp14_rcp26_2030ft, make.plot=FALSE)
+SF_kopp14_rcp26_2030ft = plot.sf(kopp14_rcp26$t_2030, make.plot=FALSE)
 lines(SF_kopp14_rcp26_2030ft$sf.num, SF_kopp14_rcp26_2030ft$sf, col=RdGy[4], lwd=2)
 
 SF_brickfd_rcp85_2030ft = plot.sf(brickfd_rcp85_2030ft, make.plot=FALSE)
@@ -342,12 +342,12 @@ legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et
 
 # Plot LSLR in 2050
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
-plot(density(kopp14_rcp85_2050ft), xlab="Projected sea level in 2050 (ft)", ylab="Probability density", yaxt="n", 
+plot(density(kopp14_rcp85$t_2050), xlab="Projected sea level in 2050 (ft)", ylab="Probability density", yaxt="n", 
      main="", col=RdGy[1], lwd=2, xlim=c(-0.2,4), ylim = c(0, 3.5), bty="l")
 title(main="a.", adj=0)
-lines(density(kopp14_rcp60_2050ft), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45_2050ft), col=RdGy[3], lwd=2)
-lines(density(kopp14_rcp26_2050ft), col=RdGy[4], lwd=2)
+lines(density(kopp14_rcp60$t_2050), col=RdGy[2], lwd=2)
+lines(density(kopp14_rcp45$t_2050), col=RdGy[3], lwd=2)
+lines(density(kopp14_rcp26$t_2050), col=RdGy[4], lwd=2)
 
 lines(density(brickfd_rcp85_2050ft), col=BrBG[11], lwd=2)
 lines(density(brickfd_rcp60_2050ft), col=BrBG[10], lwd=2)
@@ -432,16 +432,16 @@ lines(density(NOfd_r26_2050_SS), col=PRGn[5], lwd=2)
 
 # SF ----------------------------------------------------------------------
 par(mgp=c(2,.5,0), mar=c(3.5,4,1,1))
-plot.sf(kopp14_rcp85_2050ft, ylab = "Probability of exceedance", xlab = "Projected sea level in 2050 (ft)",
+plot.sf(kopp14_rcp85$t_2050, ylab = "Probability of exceedance", xlab = "Projected sea level in 2050 (ft)",
         yaxt = "n", yaxs = 'i', typ="l", lwd=2, lty=1, bty="l",
         ylim = c(10^-4, 10^0+0.25), col=RdGy[1])
 title(main="d.", adj=0)
 
-SF_kopp14_rcp60_2050ft = plot.sf(kopp14_rcp60_2050ft, make.plot=FALSE)
+SF_kopp14_rcp60_2050ft = plot.sf(kopp14_rcp60$t_2050, make.plot=FALSE)
 lines(SF_kopp14_rcp60_2050ft$sf.num, SF_kopp14_rcp60_2050ft$sf, col=RdGy[2], lwd=2)
-SF_kopp14_rcp45_2050ft = plot.sf(kopp14_rcp45_2050ft, make.plot=FALSE)
+SF_kopp14_rcp45_2050ft = plot.sf(kopp14_rcp45$t_2050, make.plot=FALSE)
 lines(SF_kopp14_rcp45_2050ft$sf.num, SF_kopp14_rcp45_2050ft$sf, col=RdGy[3], lwd=2)
-SF_kopp14_rcp26_2050ft = plot.sf(kopp14_rcp26_2050ft, make.plot=FALSE)
+SF_kopp14_rcp26_2050ft = plot.sf(kopp14_rcp26$t_2050, make.plot=FALSE)
 lines(SF_kopp14_rcp26_2050ft$sf.num, SF_kopp14_rcp26_2050ft$sf, col=RdGy[4], lwd=2)
 
 SF_brickfd_rcp85_2050ft = plot.sf(brickfd_rcp85_2050ft, make.plot=FALSE)
@@ -567,12 +567,12 @@ legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et
 
 # Plot LSLR in 2060
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
-plot(density(kopp14_rcp85_2060ft), xlab="Projected sea level in 2060 (ft)", ylab="Probability density", yaxt="n",
+plot(density(kopp14_rcp85$t_2060), xlab="Projected sea level in 2060 (ft)", ylab="Probability density", yaxt="n",
      main="", col=RdGy[1], lwd=2, xlim=c(-0.2,6), ylim = c(0, 3), bty="l")
 title(main="a.", adj=0)
-lines(density(kopp14_rcp60_2060ft), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45_2060ft), col=RdGy[3], lwd=2)
-lines(density(kopp14_rcp26_2060ft), col=RdGy[4], lwd=2)
+lines(density(kopp14_rcp60$t_2060), col=RdGy[2], lwd=2)
+lines(density(kopp14_rcp45$t_2060), col=RdGy[3], lwd=2)
+lines(density(kopp14_rcp26$t_2060), col=RdGy[4], lwd=2)
 
 lines(density(brickfd_rcp85_2060ft), col=BrBG[11], lwd=2)
 lines(density(brickfd_rcp60_2060ft), col=BrBG[10], lwd=2)
@@ -657,16 +657,16 @@ lines(density(NOfd_r26_2060_SS), col=PRGn[5], lwd=2)
 
 # SF ----------------------------------------------------------------------
 par(mgp=c(2,.5,0), mar=c(3.5,4,1,1))
-plot.sf(kopp14_rcp85_2060ft, ylab = "Probability of exceedance", xlab = "Projected sea level in 2060 (ft)",
+plot.sf(kopp14_rcp85$t_2060, ylab = "Probability of exceedance", xlab = "Projected sea level in 2060 (ft)",
         yaxt = "n", yaxs = 'i', typ="l", lwd=2, lty=1, bty="l",
         ylim = c(10^-4, 10^0+0.25), col=RdGy[1])
 title(main="d.", adj=0)
 
-SF_kopp14_rcp60_2060ft = plot.sf(kopp14_rcp60_2060ft, make.plot=FALSE)
+SF_kopp14_rcp60_2060ft = plot.sf(kopp14_rcp60$t_2060, make.plot=FALSE)
 lines(SF_kopp14_rcp60_2060ft$sf.num, SF_kopp14_rcp60_2060ft$sf, col=RdGy[2], lwd=2)
-SF_kopp14_rcp45_2060ft = plot.sf(kopp14_rcp45_2060ft, make.plot=FALSE)
+SF_kopp14_rcp45_2060ft = plot.sf(kopp14_rcp45$t_2060, make.plot=FALSE)
 lines(SF_kopp14_rcp45_2060ft$sf.num, SF_kopp14_rcp45_2060ft$sf, col=RdGy[3], lwd=2)
-SF_kopp14_rcp26_2060ft = plot.sf(kopp14_rcp26_2060ft, make.plot=FALSE)
+SF_kopp14_rcp26_2060ft = plot.sf(kopp14_rcp26$t_2060, make.plot=FALSE)
 lines(SF_kopp14_rcp26_2060ft$sf.num, SF_kopp14_rcp26_2060ft$sf, col=RdGy[4], lwd=2)
 
 SF_brickfd_rcp85_2060ft = plot.sf(brickfd_rcp85_2060ft, make.plot=FALSE)
@@ -792,12 +792,12 @@ legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et
 
 # Plot LSLR in 2100
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
-plot(density(kopp14_rcp85_2100ft), xlab="Projected sea level in 2100 (ft)", ylab="Probability density", yaxt="n", 
+plot(density(kopp14_rcp85$t_2100), xlab="Projected sea level in 2100 (ft)", ylab="Probability density", yaxt="n", 
      main="", col=RdGy[1], lwd=2, xlim=c(-0.5,15), ylim = c(0, 1.5), bty="l")
 title(main="a.", adj=0)
-lines(density(kopp14_rcp60_2100ft), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45_2100ft), col=RdGy[3], lwd=2)
-lines(density(kopp14_rcp26_2100ft), col=RdGy[4], lwd=2)
+lines(density(kopp14_rcp60$t_2100), col=RdGy[2], lwd=2)
+lines(density(kopp14_rcp45$t_2100), col=RdGy[3], lwd=2)
+lines(density(kopp14_rcp26$t_2100), col=RdGy[4], lwd=2)
 
 lines(density(brickfd_rcp85_2100ft), col=BrBG[11], lwd=2)
 lines(density(brickfd_rcp60_2100ft), col=BrBG[10], lwd=2)
@@ -882,16 +882,16 @@ lines(density(NOfd_r26_2100_SS), col=PRGn[5], lwd=2)
 
 # SF ----------------------------------------------------------------------
 par(mgp=c(2,0.5,0), mar=c(3.5,4,1,1))
-plot.sf(kopp14_rcp85_2100ft, ylab = "Probability of exceedance", xlab = "Projected sea level in 2100 (ft)",
+plot.sf(kopp14_rcp85$t_2100, ylab = "Probability of exceedance", xlab = "Projected sea level in 2100 (ft)",
         yaxt = "n", yaxs = 'i', typ="l", lwd=2, lty=1, bty="l",
         ylim = c(10^-4, 10^0+0.25), col=RdGy[1])
 title(main="d.", adj=0)
 
-SF_kopp14_rcp60_2100ft = plot.sf(kopp14_rcp60_2100ft, make.plot=FALSE)
+SF_kopp14_rcp60_2100ft = plot.sf(kopp14_rcp60$t_2100, make.plot=FALSE)
 lines(SF_kopp14_rcp60_2100ft$sf.num, SF_kopp14_rcp60_2100ft$sf, col=RdGy[2], lwd=2)
-SF_kopp14_rcp45_2100ft = plot.sf(kopp14_rcp45_2100ft, make.plot=FALSE)
+SF_kopp14_rcp45_2100ft = plot.sf(kopp14_rcp45$t_2100, make.plot=FALSE)
 lines(SF_kopp14_rcp45_2100ft$sf.num, SF_kopp14_rcp45_2100ft$sf, col=RdGy[3], lwd=2)
-SF_kopp14_rcp26_2100ft = plot.sf(kopp14_rcp26_2100ft, make.plot=FALSE)
+SF_kopp14_rcp26_2100ft = plot.sf(kopp14_rcp26$t_2100, make.plot=FALSE)
 lines(SF_kopp14_rcp26_2100ft$sf.num, SF_kopp14_rcp26_2100ft$sf, col=RdGy[4], lwd=2)
 
 SF_brickfd_rcp85_2100ft = plot.sf(brickfd_rcp85_2100ft, make.plot=FALSE)
@@ -988,10 +988,10 @@ dev.off()
 
 ################################ 2100 #####################################
 # 2030
-denskopp14_rcp85_2030 <- density(kopp14_rcp85_2030ft)
-denskopp14_rcp60_2030 <- density(kopp14_rcp60_2030ft)
-denskopp14_rcp45_2030 <- density(kopp14_rcp45_2030ft)
-denskopp14_rcp26_2030 <- density(kopp14_rcp26_2030ft)
+denskopp14_rcp85_2030 <- density(kopp14_rcp85$t_2030)
+denskopp14_rcp60_2030 <- density(kopp14_rcp60$t_2030)
+denskopp14_rcp45_2030 <- density(kopp14_rcp45$t_2030)
+denskopp14_rcp26_2030 <- density(kopp14_rcp26$t_2030)
 densbrickfd_rcp85_2030 <- density(brickfd_rcp85_2030ft)
 densbrickfd_rcp60_2030 <- density(brickfd_rcp60_2030ft)
 densbrickfd_rcp45_2030 <- density(brickfd_rcp45_2030ft)
@@ -1001,10 +1001,10 @@ densNO_fd_rcp60_2030 <- density(NO_fd_rcp60_2030ft)
 densNO_fd_rcp45_2030 <- density(NO_fd_rcp45_2030ft)
 densNO_fd_rcp26_2030 <- density(NO_fd_rcp26_2030ft)
 # 2050
-denskopp14_rcp85_2050 <- density(kopp14_rcp85_2050ft)
-denskopp14_rcp60_2050 <- density(kopp14_rcp60_2050ft)
-denskopp14_rcp45_2050 <- density(kopp14_rcp45_2050ft)
-denskopp14_rcp26_2050 <- density(kopp14_rcp26_2050ft)
+denskopp14_rcp85_2050 <- density(kopp14_rcp85$t_2050)
+denskopp14_rcp60_2050 <- density(kopp14_rcp60$t_2050)
+denskopp14_rcp45_2050 <- density(kopp14_rcp45$t_2050)
+denskopp14_rcp26_2050 <- density(kopp14_rcp26$t_2050)
 densbrickfd_rcp85_2050 <- density(brickfd_rcp85_2050ft)
 densbrickfd_rcp60_2050 <- density(brickfd_rcp60_2050ft)
 densbrickfd_rcp45_2050 <- density(brickfd_rcp45_2050ft)
@@ -1014,10 +1014,10 @@ densNO_fd_rcp60_2050 <- density(NO_fd_rcp60_2050ft)
 densNO_fd_rcp45_2050 <- density(NO_fd_rcp45_2050ft)
 densNO_fd_rcp26_2050 <- density(NO_fd_rcp26_2050ft)
 # 2060
-denskopp14_rcp85_2060 <- density(kopp14_rcp85_2060ft)
-denskopp14_rcp60_2060 <- density(kopp14_rcp60_2060ft)
-denskopp14_rcp45_2060 <- density(kopp14_rcp45_2060ft)
-denskopp14_rcp26_2060 <- density(kopp14_rcp26_2060ft)
+denskopp14_rcp85_2060 <- density(kopp14_rcp85$t_2060)
+denskopp14_rcp60_2060 <- density(kopp14_rcp60$t_2060)
+denskopp14_rcp45_2060 <- density(kopp14_rcp45$t_2060)
+denskopp14_rcp26_2060 <- density(kopp14_rcp26$t_2060)
 densbrickfd_rcp85_2060 <- density(brickfd_rcp85_2060ft)
 densbrickfd_rcp60_2060 <- density(brickfd_rcp60_2060ft)
 densbrickfd_rcp45_2060 <- density(brickfd_rcp45_2060ft)
@@ -1027,10 +1027,10 @@ densNO_fd_rcp60_2060 <- density(NO_fd_rcp60_2060ft)
 densNO_fd_rcp45_2060 <- density(NO_fd_rcp45_2060ft)
 densNO_fd_rcp26_2060 <- density(NO_fd_rcp26_2060ft)
 # 2100
-denskopp14_rcp85_2100 <- density(kopp14_rcp85_2100ft)
-denskopp14_rcp60_2100 <- density(kopp14_rcp60_2100ft)
-denskopp14_rcp45_2100 <- density(kopp14_rcp45_2100ft)
-denskopp14_rcp26_2100 <- density(kopp14_rcp26_2100ft)
+denskopp14_rcp85_2100 <- density(kopp14_rcp85$t_2100)
+denskopp14_rcp60_2100 <- density(kopp14_rcp60$t_2100)
+denskopp14_rcp45_2100 <- density(kopp14_rcp45$t_2100)
+denskopp14_rcp26_2100 <- density(kopp14_rcp26$t_2100)
 densbrickfd_rcp85_2100 <- density(brickfd_rcp85_2100ft)
 densbrickfd_rcp60_2100 <- density(brickfd_rcp60_2100ft)
 densbrickfd_rcp45_2100 <- density(brickfd_rcp45_2100ft)
