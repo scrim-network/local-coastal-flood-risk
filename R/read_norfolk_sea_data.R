@@ -190,8 +190,7 @@ zervas_2013[,1:3] = convert_mhhw_to_msl(convert_m_to_ft(zervas_2013[,1:3]))
 
 # Load storm surge data from Vivek et al. in prep.
 stationary = readRDS("norfolk_MCMC-stationary.rds")
-non_stationary = readRDS("norfolk_MCMC-nonstationary.rds")
-processed_data = readRDS("processed_norfolk_data.rds")
+# processed_data = readRDS("processed_norfolk_data.rds")
 
 burnin = 1:50000
 burn_stationary = stationary[[1]]$samples[-burnin, ]
@@ -204,72 +203,15 @@ for(i in 1:3){
   post_stat_975[i] = quantile(burn_stationary[ ,i],0.975) 
 }
 
-burn_nonstat = non_stationary[[1]]$samples[-burnin, ]
-mean_nonstat = rep(NA,4)
-post_nonstat_25 = rep(NA,4)
-post_nonstat_975 = rep(NA,4)
-for(i in 1:4){
-  mean_nonstat[i] = mean(burn_nonstat[ ,i])
-  post_nonstat_25[i] = quantile(burn_nonstat[ ,i],0.025) 
-  post_nonstat_975[i] = quantile(burn_nonstat[ ,i],0.975) 
-}
-
-temp_2030_yr = match(2030, processed_data$temps$forcing$year)
-temp_2050_yr = match(2050, processed_data$temps$forcing$year)
-temp_2060_yr = match(2060, processed_data$temps$forcing$year)
-temp_2100_yr = match(2100, processed_data$temps$forcing$year)
-lambda_2030 = burn_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2030_yr])*burn_nonstat[,2]
-lambda_2030_25 = post_nonstat_25[1] + (processed_data$temps$forcing$temp[temp_2030_yr])*post_nonstat_25[2]
-lambda_2030_975 = post_nonstat_975[1] + (processed_data$temps$forcing$temp[temp_2030_yr])*post_nonstat_975[2]
-lambda_2050 = burn_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2050_yr])*burn_nonstat[,2]
-lambda_2050_25 = post_nonstat_25[1] + (processed_data$temps$forcing$temp[temp_2050_yr])*post_nonstat_25[2]
-lambda_2050_975 = post_nonstat_975[1] + (processed_data$temps$forcing$temp[temp_2050_yr])*post_nonstat_975[2]
-lambda_2060 = burn_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2060_yr])*burn_nonstat[,2]
-lambda_2060_25 = post_nonstat_25[1] + (processed_data$temps$forcing$temp[temp_2060_yr])*post_nonstat_25[2]
-lambda_2060_975 = post_nonstat_975[1] + (processed_data$temps$forcing$temp[temp_2060_yr])*post_nonstat_975[2]
-lambda_2100 = burn_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2100_yr])*burn_nonstat[,2]
-lambda_2100_25 = post_nonstat_25[1] + (processed_data$temps$forcing$temp[temp_2100_yr])*post_nonstat_25[2]
-lambda_2100_975 = post_nonstat_975[1] + (processed_data$temps$forcing$temp[temp_2100_yr])*post_nonstat_975[2]
-
 # Random generation data in millimeters
 stat_gev = revd(nrow(burn_stationary), loc = burn_stationary[,1], scale = burn_stationary[,2], 
                 shape = burn_stationary[,3], type='GEV')
 stat_gev25 = revd(1e5, loc = post_stat_25[1], scale = post_stat_25[2], shape = post_stat_25[3], type='GEV')
 stat_gev975 = revd(1e5, loc = post_stat_975[1], scale = post_stat_975[2], shape = post_stat_975[3], type='GEV')
 
-nonstat_gev2030 = revd(nrow(burn_nonstat), loc = lambda_2030, scale = burn_nonstat[,3], 
-                       shape = burn_nonstat[,4], type='GEV')
-nonstat_gev203025 = revd(1e5, loc = lambda_2030_25, scale = post_nonstat_25[3], shape = post_nonstat_25[4], type='GEV')
-nonstat_gev2030975 = revd(1e5, loc = lambda_2030_975, scale = post_nonstat_975[3], shape = post_nonstat_975[4], type='GEV')
-nonstat_gev2050 = revd(nrow(burn_nonstat), loc = lambda_2050, scale = burn_nonstat[,3], 
-                       shape = burn_nonstat[,4], type='GEV')
-nonstat_gev205025 = revd(1e5, loc = lambda_2050_25, scale = post_nonstat_25[3], shape = post_nonstat_25[4], type='GEV')
-nonstat_gev2050975 = revd(1e5, loc = lambda_2050_975, scale = post_nonstat_975[3], shape = post_nonstat_975[4], type='GEV')
-nonstat_gev2060 = revd(nrow(burn_nonstat), loc = lambda_2060, scale = burn_nonstat[,3], 
-                       shape = burn_nonstat[,4], type='GEV')
-nonstat_gev206025 = revd(1e5, loc = lambda_2060_25, scale = post_nonstat_25[3], shape = post_nonstat_25[4], type='GEV')
-nonstat_gev2060975 = revd(1e5, loc = lambda_2060_975, scale = post_nonstat_975[3], shape = post_nonstat_975[4], type='GEV')
-nonstat_gev2100 = revd(nrow(burn_nonstat), loc = lambda_2100, scale = burn_nonstat[,3], 
-                       shape = burn_nonstat[,4], type='GEV')
-nonstat_gev210025 = revd(1e5, loc = lambda_2100_25, scale = post_nonstat_25[3], shape = post_nonstat_25[4], type='GEV')
-nonstat_gev2100975 = revd(1e5, loc = lambda_2100_975, scale = post_nonstat_975[3], shape = post_nonstat_975[4], type='GEV')
-
 stat_gev = convert_mm_to_ft(stat_gev)
 stat_gev25 = convert_mm_to_ft(stat_gev25)
 stat_gev975 = convert_mm_to_ft(stat_gev975)
-
-nonstat_gev2030 = convert_mm_to_ft(nonstat_gev2030)
-nonstat_gev203025 = convert_mm_to_ft(nonstat_gev203025)
-nonstat_gev2030975 = convert_mm_to_ft(nonstat_gev2030975)
-nonstat_gev2050 = convert_mm_to_ft(nonstat_gev2050)
-nonstat_gev205025 = convert_mm_to_ft(nonstat_gev205025)
-nonstat_gev2050975 = convert_mm_to_ft(nonstat_gev2050975)
-nonstat_gev2060 = convert_mm_to_ft(nonstat_gev2060)
-nonstat_gev206025 = convert_mm_to_ft(nonstat_gev206025)
-nonstat_gev2060975 = convert_mm_to_ft(nonstat_gev2060975)
-nonstat_gev2100 = convert_mm_to_ft(nonstat_gev2100)
-nonstat_gev210025 = convert_mm_to_ft(nonstat_gev210025)
-nonstat_gev2100975 = convert_mm_to_ft(nonstat_gev2100975)
 
 #--------- Combined SLR + Storm surge
 # BRICK length stationary
@@ -282,45 +224,12 @@ subkopp_length = length(kopp14_rcp26$t_2030)
 subkopp_stat = burn_stationary[sample(nrow(burn_stationary), size=subkopp_length, replace=FALSE), ]
 stationary_kopp = convert_mm_to_ft(revd(nrow(subkopp_stat), loc = subkopp_stat[,1], scale = subkopp_stat[,2], 
                       shape = subkopp_stat[,3], type='GEV'))
-# BRICK length non stationary
-subbrick_nonstat = burn_nonstat[sample(nrow(burn_nonstat), size=subbrick_length, replace=FALSE), ]
-lambda_brick2030 = subbrick_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2030_yr])*subbrick_nonstat[,2]
-lambda_brick2050 = subbrick_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2050_yr])*subbrick_nonstat[,2]
-lambda_brick2060 = subbrick_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2060_yr])*subbrick_nonstat[,2]
-lambda_brick2100 = subbrick_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2100_yr])*subbrick_nonstat[,2]
-nonstat_brick2030 = convert_mm_to_ft(revd(nrow(subbrick_nonstat), loc = lambda_brick2030, scale = subbrick_nonstat[,3], 
-                                         shape = subbrick_nonstat[,4], type='GEV'))
-nonstat_brick2050 = convert_mm_to_ft(revd(nrow(subbrick_nonstat), loc = lambda_brick2050, scale = subbrick_nonstat[,3], 
-                                         shape = subbrick_nonstat[,4], type='GEV'))
-nonstat_brick2060 = convert_mm_to_ft(revd(nrow(subbrick_nonstat), loc = lambda_brick2060, scale = subbrick_nonstat[,3], 
-                                         shape = subbrick_nonstat[,4], type='GEV'))
-nonstat_brick2100 = convert_mm_to_ft(revd(nrow(subbrick_nonstat), loc = lambda_brick2100, scale = subbrick_nonstat[,3], 
-                                         shape = subbrick_nonstat[,4], type='GEV'))
-# KOPP length non stationary
-subkopp_nonstat = burn_nonstat[sample(nrow(burn_nonstat), size=subkopp_length, replace=FALSE), ]
-lambda_kopp2030 = subkopp_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2030_yr])*subkopp_nonstat[,2]
-lambda_kopp2050 = subkopp_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2050_yr])*subkopp_nonstat[,2]
-lambda_kopp2060 = subkopp_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2060_yr])*subkopp_nonstat[,2]
-lambda_kopp2100 = subkopp_nonstat[,1] + (processed_data$temps$forcing$temp[temp_2100_yr])*subkopp_nonstat[,2]
-nonstat_kopp2030 = convert_mm_to_ft(revd(nrow(subkopp_nonstat), loc = lambda_kopp2030, scale = subkopp_nonstat[,3], 
-                                       shape = subkopp_nonstat[,4], type='GEV'))
-nonstat_kopp2050 = convert_mm_to_ft(revd(nrow(subkopp_nonstat), loc = lambda_kopp2050, scale = subkopp_nonstat[,3], 
-                                         shape = subkopp_nonstat[,4], type='GEV'))
-nonstat_kopp2060 = convert_mm_to_ft(revd(nrow(subkopp_nonstat), loc = lambda_kopp2060, scale = subkopp_nonstat[,3], 
-                                         shape = subkopp_nonstat[,4], type='GEV'))
-nonstat_kopp2100 = convert_mm_to_ft(revd(nrow(subkopp_nonstat), loc = lambda_kopp2100, scale = subkopp_nonstat[,3], 
-                                         shape = subkopp_nonstat[,4], type='GEV'))
+
 # add stationary storm surge to kopp
 k14_r26_SS = kopp14_rcp26 + stationary_kopp
 k14_r45_SS = kopp14_rcp45 + stationary_kopp
 k14_r60_SS = kopp14_rcp60 + stationary_kopp
 k14_r85_SS = kopp14_rcp85 + stationary_kopp
-
-# add non-stationary storm surge to kopp
-k14_r85_2030_SSN = kopp14_rcp85$t_2030 + nonstat_kopp2030
-k14_r85_2050_SSN = kopp14_rcp85$t_2050 + nonstat_kopp2050 
-k14_r85_2060_SSN = kopp14_rcp85$t_2060 + nonstat_kopp2060
-k14_r85_2100_SSN = kopp14_rcp85$t_2100 + nonstat_kopp2100
 
 #add storm surge to brick fast dynamics
 # RCP26
@@ -343,10 +252,6 @@ bfd_r85_2030_SS = brickfd_rcp85_2030ft + stationary_brick
 bfd_r85_2050_SS = brickfd_rcp85_2050ft + stationary_brick
 bfd_r85_2060_SS = brickfd_rcp85_2060ft + stationary_brick
 bfd_r85_2100_SS = brickfd_rcp85_2100ft + stationary_brick
-bfd_r85_2030_SSN = brickfd_rcp85_2030ft + nonstat_brick2030
-bfd_r85_2050_SSN = brickfd_rcp85_2050ft + nonstat_brick2050
-bfd_r85_2060_SSN = brickfd_rcp85_2060ft + nonstat_brick2060
-bfd_r85_2100_SSN = brickfd_rcp85_2100ft + nonstat_brick2100
 
 #add storm surge to brick non fast dynamics
 # RCP26
@@ -369,10 +274,6 @@ NOfd_r85_2030_SS = NO_fd_rcp85_2030ft + stationary_brick
 NOfd_r85_2050_SS = NO_fd_rcp85_2050ft + stationary_brick
 NOfd_r85_2060_SS = NO_fd_rcp85_2060ft + stationary_brick
 NOfd_r85_2100_SS = NO_fd_rcp85_2100ft + stationary_brick
-NOfd_r85_2030_SSN = NO_fd_rcp85_2030ft + nonstat_brick2030
-NOfd_r85_2050_SSN = NO_fd_rcp85_2050ft + nonstat_brick2050
-NOfd_r85_2060_SSN = NO_fd_rcp85_2060ft + nonstat_brick2060
-NOfd_r85_2100_SSN = NO_fd_rcp85_2100ft + nonstat_brick2100
 
 # add Tebadli et al 100-yr return period to kopp
 k14_r26_Teb = kopp14_rcp26 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]

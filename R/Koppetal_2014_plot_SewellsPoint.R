@@ -98,7 +98,7 @@ plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
                            "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
                            "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. S 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep. S",
+                           "Srikrishnan et al.\nin prep. 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
                            "Observations"),
        lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
        col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
@@ -107,11 +107,10 @@ gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
 arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
 text(8.5,0.5, "Higher scenario")
 
-legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI",
-                              "Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
-       lty=c(3,NA,1,NA), lwd=c(2,NA,2,NA), pch=c(NA,22,NA,22), 
-       col=c(noaa_cols[2], "black", BrBG[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_noaa_cols[7],NA,trans_BrBG[2]), pt.cex = c(NA,2,NA,2))
+legend("bottomleft", legend=c("Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
+       lty=c(1,NA), lwd=c(2,NA), pch=c(NA,22), 
+       col=c(BrBG[2], "black"), bty='n', horiz=TRUE, 
+       pt.bg=c(NA,trans_BrBG[2]), pt.cex = c(NA,2))
 
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
 plot(density(kopp14_rcp85$t_2030), xlab="Projected sea level in 2030 (ft)", ylab="Probability density", yaxt="n", 
@@ -150,12 +149,6 @@ plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", x
 title(main="b.", adj=0)
 axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
-SF_Srikrishnan_nonstationary25 = plot.sf(nonstat_gev203025, make.plot=FALSE)
-SF_Srikrishnan_nonstationary975 = plot.sf(nonstat_gev2030975, make.plot=FALSE)
-polygon(y = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstationary975$sf.num)), 
-        x = c(1/SF_Srikrishnan_nonstationary25$sf, rev(1/SF_Srikrishnan_nonstationary975$sf)), col = trans_noaa_cols[7], 
-        border = trans_noaa_cols[7], lty=3)
-
 SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
 SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
 polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
@@ -168,9 +161,6 @@ polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)),
         x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
-SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2030, make.plot=FALSE)
-lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, col=noaa_cols[2], lwd=2, lty=3)
-
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
@@ -181,22 +171,19 @@ points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 # ----------------------------------------------------------------------
 # PLACE HOLDER
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(density(k14_r85_2030_SSN), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
-     main="", col=RdGy[1], lwd=2, lty=3, xlim=c(min(k14_r85_2030_SSN),12), ylim=c(0, 0.75), bty="l")
+plot(density(k14_r85_SS$t_2030), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
+     main="", col=RdGy[1], lwd=2, xlim=c(min(k14_r60_SS$t_2030),12), ylim=c(0, 0.75), bty="l")
 title(main="c.", adj=0)
 
-lines(density(k14_r85_SS$t_2030), col=RdGy[1], lwd=2)
 lines(density(k14_r60_SS$t_2030), col=RdGy[2], lwd=2)
 lines(density(k14_r45_SS$t_2030), col=RdGy[3], lwd=2)
 lines(density(k14_r26_SS$t_2030), col=RdGy[4], lwd=2)
 
-lines(density(bfd_r85_2030_SSN), col=BrBG[11], lwd=2, lty=3)
 lines(density(bfd_r85_2030_SS), col=BrBG[11], lwd=2)
 lines(density(bfd_r60_2030_SS), col=BrBG[10], lwd=2)
 lines(density(bfd_r45_2030_SS), col=BrBG[9], lwd=2)
 lines(density(bfd_r26_2030_SS), col=BrBG[8], lwd=2)
 
-lines(density(NOfd_r85_2030_SSN), col=PRGn[2], lwd=2, lty=3)
 lines(density(NOfd_r85_2030_SS), col=PRGn[2], lwd=2)
 lines(density(NOfd_r60_2030_SS), col=PRGn[3], lwd=2)
 lines(density(NOfd_r45_2030_SS), col=PRGn[4], lwd=2)
@@ -241,10 +228,6 @@ plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty=
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
 title(main="e.", adj=0)
 
-polygon(x = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstationary975$sf.num)), 
-        y = c(SF_Srikrishnan_nonstationary25$sf, rev(SF_Srikrishnan_nonstationary975$sf)), col = trans_noaa_cols[7], 
-        border = trans_noaa_cols[7], lty=3)
-
 polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
@@ -255,7 +238,6 @@ polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)),
         y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
-lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
 lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
 lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
@@ -273,9 +255,6 @@ title(main="f.", adj=0)
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
 # axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
-SF_k14_r85_2030_SSN = plot.sf(k14_r85_2030_SSN, make.plot=FALSE)
-lines(SF_k14_r85_2030_SSN$sf.num, SF_k14_r85_2030_SSN$sf, col=RdGy[1], lwd=1.5, lty=3)
-
 SF_k14_r85_2030_SS = plot.sf(k14_r85_SS$t_2030, make.plot=FALSE)
 lines(SF_k14_r85_2030_SS$sf.num, SF_k14_r85_2030_SS$sf, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2030_SS = plot.sf(k14_r60_SS$t_2030, make.plot=FALSE)
@@ -285,9 +264,6 @@ lines(SF_k14_r45_2030_SS$sf.num, SF_k14_r45_2030_SS$sf, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2030_SS = plot.sf(k14_r26_SS$t_2030, make.plot=FALSE)
 lines(SF_k14_r26_2030_SS$sf.num, SF_k14_r26_2030_SS$sf, col=RdGy[4], lwd=1.5)
 
-SF_bfd_r85_2030_SSN = plot.sf(bfd_r85_2030_SSN, make.plot=FALSE)
-lines(SF_bfd_r85_2030_SSN$sf.num, SF_bfd_r85_2030_SSN$sf, col=BrBG[11], lwd=1.5, lty=3)
-
 SF_bfd_r85_2030_SS = plot.sf(bfd_r85_2030_SS, make.plot=FALSE)
 lines(SF_bfd_r85_2030_SS$sf.num, SF_bfd_r85_2030_SS$sf, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2030_SS = plot.sf(bfd_r60_2030_SS, make.plot=FALSE)
@@ -296,9 +272,6 @@ SF_bfd_r45_2030_SS = plot.sf(bfd_r45_2030_SS, make.plot=FALSE)
 lines(SF_bfd_r45_2030_SS$sf.num, SF_bfd_r45_2030_SS$sf, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2030_SS = plot.sf(bfd_r26_2030_SS, make.plot=FALSE)
 lines(SF_bfd_r26_2030_SS$sf.num, SF_bfd_r26_2030_SS$sf, col=BrBG[8], lwd=1.5)
-
-SF_NOfd_r85_2030_SSN = plot.sf(NOfd_r85_2030_SSN, make.plot=FALSE)
-lines(SF_NOfd_r85_2030_SSN$sf.num, SF_NOfd_r85_2030_SSN$sf, col=PRGn[2], lwd=1.5, lty=3)
 
 SF_NOfd_r85_2030_SS = plot.sf(NOfd_r85_2030_SS, make.plot=FALSE)
 lines(SF_NOfd_r85_2030_SS$sf.num, SF_NOfd_r85_2030_SS$sf, col=PRGn[2], lwd=1.5)
@@ -325,7 +298,7 @@ plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
                            "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
                            "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. S 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep. S",
+                           "Srikrishnan et al.\nin prep. 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
                            "Observations"),
        lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
        col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
@@ -334,11 +307,10 @@ gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
 arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
 text(8.5,0.5, "Higher scenario")
 
-legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI",
-                              "Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
-       lty=c(3,NA,1,NA), lwd=c(2,NA,2,NA), pch=c(NA,22,NA,22), 
-       col=c(noaa_cols[2], "black", BrBG[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_noaa_cols[7],NA,trans_BrBG[2]), pt.cex = c(NA,2,NA,2))
+legend("bottomleft", legend=c("Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
+       lty=c(1,NA), lwd=c(2,NA), pch=c(NA,22), 
+       col=c(BrBG[2], "black"), bty='n', horiz=TRUE, 
+       pt.bg=c(NA,trans_BrBG[2]), pt.cex = c(NA,2))
 
 # Plot LSLR in 2050
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
@@ -378,12 +350,6 @@ plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", x
 title(main="b.", adj=0)
 axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
-SF_Srikrishnan_nonstationary25 = plot.sf(nonstat_gev205025, make.plot=FALSE)
-SF_Srikrishnan_nonstationary975 = plot.sf(nonstat_gev2050975, make.plot=FALSE)
-polygon(y = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstationary975$sf.num)), 
-        x = c(1/SF_Srikrishnan_nonstationary25$sf, rev(1/SF_Srikrishnan_nonstationary975$sf)), col = trans_noaa_cols[7], 
-        border = trans_noaa_cols[7], lty=3)
-
 SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
 SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
 polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
@@ -396,9 +362,6 @@ polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)),
         x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
-SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2050, make.plot=FALSE)
-lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, col=noaa_cols[2], lwd=2, lty=3)
-
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
@@ -409,22 +372,19 @@ points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 # ----------------------------------------------------------------------
 # PLACE HOLDER
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(density(k14_r85_2050_SSN), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
-     main="", col=RdGy[1], lwd=2, lty=3, xlim=c(min(k14_r85_2050_SSN), 15), ylim=c(0, 0.75), bty="l")
+plot(density(k14_r85_SS$t_2050), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
+     main="", col=RdGy[1], lwd=2, xlim=c(min(k14_r85_SS$t_2050), 15), ylim=c(0, 0.75), bty="l")
 title(main="c.", adj=0)
 
-lines(density(k14_r85_SS$t_2050), col=RdGy[1], lwd=2)
 lines(density(k14_r60_SS$t_2050), col=RdGy[2], lwd=2)
 lines(density(k14_r45_SS$t_2050), col=RdGy[3], lwd=2)
 lines(density(k14_r26_SS$t_2050), col=RdGy[4], lwd=2)
 
-lines(density(bfd_r85_2050_SSN), col=BrBG[11], lwd=2, lty=3)
 lines(density(bfd_r85_2050_SS), col=BrBG[11], lwd=2)
 lines(density(bfd_r60_2050_SS), col=BrBG[10], lwd=2)
 lines(density(bfd_r45_2050_SS), col=BrBG[9], lwd=2)
 lines(density(bfd_r26_2050_SS), col=BrBG[8], lwd=2)
 
-lines(density(NOfd_r85_2050_SSN), col=PRGn[2], lwd=2, lty=3)
 lines(density(NOfd_r85_2050_SS), col=PRGn[2], lwd=2)
 lines(density(NOfd_r60_2050_SS), col=PRGn[3], lwd=2)
 lines(density(NOfd_r45_2050_SS), col=PRGn[4], lwd=2)
@@ -469,10 +429,6 @@ plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty=
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
 title(main="e.", adj=0)
 
-polygon(x = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstationary975$sf.num)), 
-        y = c(SF_Srikrishnan_nonstationary25$sf, rev(SF_Srikrishnan_nonstationary975$sf)), col = trans_noaa_cols[7], 
-        border = trans_noaa_cols[7], lty=3)
-
 polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
@@ -483,7 +439,6 @@ polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)),
         y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
-lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
 lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
 lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
@@ -498,9 +453,6 @@ plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty=
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
 title(main="f.", adj=0)
 
-SF_k14_r85_2050_SSN = plot.sf(k14_r85_2050_SSN, make.plot=FALSE)
-lines(SF_k14_r85_2050_SSN$sf.num, SF_k14_r85_2050_SSN$sf, col=RdGy[1], lwd=1.5, lty=3)
-
 SF_k14_r85_2050_SS = plot.sf(k14_r85_SS$t_2050, make.plot=FALSE)
 lines(SF_k14_r85_2050_SS$sf.num, SF_k14_r85_2050_SS$sf, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2050_SS = plot.sf(k14_r60_SS$t_2050, make.plot=FALSE)
@@ -510,9 +462,6 @@ lines(SF_k14_r45_2050_SS$sf.num, SF_k14_r45_2050_SS$sf, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2050_SS = plot.sf(k14_r26_SS$t_2050, make.plot=FALSE)
 lines(SF_k14_r26_2050_SS$sf.num, SF_k14_r26_2050_SS$sf, col=RdGy[4], lwd=1.5)
 
-SF_bfd_r85_2050_SSN = plot.sf(bfd_r85_2050_SSN, make.plot=FALSE)
-lines(SF_bfd_r85_2050_SSN$sf.num, SF_bfd_r85_2050_SSN$sf, col=BrBG[11], lwd=1.5, lty=3)
-
 SF_bfd_r85_2050_SS = plot.sf(bfd_r85_2050_SS, make.plot=FALSE)
 lines(SF_bfd_r85_2050_SS$sf.num, SF_bfd_r85_2050_SS$sf, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2050_SS = plot.sf(bfd_r60_2050_SS, make.plot=FALSE)
@@ -521,9 +470,6 @@ SF_bfd_r45_2050_SS = plot.sf(bfd_r45_2050_SS, make.plot=FALSE)
 lines(SF_bfd_r45_2050_SS$sf.num, SF_bfd_r45_2050_SS$sf, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2050_SS = plot.sf(bfd_r26_2050_SS, make.plot=FALSE)
 lines(SF_bfd_r26_2050_SS$sf.num, SF_bfd_r26_2050_SS$sf, col=BrBG[8], lwd=1.5)
-
-SF_NOfd_r85_2050_SSN = plot.sf(NOfd_r85_2050_SSN, make.plot=FALSE)
-lines(SF_NOfd_r85_2050_SSN$sf.num, SF_NOfd_r85_2050_SSN$sf, col=PRGn[2], lwd=1.5, lty=3)
 
 SF_NOfd_r85_2050_SS = plot.sf(NOfd_r85_2050_SS, make.plot=FALSE)
 lines(SF_NOfd_r85_2050_SS$sf.num, SF_NOfd_r85_2050_SS$sf, col=PRGn[2], lwd=1.5)
@@ -550,7 +496,7 @@ plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
                            "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
                            "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. S 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep. S",
+                           "Srikrishnan et al.\nin prep. 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
                            "Observations"),
        lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
        col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
@@ -559,11 +505,10 @@ gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
 arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
 text(8.5,0.5, "Higher scenario")
 
-legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI",
-                              "Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
-       lty=c(3,NA,1,NA), lwd=c(2,NA,2,NA), pch=c(NA,22,NA,22), 
-       col=c(noaa_cols[2], "black", BrBG[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_noaa_cols[7],NA,trans_BrBG[2]), pt.cex = c(NA,2,NA,2))
+legend("bottomleft", legend=c("Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
+       lty=c(1,NA), lwd=c(2,NA), pch=c(NA,22), 
+       col=c(BrBG[2], "black"), bty='n', horiz=TRUE, 
+       pt.bg=c(NA,trans_BrBG[2]), pt.cex = c(NA,2))
 
 # Plot LSLR in 2060
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
@@ -603,12 +548,6 @@ plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", x
 title(main="b.", adj=0)
 axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
-SF_Srikrishnan_nonstationary25 = plot.sf(nonstat_gev206025, make.plot=FALSE)
-SF_Srikrishnan_nonstationary975 = plot.sf(nonstat_gev2060975, make.plot=FALSE)
-polygon(y = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstationary975$sf.num)), 
-        x = c(1/SF_Srikrishnan_nonstationary25$sf, rev(1/SF_Srikrishnan_nonstationary975$sf)), col = trans_noaa_cols[7], 
-        border = trans_noaa_cols[7], lty=3)
-
 SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
 SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
 polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
@@ -621,9 +560,6 @@ polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)),
         x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
-SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2060, make.plot=FALSE)
-lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, col=noaa_cols[2], lwd=2, lty=3)
-
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
@@ -634,22 +570,19 @@ points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 # ----------------------------------------------------------------------
 # PLACE HOLDER
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(density(k14_r85_2060_SSN), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
-     main="", col=RdGy[1], lwd=2, lty=3, xlim=c(min(k14_r85_2060_SSN),max(bfd_r85_2060_SSN)), ylim=c(0, 0.75), bty="l")
+plot(density(k14_r85_SS$t_2060), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
+     main="", col=RdGy[1], lwd=2, xlim=c(min(k14_r85_SS$t_2060),max(bfd_r85_2060_SS)), ylim=c(0, 0.75), bty="l")
 title(main="c.", adj=0)
 
-lines(density(k14_r85_SS$t_2060), col=RdGy[1], lwd=2)
 lines(density(k14_r60_SS$t_2060), col=RdGy[2], lwd=2)
 lines(density(k14_r45_SS$t_2060), col=RdGy[3], lwd=2)
 lines(density(k14_r26_SS$t_2060), col=RdGy[4], lwd=2)
 
-lines(density(bfd_r85_2060_SSN), col=BrBG[11], lwd=2, lty=3)
 lines(density(bfd_r85_2060_SS), col=BrBG[11], lwd=2)
 lines(density(bfd_r60_2060_SS), col=BrBG[10], lwd=2)
 lines(density(bfd_r45_2060_SS), col=BrBG[9], lwd=2)
 lines(density(bfd_r26_2060_SS), col=BrBG[8], lwd=2)
 
-lines(density(NOfd_r85_2060_SSN), col=PRGn[2], lwd=2, lty=3)
 lines(density(NOfd_r85_2060_SS), col=PRGn[2], lwd=2)
 lines(density(NOfd_r60_2060_SS), col=PRGn[3], lwd=2)
 lines(density(NOfd_r45_2060_SS), col=PRGn[4], lwd=2)
@@ -694,10 +627,6 @@ plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty=
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
 title(main="e.", adj=0)
 
-polygon(x = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstationary975$sf.num)), 
-        y = c(SF_Srikrishnan_nonstationary25$sf, rev(SF_Srikrishnan_nonstationary975$sf)), col = trans_noaa_cols[7], 
-        border = trans_noaa_cols[7], lty=3)
-
 polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
@@ -708,7 +637,6 @@ polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)),
         y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
-lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
 lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
 lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
@@ -723,9 +651,6 @@ plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty=
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
 title(main="f.", adj=0)
 
-SF_k14_r85_2060_SSN = plot.sf(k14_r85_2060_SSN, make.plot=FALSE)
-lines(SF_k14_r85_2060_SSN$sf.num, SF_k14_r85_2060_SSN$sf, col=RdGy[1], lwd=1.5, lty=3)
-
 SF_k14_r85_2060_SS = plot.sf(k14_r85_SS$t_2060, make.plot=FALSE)
 lines(SF_k14_r85_2060_SS$sf.num, SF_k14_r85_2060_SS$sf, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2060_SS = plot.sf(k14_r60_SS$t_2060, make.plot=FALSE)
@@ -735,9 +660,6 @@ lines(SF_k14_r45_2060_SS$sf.num, SF_k14_r45_2060_SS$sf, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2060_SS = plot.sf(k14_r26_SS$t_2060, make.plot=FALSE)
 lines(SF_k14_r26_2060_SS$sf.num, SF_k14_r26_2060_SS$sf, col=RdGy[4], lwd=1.5)
 
-SF_bfd_r85_2060_SSN = plot.sf(bfd_r85_2060_SSN, make.plot=FALSE)
-lines(SF_bfd_r85_2060_SSN$sf.num, SF_bfd_r85_2060_SSN$sf, col=BrBG[11], lwd=1.5, lty=3)
-
 SF_bfd_r85_2060_SS = plot.sf(bfd_r85_2060_SS, make.plot=FALSE)
 lines(SF_bfd_r85_2060_SS$sf.num, SF_bfd_r85_2060_SS$sf, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2060_SS = plot.sf(bfd_r60_2060_SS, make.plot=FALSE)
@@ -746,9 +668,6 @@ SF_bfd_r45_2060_SS = plot.sf(bfd_r45_2060_SS, make.plot=FALSE)
 lines(SF_bfd_r45_2060_SS$sf.num, SF_bfd_r45_2060_SS$sf, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2060_SS = plot.sf(bfd_r26_2060_SS, make.plot=FALSE)
 lines(SF_bfd_r26_2060_SS$sf.num, SF_bfd_r26_2060_SS$sf, col=BrBG[8], lwd=1.5)
-
-SF_NOfd_r85_2060_SSN = plot.sf(NOfd_r85_2060_SSN, make.plot=FALSE)
-lines(SF_NOfd_r85_2060_SSN$sf.num, SF_NOfd_r85_2060_SSN$sf, col=PRGn[2], lwd=1.5, lty=3)
 
 SF_NOfd_r85_2060_SS = plot.sf(NOfd_r85_2060_SS, make.plot=FALSE)
 lines(SF_NOfd_r85_2060_SS$sf.num, SF_NOfd_r85_2060_SS$sf, col=PRGn[2], lwd=1.5)
@@ -775,7 +694,7 @@ plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
                            "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
                            "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. S 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep. S",
+                           "Srikrishnan et al.\nin prep. 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
                            "Observations"),
        lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
        col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
@@ -784,11 +703,10 @@ gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
 arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
 text(8.5,0.5, "Higher scenario")
 
-legend("bottomleft", legend=c("Srikrishnan et al.\nin prep. NS", "Srikrishnan et al.\nin prep. NS 95% CI",
-                              "Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
-       lty=c(3,NA,1,NA), lwd=c(2,NA,2,NA), pch=c(NA,22,NA,22), 
-       col=c(noaa_cols[2], "black", BrBG[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_noaa_cols[7],NA,trans_BrBG[2]), pt.cex = c(NA,2,NA,2))
+legend("bottomleft", legend=c("Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
+       lty=c(1,NA), lwd=c(2,NA), pch=c(NA,22), 
+       col=c(BrBG[2], "black"), bty='n', horiz=TRUE, 
+       pt.bg=c(NA,trans_BrBG[2]), pt.cex = c(NA,2))
 
 # Plot LSLR in 2100
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
@@ -828,12 +746,6 @@ plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", x
 title(main="b.", adj=0)
 axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
-SF_Srikrishnan_nonstationary25 = plot.sf(nonstat_gev210025, make.plot=FALSE)
-SF_Srikrishnan_nonstationary975 = plot.sf(nonstat_gev2100975, make.plot=FALSE)
-polygon(y = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstationary975$sf.num)), 
-        x = c(1/SF_Srikrishnan_nonstationary25$sf, rev(1/SF_Srikrishnan_nonstationary975$sf)), col = trans_noaa_cols[7], 
-        border = trans_noaa_cols[7], lty=3)
-
 SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
 SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
 polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
@@ -846,9 +758,6 @@ polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)),
         x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
-SF_Srikrishnan_nonstationary = plot.sf(nonstat_gev2100, make.plot=FALSE)
-lines(1/SF_Srikrishnan_nonstationary$sf, SF_Srikrishnan_nonstationary$sf.num, col=noaa_cols[2], lwd=2, lty=3)
-
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
@@ -859,22 +768,19 @@ points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 # ----------------------------------------------------------------------
 # PLACE HOLDER
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(density(k14_r85_2100_SSN), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
-     main="", col=RdGy[1], lwd=2, lty=3, xlim=c(min(k14_r85_2100_SSN),max(bfd_r85_2100_SSN)), ylim=c(0, 0.6), bty="l")
+plot(density(k14_r85_SS$t_2100), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
+     main="", col=RdGy[1], lwd=2, xlim=c(min(k14_r85_SS$t_2100),max(bfd_r85_2100_SS)), ylim=c(0, 0.6), bty="l")
 title(main="c.", adj=0)
 
-lines(density(k14_r85_SS$t_2100), col=RdGy[1], lwd=2)
 lines(density(k14_r60_SS$t_2100), col=RdGy[2], lwd=2)
 lines(density(k14_r45_SS$t_2100), col=RdGy[3], lwd=2)
 lines(density(k14_r26_SS$t_2100), col=RdGy[4], lwd=2)
 
-lines(density(bfd_r85_2100_SSN), col=BrBG[11], lwd=2, lty=3)
 lines(density(bfd_r85_2100_SS), col=BrBG[11], lwd=2)
 lines(density(bfd_r60_2100_SS), col=BrBG[10], lwd=2)
 lines(density(bfd_r45_2100_SS), col=BrBG[9], lwd=2)
 lines(density(bfd_r26_2100_SS), col=BrBG[8], lwd=2)
 
-lines(density(NOfd_r85_2100_SSN), col=PRGn[2], lwd=2, lty=3)
 lines(density(NOfd_r85_2100_SS), col=PRGn[2], lwd=2)
 lines(density(NOfd_r60_2100_SS), col=PRGn[3], lwd=2)
 lines(density(NOfd_r45_2100_SS), col=PRGn[4], lwd=2)
@@ -919,10 +825,6 @@ plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty=
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
 title(main="e.", adj=0)
 
-polygon(x = c(SF_Srikrishnan_nonstationary25$sf.num, rev(SF_Srikrishnan_nonstationary975$sf.num)), 
-        y = c(SF_Srikrishnan_nonstationary25$sf, rev(SF_Srikrishnan_nonstationary975$sf)), col = trans_noaa_cols[7], 
-        border = trans_noaa_cols[7], lty=3)
-
 polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
         y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
 
@@ -933,7 +835,6 @@ polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)),
         y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
 
-lines(SF_Srikrishnan_nonstationary$sf.num, SF_Srikrishnan_nonstationary$sf, col=noaa_cols[2], lwd=2, lty=3)
 lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
 lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
 lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
@@ -948,9 +849,6 @@ plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty=
 axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
 title(main="f.", adj=0)
 
-SF_k14_r85_2100_SSN = plot.sf(k14_r85_2100_SSN, make.plot=FALSE)
-lines(SF_k14_r85_2100_SSN$sf.num, SF_k14_r85_2100_SSN$sf, col=RdGy[1], lwd=1.5, lty=3)
-
 SF_k14_r85_2100_SS = plot.sf(k14_r85_SS$t_2100, make.plot=FALSE)
 lines(SF_k14_r85_2100_SS$sf.num, SF_k14_r85_2100_SS$sf, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2100_SS = plot.sf(k14_r60_SS$t_2100, make.plot=FALSE)
@@ -960,9 +858,6 @@ lines(SF_k14_r45_2100_SS$sf.num, SF_k14_r45_2100_SS$sf, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2100_SS = plot.sf(k14_r26_SS$t_2100, make.plot=FALSE)
 lines(SF_k14_r26_2100_SS$sf.num, SF_k14_r26_2100_SS$sf, col=RdGy[4], lwd=1.5)
 
-SF_bfd_r85_2100_SSN = plot.sf(bfd_r85_2100_SSN, make.plot=FALSE)
-lines(SF_bfd_r85_2100_SSN$sf.num, SF_bfd_r85_2100_SSN$sf, col=BrBG[11], lwd=1.5, lty=3)
-
 SF_bfd_r85_2100_SS = plot.sf(bfd_r85_2100_SS, make.plot=FALSE)
 lines(SF_bfd_r85_2100_SS$sf.num, SF_bfd_r85_2100_SS$sf, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2100_SS = plot.sf(bfd_r60_2100_SS, make.plot=FALSE)
@@ -971,9 +866,6 @@ SF_bfd_r45_2100_SS = plot.sf(bfd_r45_2100_SS, make.plot=FALSE)
 lines(SF_bfd_r45_2100_SS$sf.num, SF_bfd_r45_2100_SS$sf, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2100_SS = plot.sf(bfd_r26_2100_SS, make.plot=FALSE)
 lines(SF_bfd_r26_2100_SS$sf.num, SF_bfd_r26_2100_SS$sf, col=BrBG[8], lwd=1.5)
-
-SF_NOfd_r85_2100_SSN = plot.sf(NOfd_r85_2100_SSN, make.plot=FALSE)
-lines(SF_NOfd_r85_2100_SSN$sf.num, SF_NOfd_r85_2100_SSN$sf, col=PRGn[2], lwd=1.5, lty=3)
 
 SF_NOfd_r85_2100_SS = plot.sf(NOfd_r85_2100_SS, make.plot=FALSE)
 lines(SF_NOfd_r85_2100_SS$sf.num, SF_NOfd_r85_2100_SS$sf, col=PRGn[2], lwd=1.5)
