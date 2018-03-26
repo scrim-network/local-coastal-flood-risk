@@ -610,19 +610,6 @@ points(usace2013$t_2100, rep(2.45, 3), col=trans_RdBu[9:11], pch=20)
 points(carswg2016$t_2100, rep(1.95, 5), col=trans_RdGy[7:11], pch=20)
 points(noaa2017$t_2100, rep(1.45, length(noaa2017$t_2100)), col=trans_noaa_cols[8:2], pch=20)
 
-# lines(noaa2012_2100, rep(4.75, 4), col=trans_BrBG[4:1], lwd=1.5, lty=3)
-# lines(usace2013_2100, rep(4.25, 3), col=trans_RdBu[9:11], lwd=1.5, lty=3)
-# lines(carswg2016_2100, rep(3.75, 5), col=trans_RdGy[7:11], lwd=1.5, lty=3)
-# lines(noaa2017_2100_50, rep(3.25, length(noaa2017_2100_50)), col=trans_noaa_cols[8:2], lwd=1.5, lty=3)
-# 
-# points(noaa2012_2100, rep(4.75, 4), col=trans_BrBG[4:1], pch=20)
-# points(usace2013_2100, rep(4.25, 3), col=trans_RdBu[9:11], pch=20)
-# points(carswg2016_2100, rep(3.75, 5), col=trans_RdGy[7:11], pch=20)
-# points(noaa2017_2100_50, rep(3.25, length(noaa2017_2100_50)), col=trans_noaa_cols[8:2], pch=20)
-# 
-# #2060
-# abline(h=5, col="lightgray")
-# text(15, 5.5, "2060", col="lightgray")
 #2060
 abline(h=3.2, col="lightgray")
 text(15, 3.7, "2060", col="lightgray")
@@ -652,19 +639,6 @@ points(usace2013$t_2060, rep(6.7, 3), col=trans_RdBu[9:11], pch=20)
 points(carswg2016$t_2060, rep(6.2, 5), col=trans_RdGy[7:11], pch=20)
 points(noaa2017$t_2060, rep(5.7, length(noaa2017$t_2060)), col=trans_noaa_cols[8:2], pch=20)
 
-# lines(noaa2012_2060, rep(10, 4), col=trans_BrBG[4:1], lwd=1.5, lty=3)
-# lines(usace2013_2060, rep(9.5, 3), col=trans_RdBu[9:11], lwd=1.5, lty=3)
-# lines(carswg2016_2060, rep(9, 5), col=trans_RdGy[7:11], lwd=1.5, lty=3)
-# lines(noaa2017_2060_50, rep(8.5, length(noaa2017_2060_50)), col=trans_noaa_cols[8:2], lwd=1.5, lty=3)
-# 
-# points(noaa2012_2060, rep(10, 4), col=trans_BrBG[4:1], pch=20)
-# points(usace2013_2060, rep(9.5, 3), col=trans_RdBu[9:11], pch=20)
-# points(carswg2016_2060, rep(9, 5), col=trans_RdGy[7:11], pch=20)
-# points(noaa2017_2060_50, rep(8.5, length(noaa2017_2060_50)), col=trans_noaa_cols[8:2], pch=20)
-# 
-# #2050
-# abline(h=10.25, col="#5f4b3a")
-# text(15, 10.75, "2050", col="#5f4b3a")
 #2050
 abline(h=7.45, col="#5f4b3a")
 text(15, 7.95, "2050", col="#5f4b3a")
@@ -694,19 +668,6 @@ points(usace2013$t_2050, rep(11.2, 3), col=RdBu[9:11], pch=20)
 points(carswg2016$t_2050, rep(10.7, 5), col=RdGy[7:11], pch=20)
 points(noaa2017$t_2050, rep(10.2, length(noaa2017$t_2050)), col=noaa_cols[8:2], pch=20)
 
-# lines(noaa2012_2050, rep(14.75, 4), col=BrBG[4:1], lwd=1.5, lty=3)
-# lines(usace2013_2050, rep(14.25, 3), col=RdBu[9:11], lwd=1.5, lty=3)
-# lines(carswg2016_2050, rep(13.75, 5), col=RdGy[7:11], lwd=1.5, lty=3)
-# lines(noaa2017_2050_50, rep(13.25, length(noaa2017_2050_50)), col=noaa_cols[8:2], lwd=1.5, lty=3)
-# 
-# points(noaa2012_2050, rep(14.75, 4), col=BrBG[4:1], pch=20)
-# points(usace2013_2050, rep(14.25, 3), col=RdBu[9:11], pch=20)
-# points(carswg2016_2050, rep(13.75, 5), col=RdGy[7:11], pch=20)
-# points(noaa2017_2050_50, rep(13.25, length(noaa2017_2050_50)), col=noaa_cols[8:2], pch=20)
-# 
-# #2030
-# abline(h=15, col="lightgray")
-# text(15, 15.5, "2030", col="lightgray")
 #2030
 abline(h=11.95, col="lightgray")
 text(15, 12.45, "2030", col="lightgray")
@@ -735,16 +696,6 @@ points(noaa2012$t_2030, rep(18.45, 4), col=trans_BrBG[4:1], pch=20)
 points(usace2013$t_2030, rep(17.95, 3), col=trans_RdBu[9:11], pch=20)
 points(carswg2016$t_2030, rep(17.45, 5), col=trans_RdGy[7:11], pch=20)
 points(noaa2017$t_2030, rep(16.95, length(noaa2017$t_2030)), col=trans_noaa_cols[8:2], pch=20)
-
-# lines(noaa2012_2030, rep(18, 4), col=trans_BrBG[4:1], lwd=1.5, lty=3)
-# lines(usace2013_2030, rep(17.5, 3), col=trans_RdBu[9:11], lwd=1.5, lty=3)
-# lines(carswg2016_2030, rep(17, 5), col=trans_RdGy[7:11], lwd=1.5, lty=3)
-# lines(noaa2017_2030_50, rep(16.5, length(noaa2017_2030_50)), col=trans_noaa_cols[8:2], lwd=1.5, lty=3)
-# 
-# points(noaa2012_2030, rep(18, 4), col=trans_BrBG[4:1], pch=20)
-# points(usace2013_2030, rep(17.5, 3), col=trans_RdBu[9:11], pch=20)
-# points(carswg2016_2030, rep(17, 5), col=trans_RdGy[7:11], pch=20)
-# points(noaa2017_2030_50, rep(16.5, length(noaa2017_2030_50)), col=trans_noaa_cols[8:2], pch=20)
 
 par(mgp=c(2,0.5,0), mar=c(3,1,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
