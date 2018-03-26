@@ -59,32 +59,24 @@ single_panel_height = 4
 
 #---------------------------- Plot PDFS -----------------------------------
 ################################ 2030 #####################################
-pdf(file="SLR_2030.pdf", family="Times", width=full_page_width, height=1.5*single_panel_height, pointsize=12)
+pdf(file="SLR_2030.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
-                2,3,4,
-                5,6,7,
-                5,6,7,
-                5,6,7), 7, 3, byrow = TRUE))
+                2,3,4), 4, 3, byrow = TRUE))
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
-                           "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
+                           "Wong & Keller\n2017 no FD", "Tebaldi et al. 2012\nexpected value", "Sweet et al. 2017", 
                            "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
-                           "Observations"),
-       lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
-       col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
-       bty='n', ncol=6, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA), pt.cex = c(NA,NA,NA,1,NA,1,2,1,2,1,NA,1))
-gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
-arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
-text(8.5,0.5, "Higher scenario")
-
-legend("bottomleft", legend=c("Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
-       lty=c(1,NA), lwd=c(2,NA), pch=c(NA,22), 
-       col=c(BrBG[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_BrBG[2]), pt.cex = c(NA,2))
+                           "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
+                           "Zervas 2013\n 95% CI", "Observations"),
+       lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
+       col=c(BrBG[9], RdGy[3], PRGn[3], tebaldi_gold[1], noaa_cols[5], BrBG[2],"black", RdBu[10], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
+       bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
+gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
+arrows(8.75, 1.5, 9, 1.5, length=0.075)
+text(8,1.5, "Higher scenario")
 
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
 plot(density(kopp14_rcp85$t_2030), xlab="Projected sea level in 2030 (ft)", ylab="Probability density", yaxt="n", 
@@ -182,32 +174,24 @@ lines(1/SF_NOfd_r26_2030_SS$sf, SF_NOfd_r26_2030_SS$sf.num, col=PRGn[5], lwd=1.5
 dev.off()
 
 ################################ 2050 #####################################
-pdf(file="SLR_2050.pdf", family="Times", width=full_page_width, height=1.5*single_panel_height, pointsize=12)
+pdf(file="SLR_2050.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
-                2,3,4,
-                5,6,7,
-                5,6,7,
-                5,6,7), 7, 3, byrow = TRUE))
+                2,3,4), 4, 3, byrow = TRUE))
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
-                           "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
+                           "Wong & Keller\n2017 no FD", "Tebaldi et al. 2012\nexpected value", "Sweet et al. 2017", 
                            "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
-                           "Observations"),
-       lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
-       col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
-       bty='n', ncol=6, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA), pt.cex = c(NA,NA,NA,1,NA,1,2,1,2,1,NA,1))
-gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
-arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
-text(8.5,0.5, "Higher scenario")
-
-legend("bottomleft", legend=c("Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
-       lty=c(1,NA), lwd=c(2,NA), pch=c(NA,22), 
-       col=c(BrBG[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_BrBG[2]), pt.cex = c(NA,2))
+                           "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
+                           "Zervas 2013\n 95% CI", "Observations"),
+       lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
+       col=c(BrBG[9], RdGy[3], PRGn[3], tebaldi_gold[1], noaa_cols[5], BrBG[2],"black", RdBu[10], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
+       bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
+gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
+arrows(8.75, 1.5, 9, 1.5, length=0.075)
+text(8,1.5, "Higher scenario")
 
 # Plot LSLR in 2050
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
@@ -306,32 +290,24 @@ lines(1/SF_NOfd_r26_2050_SS$sf, SF_NOfd_r26_2050_SS$sf.num, col=PRGn[5], lwd=1.5
 dev.off()
 
 ################################ 2060 #####################################
-pdf(file="SLR_2060.pdf", family="Times", width=full_page_width, height=1.5*single_panel_height, pointsize=12)
+pdf(file="SLR_2060.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
-                2,3,4,
-                5,6,7,
-                5,6,7,
-                5,6,7), 7, 3, byrow = TRUE))
+                2,3,4), 4, 3, byrow = TRUE))
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
-                           "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
+                           "Wong & Keller\n2017 no FD", "Tebaldi et al. 2012\nexpected value", "Sweet et al. 2017", 
                            "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
-                           "Observations"),
-       lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
-       col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
-       bty='n', ncol=6, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA), pt.cex = c(NA,NA,NA,1,NA,1,2,1,2,1,NA,1))
-gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
-arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
-text(8.5,0.5, "Higher scenario")
-
-legend("bottomleft", legend=c("Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
-       lty=c(1,NA), lwd=c(2,NA), pch=c(NA,22), 
-       col=c(BrBG[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_BrBG[2]), pt.cex = c(NA,2))
+                           "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
+                           "Zervas 2013\n 95% CI", "Observations"),
+       lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
+       col=c(BrBG[9], RdGy[3], PRGn[3], tebaldi_gold[1], noaa_cols[5], BrBG[2],"black", RdBu[10], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
+       bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
+gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
+arrows(8.75, 1.5, 9, 1.5, length=0.075)
+text(8,1.5, "Higher scenario")
 
 # Plot LSLR in 2060
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
@@ -430,32 +406,24 @@ lines(1/SF_NOfd_r26_2060_SS$sf, SF_NOfd_r26_2060_SS$sf.num, col=PRGn[5], lwd=1.5
 dev.off()
 
 ################################ 2100 #####################################
-pdf(file="SLR_2100.pdf", family="Times", width=full_page_width, height=1.5*single_panel_height, pointsize=12)
+pdf(file="SLR_2100.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
-                2,3,4,
-                5,6,7,
-                5,6,7,
-                5,6,7), 7, 3, byrow = TRUE))
+                2,3,4), 4, 3, byrow = TRUE))
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
-                           "Wong & Keller\n2017 no FD", "Sweet et al. 2017", "Tebaldi et al. 2012\nexpected value", 
+                           "Wong & Keller\n2017 no FD", "Tebaldi et al. 2012\nexpected value", "Sweet et al. 2017", 
                            "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. 95% CI", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
-                           "Observations"),
-       lty=c(1,1,1,NA,1,NA,NA,NA,NA,NA,1,NA), lwd=c(2,2,2,NA,2,NA,NA,NA,NA,NA,2,NA), pch=c(NA,NA,NA,19,NA,19,22,19,22,19,NA,19), 
-       col=c(BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], tebaldi_gold[1],BrBG[2],"black", RdBu[10], "black", RdGy[9], RdBu[11], "black"),
-       bty='n', ncol=6, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA), pt.cex = c(NA,NA,NA,1,NA,1,2,1,2,1,NA,1))
-gradient.rect(7.5,1.5,9.5,3, col=col_grad, gradient="x")
-arrows(9.25, 0.5, 9.5, 0.5, length=0.075)
-text(8.5,0.5, "Higher scenario")
-
-legend("bottomleft", legend=c("Zervas 2013\nexpected value", "Zervas 2013\n 95% CI"),
-       lty=c(1,NA), lwd=c(2,NA), pch=c(NA,22), 
-       col=c(BrBG[2], "black"), bty='n', horiz=TRUE, 
-       pt.bg=c(NA,trans_BrBG[2]), pt.cex = c(NA,2))
+                           "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
+                           "Zervas 2013\n 95% CI", "Observations"),
+       lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
+       col=c(BrBG[9], RdGy[3], PRGn[3], tebaldi_gold[1], noaa_cols[5], BrBG[2],"black", RdBu[10], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
+       bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
+gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
+arrows(8.75, 1.5, 9, 1.5, length=0.075)
+text(8,1.5, "Higher scenario")
 
 # Plot LSLR in 2100
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
