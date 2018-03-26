@@ -143,118 +143,41 @@ lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
-# PLACE HOLDER
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(density(k14_r85_SS$t_2030), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
-     main="", col=RdGy[1], lwd=2, xlim=c(min(k14_r60_SS$t_2030),12), ylim=c(0, 0.75), bty="l")
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
+     ylim = c(2.85, 12), 
+     xaxt = 'n', cex=1, bty="l",
+     xlab = "Return period (years)", 
+     ylab = "Projected sea+surge level (ft MSL)")
 title(main="c.", adj=0)
-
-lines(density(k14_r60_SS$t_2030), col=RdGy[2], lwd=2)
-lines(density(k14_r45_SS$t_2030), col=RdGy[3], lwd=2)
-lines(density(k14_r26_SS$t_2030), col=RdGy[4], lwd=2)
-
-lines(density(bfd_r85_SS$t_2030), col=BrBG[11], lwd=2)
-lines(density(bfd_r60_SS$t_2030), col=BrBG[10], lwd=2)
-lines(density(bfd_r45_SS$t_2030), col=BrBG[9], lwd=2)
-lines(density(bfd_r26_SS$t_2030), col=BrBG[8], lwd=2)
-
-lines(density(NOfd_r85_SS$t_2030), col=PRGn[2], lwd=2)
-lines(density(NOfd_r60_SS$t_2030), col=PRGn[3], lwd=2)
-lines(density(NOfd_r45_SS$t_2030), col=PRGn[4], lwd=2)
-lines(density(NOfd_r26_SS$t_2030), col=PRGn[5], lwd=2)
-
-# ----------------------------------------------------------------------
-par(mgp=c(2,.5,0), mar=c(3.5,4,1,1))
-plot.sf(kopp14_rcp85$t_2030, ylab = "Probability of exceedance", xlab = "Projected sea level in 2030 (ft)",
-        yaxt = "n", yaxs = 'i', typ="l", lwd=2, lty=1, bty="l",
-        ylim = c(10^-4, 10^0+0.25), xlim=c(0,1.8), col=RdGy[1])
-title(main="d.", adj=0)
-
-SF_kopp14_rcp60_2030ft = plot.sf(kopp14_rcp60$t_2030, make.plot=FALSE)
-lines(SF_kopp14_rcp60_2030ft$sf.num, SF_kopp14_rcp60_2030ft$sf, col=RdGy[2], lwd=2)
-SF_kopp14_rcp45_2030ft = plot.sf(kopp14_rcp45$t_2030, make.plot=FALSE)
-lines(SF_kopp14_rcp45_2030ft$sf.num, SF_kopp14_rcp45_2030ft$sf, col=RdGy[3], lwd=2)
-SF_kopp14_rcp26_2030ft = plot.sf(kopp14_rcp26$t_2030, make.plot=FALSE)
-lines(SF_kopp14_rcp26_2030ft$sf.num, SF_kopp14_rcp26_2030ft$sf, col=RdGy[4], lwd=2)
-
-SF_brickfd_rcp85_2030ft = plot.sf(brickfd_rcp85$t_2030, make.plot=FALSE)
-lines(SF_brickfd_rcp85_2030ft$sf.num, SF_brickfd_rcp85_2030ft$sf, col=BrBG[11], lwd=2)
-SF_brickfd_rcp60_2030ft = plot.sf(brickfd_rcp60$t_2030, make.plot=FALSE)
-lines(SF_brickfd_rcp60_2030ft$sf.num, SF_brickfd_rcp60_2030ft$sf, col=BrBG[10], lwd=2)
-SF_brickfd_rcp45_2030ft = plot.sf(brickfd_rcp45$t_2030, make.plot=FALSE)
-lines(SF_brickfd_rcp45_2030ft$sf.num, SF_brickfd_rcp45_2030ft$sf, col=BrBG[9], lwd=2)
-SF_brickfd_rcp26_2030ft = plot.sf(brickfd_rcp26$t_2030, make.plot=FALSE)
-lines(SF_brickfd_rcp26_2030ft$sf.num, SF_brickfd_rcp26_2030ft$sf, col=BrBG[8], lwd=2)
-
-SF_NO_fd_rcp85_2030ft = plot.sf(NO_fdft_rcp85$t_2030, make.plot=FALSE)
-lines(SF_NO_fd_rcp85_2030ft$sf.num, SF_NO_fd_rcp85_2030ft$sf, col=PRGn[2], lwd=2)
-SF_NO_fd_rcp60_2030ft = plot.sf(NO_fdft_rcp60$t_2030, make.plot=FALSE)
-lines(SF_NO_fd_rcp60_2030ft$sf.num, SF_NO_fd_rcp60_2030ft$sf, col=PRGn[3], lwd=2)
-SF_NO_fd_rcp45_2030ft = plot.sf(NO_fdft_rcp45$t_2030, make.plot=FALSE)
-lines(SF_NO_fd_rcp45_2030ft$sf.num, SF_NO_fd_rcp45_2030ft$sf, col=PRGn[4], lwd=2)
-SF_NO_fd_rcp26_2030ft = plot.sf(NO_fdft_rcp26$t_2030, make.plot=FALSE)
-lines(SF_NO_fd_rcp26_2030ft$sf.num, SF_NO_fd_rcp26_2030ft$sf, col=PRGn[5], lwd=2)
-
-#   -----------------------------------------------------------------------
-plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
-     yaxt = 'n', cex=1, xlim = c(2.85, 12), ylim=c(0.011,1),
-     ylab = "Probability of exceedance", xlab = "Storm surge (ft MSL)")
-axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
-title(main="e.", adj=0)
-
-polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
-        y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
-
-polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
-        y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
-
-polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
-        y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
-
-lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
-lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
-lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
-points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
-
-# ----------------------------------------------------------------------
-# PLACE HOLDER
-par(mgp=c(2,0.5,0), mar=c(3.5,3.5,1,1))
-plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n", ylim = c(0.011, 1),
-     xlim = c(2.85, 12), 
-     yaxt = 'n', cex=1, bty="l",
-     ylab = "Probability of exceedance", 
-     xlab = "Projected sea+surge level (ft)")
-title(main="f.", adj=0)
-axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
-# axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
+axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
 SF_k14_r85_2030_SS = plot.sf(k14_r85_SS$t_2030, make.plot=FALSE)
-lines(SF_k14_r85_2030_SS$sf.num, SF_k14_r85_2030_SS$sf, col=RdGy[1], lwd=1.5)
+lines(1/SF_k14_r85_2030_SS$sf, SF_k14_r85_2030_SS$sf.num, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2030_SS = plot.sf(k14_r60_SS$t_2030, make.plot=FALSE)
-lines(SF_k14_r60_2030_SS$sf.num, SF_k14_r60_2030_SS$sf, col=RdGy[2], lwd=1.5)
+lines(1/SF_k14_r60_2030_SS$sf, SF_k14_r60_2030_SS$sf.num, col=RdGy[2], lwd=1.5)
 SF_k14_r45_2030_SS = plot.sf(k14_r45_SS$t_2030, make.plot=FALSE)
-lines(SF_k14_r45_2030_SS$sf.num, SF_k14_r45_2030_SS$sf, col=RdGy[3], lwd=1.5)
+lines(1/SF_k14_r45_2030_SS$sf, SF_k14_r45_2030_SS$sf.num, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2030_SS = plot.sf(k14_r26_SS$t_2030, make.plot=FALSE)
-lines(SF_k14_r26_2030_SS$sf.num, SF_k14_r26_2030_SS$sf, col=RdGy[4], lwd=1.5)
+lines(1/SF_k14_r26_2030_SS$sf, SF_k14_r26_2030_SS$sf.num, col=RdGy[4], lwd=1.5)
 
 SF_bfd_r85_2030_SS = plot.sf(bfd_r85_SS$t_2030, make.plot=FALSE)
-lines(SF_bfd_r85_2030_SS$sf.num, SF_bfd_r85_2030_SS$sf, col=BrBG[11], lwd=1.5)
+lines(1/SF_bfd_r85_2030_SS$sf, SF_bfd_r85_2030_SS$sf.num, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2030_SS = plot.sf(bfd_r60_SS$t_2030, make.plot=FALSE)
-lines(SF_bfd_r60_2030_SS$sf.num, SF_bfd_r60_2030_SS$sf, col=BrBG[10], lwd=1.5)
+lines(1/SF_bfd_r60_2030_SS$sf, SF_bfd_r60_2030_SS$sf.num, col=BrBG[10], lwd=1.5)
 SF_bfd_r45_2030_SS = plot.sf(bfd_r45_SS$t_2030, make.plot=FALSE)
-lines(SF_bfd_r45_2030_SS$sf.num, SF_bfd_r45_2030_SS$sf, col=BrBG[9], lwd=1.5)
+lines(1/SF_bfd_r45_2030_SS$sf, SF_bfd_r45_2030_SS$sf.num, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2030_SS = plot.sf(bfd_r26_SS$t_2030, make.plot=FALSE)
-lines(SF_bfd_r26_2030_SS$sf.num, SF_bfd_r26_2030_SS$sf, col=BrBG[8], lwd=1.5)
+lines(1/SF_bfd_r26_2030_SS$sf, SF_bfd_r26_2030_SS$sf.num, col=BrBG[8], lwd=1.5)
 
 SF_NOfd_r85_2030_SS = plot.sf(NOfd_r85_SS$t_2030, make.plot=FALSE)
-lines(SF_NOfd_r85_2030_SS$sf.num, SF_NOfd_r85_2030_SS$sf, col=PRGn[2], lwd=1.5)
+lines(1/SF_NOfd_r85_2030_SS$sf, SF_NOfd_r85_2030_SS$sf.num, col=PRGn[2], lwd=1.5)
 SF_NOfd_r60_2030_SS = plot.sf(NOfd_r60_SS$t_2030, make.plot=FALSE)
-lines(SF_NOfd_r60_2030_SS$sf.num, SF_NOfd_r60_2030_SS$sf, col=PRGn[3], lwd=1.5)
+lines(1/SF_NOfd_r60_2030_SS$sf, SF_NOfd_r60_2030_SS$sf.num, col=PRGn[3], lwd=1.5)
 SF_NOfd_r45_2030_SS = plot.sf(NOfd_r45_SS$t_2030, make.plot=FALSE)
-lines(SF_NOfd_r45_2030_SS$sf.num, SF_NOfd_r45_2030_SS$sf, col=PRGn[4], lwd=1.5)
+lines(1/SF_NOfd_r45_2030_SS$sf, SF_NOfd_r45_2030_SS$sf.num, col=PRGn[4], lwd=1.5)
 SF_NOfd_r26_2030_SS = plot.sf(NOfd_r26_SS$t_2030, make.plot=FALSE)
-lines(SF_NOfd_r26_2030_SS$sf.num, SF_NOfd_r26_2030_SS$sf, col=PRGn[5], lwd=1.5)
+lines(1/SF_NOfd_r26_2030_SS$sf, SF_NOfd_r26_2030_SS$sf.num, col=PRGn[5], lwd=1.5)
 
 dev.off()
 
@@ -344,115 +267,41 @@ lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
-# PLACE HOLDER
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(density(k14_r85_SS$t_2050), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
-     main="", col=RdGy[1], lwd=2, xlim=c(min(k14_r85_SS$t_2050), 15), ylim=c(0, 0.75), bty="l")
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
+     ylim = c(2.85, 15), 
+     xaxt = 'n', cex=1, bty="l",
+     xlab = "Return period (years)", 
+     ylab = "Projected sea+surge level (ft MSL)")
 title(main="c.", adj=0)
-
-lines(density(k14_r60_SS$t_2050), col=RdGy[2], lwd=2)
-lines(density(k14_r45_SS$t_2050), col=RdGy[3], lwd=2)
-lines(density(k14_r26_SS$t_2050), col=RdGy[4], lwd=2)
-
-lines(density(bfd_r85_SS$t_2050), col=BrBG[11], lwd=2)
-lines(density(bfd_r60_SS$t_2050), col=BrBG[10], lwd=2)
-lines(density(bfd_r45_SS$t_2050), col=BrBG[9], lwd=2)
-lines(density(bfd_r26_SS$t_2050), col=BrBG[8], lwd=2)
-
-lines(density(NOfd_r85_SS$t_2050), col=PRGn[2], lwd=2)
-lines(density(NOfd_r60_SS$t_2050), col=PRGn[3], lwd=2)
-lines(density(NOfd_r45_SS$t_2050), col=PRGn[4], lwd=2)
-lines(density(NOfd_r26_SS$t_2050), col=PRGn[5], lwd=2)
-
-# SF ----------------------------------------------------------------------
-par(mgp=c(2,.5,0), mar=c(3.5,4,1,1))
-plot.sf(kopp14_rcp85$t_2050, ylab = "Probability of exceedance", xlab = "Projected sea level in 2050 (ft)",
-        yaxt = "n", yaxs = 'i', typ="l", lwd=2, lty=1, bty="l",
-        ylim = c(10^-4, 10^0+0.25), col=RdGy[1])
-title(main="d.", adj=0)
-
-SF_kopp14_rcp60_2050ft = plot.sf(kopp14_rcp60$t_2050, make.plot=FALSE)
-lines(SF_kopp14_rcp60_2050ft$sf.num, SF_kopp14_rcp60_2050ft$sf, col=RdGy[2], lwd=2)
-SF_kopp14_rcp45_2050ft = plot.sf(kopp14_rcp45$t_2050, make.plot=FALSE)
-lines(SF_kopp14_rcp45_2050ft$sf.num, SF_kopp14_rcp45_2050ft$sf, col=RdGy[3], lwd=2)
-SF_kopp14_rcp26_2050ft = plot.sf(kopp14_rcp26$t_2050, make.plot=FALSE)
-lines(SF_kopp14_rcp26_2050ft$sf.num, SF_kopp14_rcp26_2050ft$sf, col=RdGy[4], lwd=2)
-
-SF_brickfd_rcp85_2050ft = plot.sf(brickfd_rcp85$t_2050, make.plot=FALSE)
-lines(SF_brickfd_rcp85_2050ft$sf.num, SF_brickfd_rcp85_2050ft$sf, col=BrBG[11], lwd=2)
-SF_brickfd_rcp60_2050ft = plot.sf(brickfd_rcp60$t_2050, make.plot=FALSE)
-lines(SF_brickfd_rcp60_2050ft$sf.num, SF_brickfd_rcp60_2050ft$sf, col=BrBG[10], lwd=2)
-SF_brickfd_rcp45_2050ft = plot.sf(brickfd_rcp45$t_2050, make.plot=FALSE)
-lines(SF_brickfd_rcp45_2050ft$sf.num, SF_brickfd_rcp45_2050ft$sf, col=BrBG[9], lwd=2)
-SF_brickfd_rcp26_2050ft = plot.sf(brickfd_rcp26$t_2050, make.plot=FALSE)
-lines(SF_brickfd_rcp26_2050ft$sf.num, SF_brickfd_rcp26_2050ft$sf, col=BrBG[8], lwd=2)
-
-SF_NO_fd_rcp85_2050ft = plot.sf(NO_fdft_rcp85$t_2050, make.plot=FALSE)
-lines(SF_NO_fd_rcp85_2050ft$sf.num, SF_NO_fd_rcp85_2050ft$sf, col=PRGn[2], lwd=2)
-SF_NO_fd_rcp60_2050ft = plot.sf(NO_fdft_rcp60$t_2050, make.plot=FALSE)
-lines(SF_NO_fd_rcp60_2050ft$sf.num, SF_NO_fd_rcp60_2050ft$sf, col=PRGn[3], lwd=2)
-SF_NO_fd_rcp45_2050ft = plot.sf(NO_fdft_rcp45$t_2050, make.plot=FALSE)
-lines(SF_NO_fd_rcp45_2050ft$sf.num, SF_NO_fd_rcp45_2050ft$sf, col=PRGn[4], lwd=2)
-SF_NO_fd_rcp26_2050ft = plot.sf(NO_fdft_rcp26$t_2050, make.plot=FALSE)
-lines(SF_NO_fd_rcp26_2050ft$sf.num, SF_NO_fd_rcp26_2050ft$sf, col=PRGn[5], lwd=2)
-
-#   -----------------------------------------------------------------------
-plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
-     yaxt = 'n', cex=1, xlim = c(2.85, 12), ylim=c(0.011,1),
-     ylab = "Probability of exceedance", xlab = "Storm surge (ft MSL)")
-axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
-title(main="e.", adj=0)
-
-polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
-        y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
-
-polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
-        y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
-
-polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
-        y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
-
-lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
-lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
-lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
-points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
-
-# ----------------------------------------------------------------------
-# PLACE HOLDER
-par(mgp=c(2,0.5,0), mar=c(3.5,3.5,1,1))
-plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
-     yaxt = 'n', cex=1, xlim = c(2.85, 15), ylim=c(0.011,1),
-     ylab = "Probability of exceedance", xlab = "Projected sea+surge level (ft)")
-axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
-title(main="f.", adj=0)
+axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
 SF_k14_r85_2050_SS = plot.sf(k14_r85_SS$t_2050, make.plot=FALSE)
-lines(SF_k14_r85_2050_SS$sf.num, SF_k14_r85_2050_SS$sf, col=RdGy[1], lwd=1.5)
+lines(1/SF_k14_r85_2050_SS$sf, SF_k14_r85_2050_SS$sf.num, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2050_SS = plot.sf(k14_r60_SS$t_2050, make.plot=FALSE)
-lines(SF_k14_r60_2050_SS$sf.num, SF_k14_r60_2050_SS$sf, col=RdGy[2], lwd=1.5)
+lines(1/SF_k14_r60_2050_SS$sf, SF_k14_r60_2050_SS$sf.num, col=RdGy[2], lwd=1.5)
 SF_k14_r45_2050_SS = plot.sf(k14_r45_SS$t_2050, make.plot=FALSE)
-lines(SF_k14_r45_2050_SS$sf.num, SF_k14_r45_2050_SS$sf, col=RdGy[3], lwd=1.5)
+lines(1/SF_k14_r45_2050_SS$sf, SF_k14_r45_2050_SS$sf.num, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2050_SS = plot.sf(k14_r26_SS$t_2050, make.plot=FALSE)
-lines(SF_k14_r26_2050_SS$sf.num, SF_k14_r26_2050_SS$sf, col=RdGy[4], lwd=1.5)
+lines(1/SF_k14_r26_2050_SS$sf, SF_k14_r26_2050_SS$sf.num, col=RdGy[4], lwd=1.5)
 
 SF_bfd_r85_2050_SS = plot.sf(bfd_r85_SS$t_2050, make.plot=FALSE)
-lines(SF_bfd_r85_2050_SS$sf.num, SF_bfd_r85_2050_SS$sf, col=BrBG[11], lwd=1.5)
+lines(1/SF_bfd_r85_2050_SS$sf, SF_bfd_r85_2050_SS$sf.num, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2050_SS = plot.sf(bfd_r60_SS$t_2050, make.plot=FALSE)
-lines(SF_bfd_r60_2050_SS$sf.num, SF_bfd_r60_2050_SS$sf, col=BrBG[10], lwd=1.5)
+lines(1/SF_bfd_r60_2050_SS$sf, SF_bfd_r60_2050_SS$sf.num, col=BrBG[10], lwd=1.5)
 SF_bfd_r45_2050_SS = plot.sf(bfd_r45_SS$t_2050, make.plot=FALSE)
-lines(SF_bfd_r45_2050_SS$sf.num, SF_bfd_r45_2050_SS$sf, col=BrBG[9], lwd=1.5)
+lines(1/SF_bfd_r45_2050_SS$sf, SF_bfd_r45_2050_SS$sf.num, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2050_SS = plot.sf(bfd_r26_SS$t_2050, make.plot=FALSE)
-lines(SF_bfd_r26_2050_SS$sf.num, SF_bfd_r26_2050_SS$sf, col=BrBG[8], lwd=1.5)
+lines(1/SF_bfd_r26_2050_SS$sf, SF_bfd_r26_2050_SS$sf.num, col=BrBG[8], lwd=1.5)
 
 SF_NOfd_r85_2050_SS = plot.sf(NOfd_r85_SS$t_2050, make.plot=FALSE)
-lines(SF_NOfd_r85_2050_SS$sf.num, SF_NOfd_r85_2050_SS$sf, col=PRGn[2], lwd=1.5)
+lines(1/SF_NOfd_r85_2050_SS$sf, SF_NOfd_r85_2050_SS$sf.num, col=PRGn[2], lwd=1.5)
 SF_NOfd_r60_2050_SS = plot.sf(NOfd_r60_SS$t_2050, make.plot=FALSE)
-lines(SF_NOfd_r60_2050_SS$sf.num, SF_NOfd_r60_2050_SS$sf, col=PRGn[3], lwd=1.5)
+lines(1/SF_NOfd_r60_2050_SS$sf, SF_NOfd_r60_2050_SS$sf.num, col=PRGn[3], lwd=1.5)
 SF_NOfd_r45_2050_SS = plot.sf(NOfd_r45_SS$t_2050, make.plot=FALSE)
-lines(SF_NOfd_r45_2050_SS$sf.num, SF_NOfd_r45_2050_SS$sf, col=PRGn[4], lwd=1.5)
+lines(1/SF_NOfd_r45_2050_SS$sf, SF_NOfd_r45_2050_SS$sf.num, col=PRGn[4], lwd=1.5)
 SF_NOfd_r26_2050_SS = plot.sf(NOfd_r26_SS$t_2050, make.plot=FALSE)
-lines(SF_NOfd_r26_2050_SS$sf.num, SF_NOfd_r26_2050_SS$sf, col=PRGn[5], lwd=1.5)
+lines(1/SF_NOfd_r26_2050_SS$sf, SF_NOfd_r26_2050_SS$sf.num, col=PRGn[5], lwd=1.5)
 
 dev.off()
 
@@ -542,115 +391,41 @@ lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
-# PLACE HOLDER
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(density(k14_r85_SS$t_2060), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
-     main="", col=RdGy[1], lwd=2, xlim=c(min(k14_r85_SS$t_2060),max(bfd_r85_SS$t_2060)), ylim=c(0, 0.75), bty="l")
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
+     ylim = c(2.25, 20), 
+     xaxt = 'n', cex=1, bty="l",
+     xlab = "Return period (years)", 
+     ylab = "Projected sea+surge level (ft MSL)")
 title(main="c.", adj=0)
-
-lines(density(k14_r60_SS$t_2060), col=RdGy[2], lwd=2)
-lines(density(k14_r45_SS$t_2060), col=RdGy[3], lwd=2)
-lines(density(k14_r26_SS$t_2060), col=RdGy[4], lwd=2)
-
-lines(density(bfd_r85_SS$t_2060), col=BrBG[11], lwd=2)
-lines(density(bfd_r60_SS$t_2060), col=BrBG[10], lwd=2)
-lines(density(bfd_r45_SS$t_2060), col=BrBG[9], lwd=2)
-lines(density(bfd_r26_SS$t_2060), col=BrBG[8], lwd=2)
-
-lines(density(NOfd_r85_SS$t_2060), col=PRGn[2], lwd=2)
-lines(density(NOfd_r60_SS$t_2060), col=PRGn[3], lwd=2)
-lines(density(NOfd_r45_SS$t_2060), col=PRGn[4], lwd=2)
-lines(density(NOfd_r26_SS$t_2060), col=PRGn[5], lwd=2)
-
-# SF ----------------------------------------------------------------------
-par(mgp=c(2,.5,0), mar=c(3.5,4,1,1))
-plot.sf(kopp14_rcp85$t_2060, ylab = "Probability of exceedance", xlab = "Projected sea level in 2060 (ft)",
-        yaxt = "n", yaxs = 'i', typ="l", lwd=2, lty=1, bty="l",
-        ylim = c(10^-4, 10^0+0.25), col=RdGy[1])
-title(main="d.", adj=0)
-
-SF_kopp14_rcp60_2060ft = plot.sf(kopp14_rcp60$t_2060, make.plot=FALSE)
-lines(SF_kopp14_rcp60_2060ft$sf.num, SF_kopp14_rcp60_2060ft$sf, col=RdGy[2], lwd=2)
-SF_kopp14_rcp45_2060ft = plot.sf(kopp14_rcp45$t_2060, make.plot=FALSE)
-lines(SF_kopp14_rcp45_2060ft$sf.num, SF_kopp14_rcp45_2060ft$sf, col=RdGy[3], lwd=2)
-SF_kopp14_rcp26_2060ft = plot.sf(kopp14_rcp26$t_2060, make.plot=FALSE)
-lines(SF_kopp14_rcp26_2060ft$sf.num, SF_kopp14_rcp26_2060ft$sf, col=RdGy[4], lwd=2)
-
-SF_brickfd_rcp85_2060ft = plot.sf(brickfd_rcp85$t_2060, make.plot=FALSE)
-lines(SF_brickfd_rcp85_2060ft$sf.num, SF_brickfd_rcp85_2060ft$sf, col=BrBG[11], lwd=2)
-SF_brickfd_rcp60_2060ft = plot.sf(brickfd_rcp60$t_2060, make.plot=FALSE)
-lines(SF_brickfd_rcp60_2060ft$sf.num, SF_brickfd_rcp60_2060ft$sf, col=BrBG[10], lwd=2)
-SF_brickfd_rcp45_2060ft = plot.sf(brickfd_rcp45$t_2060, make.plot=FALSE)
-lines(SF_brickfd_rcp45_2060ft$sf.num, SF_brickfd_rcp45_2060ft$sf, col=BrBG[9], lwd=2)
-SF_brickfd_rcp26_2060ft = plot.sf(brickfd_rcp26$t_2060, make.plot=FALSE)
-lines(SF_brickfd_rcp26_2060ft$sf.num, SF_brickfd_rcp26_2060ft$sf, col=BrBG[8], lwd=2)
-
-SF_NO_fd_rcp85_2060ft = plot.sf(NO_fdft_rcp85$t_2060, make.plot=FALSE)
-lines(SF_NO_fd_rcp85_2060ft$sf.num, SF_NO_fd_rcp85_2060ft$sf, col=PRGn[2], lwd=2)
-SF_NO_fd_rcp60_2060ft = plot.sf(NO_fdft_rcp60$t_2060, make.plot=FALSE)
-lines(SF_NO_fd_rcp60_2060ft$sf.num, SF_NO_fd_rcp60_2060ft$sf, col=PRGn[3], lwd=2)
-SF_NO_fd_rcp45_2060ft = plot.sf(NO_fdft_rcp45$t_2060, make.plot=FALSE)
-lines(SF_NO_fd_rcp45_2060ft$sf.num, SF_NO_fd_rcp45_2060ft$sf, col=PRGn[4], lwd=2)
-SF_NO_fd_rcp26_2060ft = plot.sf(NO_fdft_rcp26$t_2060, make.plot=FALSE)
-lines(SF_NO_fd_rcp26_2060ft$sf.num, SF_NO_fd_rcp26_2060ft$sf, col=PRGn[5], lwd=2)
-
-#   -----------------------------------------------------------------------
-plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
-     yaxt = 'n', cex=1, xlim = c(2.25, 12), ylim=c(0.011,1),
-     ylab = "Probability of exceedance", xlab = "Storm surge (ft MSL)")
-axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
-title(main="e.", adj=0)
-
-polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
-        y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
-
-polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
-        y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
-
-polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
-        y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
-
-lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
-lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
-lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
-points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
-
-# ----------------------------------------------------------------------
-# PLACE HOLDER
-par(mgp=c(2,0.5,0), mar=c(3.5,3.5,1,1))
-plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
-     yaxt = 'n', cex=1, xlim = c(2.25, 20), ylim=c(0.011,1),
-     ylab = "Probability of exceedance", xlab = "Projected sea+surge level (ft)")
-axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
-title(main="f.", adj=0)
+axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
 SF_k14_r85_2060_SS = plot.sf(k14_r85_SS$t_2060, make.plot=FALSE)
-lines(SF_k14_r85_2060_SS$sf.num, SF_k14_r85_2060_SS$sf, col=RdGy[1], lwd=1.5)
+lines(1/SF_k14_r85_2060_SS$sf, SF_k14_r85_2060_SS$sf.num, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2060_SS = plot.sf(k14_r60_SS$t_2060, make.plot=FALSE)
-lines(SF_k14_r60_2060_SS$sf.num, SF_k14_r60_2060_SS$sf, col=RdGy[2], lwd=1.5)
+lines(1/SF_k14_r60_2060_SS$sf, SF_k14_r60_2060_SS$sf.num, col=RdGy[2], lwd=1.5)
 SF_k14_r45_2060_SS = plot.sf(k14_r45_SS$t_2060, make.plot=FALSE)
-lines(SF_k14_r45_2060_SS$sf.num, SF_k14_r45_2060_SS$sf, col=RdGy[3], lwd=1.5)
+lines(1/SF_k14_r45_2060_SS$sf, SF_k14_r45_2060_SS$sf.num, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2060_SS = plot.sf(k14_r26_SS$t_2060, make.plot=FALSE)
-lines(SF_k14_r26_2060_SS$sf.num, SF_k14_r26_2060_SS$sf, col=RdGy[4], lwd=1.5)
+lines(1/SF_k14_r26_2060_SS$sf, SF_k14_r26_2060_SS$sf.num, col=RdGy[4], lwd=1.5)
 
 SF_bfd_r85_2060_SS = plot.sf(bfd_r85_SS$t_2060, make.plot=FALSE)
-lines(SF_bfd_r85_2060_SS$sf.num, SF_bfd_r85_2060_SS$sf, col=BrBG[11], lwd=1.5)
+lines(1/SF_bfd_r85_2060_SS$sf, SF_bfd_r85_2060_SS$sf.num, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2060_SS = plot.sf(bfd_r60_SS$t_2060, make.plot=FALSE)
-lines(SF_bfd_r60_2060_SS$sf.num, SF_bfd_r60_2060_SS$sf, col=BrBG[10], lwd=1.5)
+lines(1/SF_bfd_r60_2060_SS$sf, SF_bfd_r60_2060_SS$sf.num, col=BrBG[10], lwd=1.5)
 SF_bfd_r45_2060_SS = plot.sf(bfd_r45_SS$t_2060, make.plot=FALSE)
-lines(SF_bfd_r45_2060_SS$sf.num, SF_bfd_r45_2060_SS$sf, col=BrBG[9], lwd=1.5)
+lines(1/SF_bfd_r45_2060_SS$sf, SF_bfd_r45_2060_SS$sf.num, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2060_SS = plot.sf(bfd_r26_SS$t_2060, make.plot=FALSE)
-lines(SF_bfd_r26_2060_SS$sf.num, SF_bfd_r26_2060_SS$sf, col=BrBG[8], lwd=1.5)
+lines(1/SF_bfd_r26_2060_SS$sf, SF_bfd_r26_2060_SS$sf.num, col=BrBG[8], lwd=1.5)
 
 SF_NOfd_r85_2060_SS = plot.sf(NOfd_r85_SS$t_2060, make.plot=FALSE)
-lines(SF_NOfd_r85_2060_SS$sf.num, SF_NOfd_r85_2060_SS$sf, col=PRGn[2], lwd=1.5)
+lines(1/SF_NOfd_r85_2060_SS$sf, SF_NOfd_r85_2060_SS$sf.num, col=PRGn[2], lwd=1.5)
 SF_NOfd_r60_2060_SS = plot.sf(NOfd_r60_SS$t_2060, make.plot=FALSE)
-lines(SF_NOfd_r60_2060_SS$sf.num, SF_NOfd_r60_2060_SS$sf, col=PRGn[3], lwd=1.5)
+lines(1/SF_NOfd_r60_2060_SS$sf, SF_NOfd_r60_2060_SS$sf.num, col=PRGn[3], lwd=1.5)
 SF_NOfd_r45_2060_SS = plot.sf(NOfd_r45_SS$t_2060, make.plot=FALSE)
-lines(SF_NOfd_r45_2060_SS$sf.num, SF_NOfd_r45_2060_SS$sf, col=PRGn[4], lwd=1.5)
+lines(1/SF_NOfd_r45_2060_SS$sf, SF_NOfd_r45_2060_SS$sf.num, col=PRGn[4], lwd=1.5)
 SF_NOfd_r26_2060_SS = plot.sf(NOfd_r26_SS$t_2060, make.plot=FALSE)
-lines(SF_NOfd_r26_2060_SS$sf.num, SF_NOfd_r26_2060_SS$sf, col=PRGn[5], lwd=1.5)
+lines(1/SF_NOfd_r26_2060_SS$sf, SF_NOfd_r26_2060_SS$sf.num, col=PRGn[5], lwd=1.5)
 
 dev.off()
 
@@ -740,115 +515,41 @@ lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
 # ----------------------------------------------------------------------
-# PLACE HOLDER
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(density(k14_r85_SS$t_2100), xlab="Projected sea+surge level (ft)", ylab="Probability density", yaxt="n", type = "l", 
-     main="", col=RdGy[1], lwd=2, xlim=c(min(k14_r85_SS$t_2100),max(bfd_r85_SS$t_2100)), ylim=c(0, 0.6), bty="l")
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
+     ylim = c(2, 25), 
+     xaxt = 'n', cex=1, bty="l",
+     xlab = "Return period (years)", 
+     ylab = "Projected sea+surge level (ft MSL)")
 title(main="c.", adj=0)
-
-lines(density(k14_r60_SS$t_2100), col=RdGy[2], lwd=2)
-lines(density(k14_r45_SS$t_2100), col=RdGy[3], lwd=2)
-lines(density(k14_r26_SS$t_2100), col=RdGy[4], lwd=2)
-
-lines(density(bfd_r85_SS$t_2100), col=BrBG[11], lwd=2)
-lines(density(bfd_r60_SS$t_2100), col=BrBG[10], lwd=2)
-lines(density(bfd_r45_SS$t_2100), col=BrBG[9], lwd=2)
-lines(density(bfd_r26_SS$t_2100), col=BrBG[8], lwd=2)
-
-lines(density(NOfd_r85_SS$t_2100), col=PRGn[2], lwd=2)
-lines(density(NOfd_r60_SS$t_2100), col=PRGn[3], lwd=2)
-lines(density(NOfd_r45_SS$t_2100), col=PRGn[4], lwd=2)
-lines(density(NOfd_r26_SS$t_2100), col=PRGn[5], lwd=2)
-
-# SF ----------------------------------------------------------------------
-par(mgp=c(2,0.5,0), mar=c(3.5,4,1,1))
-plot.sf(kopp14_rcp85$t_2100, ylab = "Probability of exceedance", xlab = "Projected sea level in 2100 (ft)",
-        yaxt = "n", yaxs = 'i', typ="l", lwd=2, lty=1, bty="l",
-        ylim = c(10^-4, 10^0+0.25), col=RdGy[1])
-title(main="d.", adj=0)
-
-SF_kopp14_rcp60_2100ft = plot.sf(kopp14_rcp60$t_2100, make.plot=FALSE)
-lines(SF_kopp14_rcp60_2100ft$sf.num, SF_kopp14_rcp60_2100ft$sf, col=RdGy[2], lwd=2)
-SF_kopp14_rcp45_2100ft = plot.sf(kopp14_rcp45$t_2100, make.plot=FALSE)
-lines(SF_kopp14_rcp45_2100ft$sf.num, SF_kopp14_rcp45_2100ft$sf, col=RdGy[3], lwd=2)
-SF_kopp14_rcp26_2100ft = plot.sf(kopp14_rcp26$t_2100, make.plot=FALSE)
-lines(SF_kopp14_rcp26_2100ft$sf.num, SF_kopp14_rcp26_2100ft$sf, col=RdGy[4], lwd=2)
-
-SF_brickfd_rcp85_2100ft = plot.sf(brickfd_rcp85$t_2100, make.plot=FALSE)
-lines(SF_brickfd_rcp85_2100ft$sf.num, SF_brickfd_rcp85_2100ft$sf, col=BrBG[11], lwd=2)
-SF_brickfd_rcp60_2100ft = plot.sf(brickfd_rcp60$t_2100, make.plot=FALSE)
-lines(SF_brickfd_rcp60_2100ft$sf.num, SF_brickfd_rcp60_2100ft$sf, col=BrBG[10], lwd=2)
-SF_brickfd_rcp45_2100ft = plot.sf(brickfd_rcp45$t_2100, make.plot=FALSE)
-lines(SF_brickfd_rcp45_2100ft$sf.num, SF_brickfd_rcp45_2100ft$sf, col=BrBG[9], lwd=2)
-SF_brickfd_rcp26_2100ft = plot.sf(brickfd_rcp26$t_2100, make.plot=FALSE)
-lines(SF_brickfd_rcp26_2100ft$sf.num, SF_brickfd_rcp26_2100ft$sf, col=BrBG[8], lwd=2)
-
-SF_NO_fd_rcp85_2100ft = plot.sf(NO_fdft_rcp85$t_2100, make.plot=FALSE)
-lines(SF_NO_fd_rcp85_2100ft$sf.num, SF_NO_fd_rcp85_2100ft$sf, col=PRGn[2], lwd=2)
-SF_NO_fd_rcp60_2100ft = plot.sf(NO_fdft_rcp60$t_2100, make.plot=FALSE)
-lines(SF_NO_fd_rcp60_2100ft$sf.num, SF_NO_fd_rcp60_2100ft$sf, col=PRGn[3], lwd=2)
-SF_NO_fd_rcp45_2100ft = plot.sf(NO_fdft_rcp45$t_2100, make.plot=FALSE)
-lines(SF_NO_fd_rcp45_2100ft$sf.num, SF_NO_fd_rcp45_2100ft$sf, col=PRGn[4], lwd=2)
-SF_NO_fd_rcp26_2100ft = plot.sf(NO_fdft_rcp26$t_2100, make.plot=FALSE)
-lines(SF_NO_fd_rcp26_2100ft$sf.num, SF_NO_fd_rcp26_2100ft$sf, col=PRGn[5], lwd=2)
-
-#   -----------------------------------------------------------------------
-plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
-     yaxt = 'n', cex=1, xlim = c(2, 13), ylim=c(0.011,1),
-     ylab = "Probability of exceedance", xlab = "Storm surge (ft MSL)")
-axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
-title(main="e.", adj=0)
-
-polygon(x = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
-        y = c(SF_Srikrishnan_stationary25$sf, rev(SF_Srikrishnan_stationary975$sf)), col = trans_RdBu[9], border = NA)
-
-polygon(x = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
-        y = c(1/tebaldi12$rp, rev(1/tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
-
-polygon(x = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
-        y = c(zervas_2013$aep, rev(zervas_2013$aep)), col = trans_BrBG[2], border = NA)
-points(NOAA_methodGEV$obs, 1/NOAA_methodGEV$return_obs, pch = 19)
-
-lines(SF_Srikrishnan_stationary$sf.num, SF_Srikrishnan_stationary$sf, col=RdBu[11], lwd=2)
-lines(NOAA_rl, 1/NOAA_rp, lwd=2, col=BrBG[2])
-lines(tebaldi12$rl_50, 1/tebaldi12$rp, lty = 1, lwd = 2, col=tebaldi_gold[1])
-points(USACE_EWL$feet[8:14], 1/USACE_rp, pch = 20, col=RdBu[10])
-
-# ----------------------------------------------------------------------
-# PLACE HOLDER
-par(mgp=c(2,0.5,0), mar=c(3.5,3.5,1,1))
-plot(NOAA_methodGEV$return_level, NOAA_methodGEV$aep, log = "y", type = "n",bty="l",
-     yaxt = 'n', cex=1, xlim = c(2, 25), ylim=c(0.011,1),
-     ylab = "Probability of exceedance", xlab = "Projected sea+surge level (ft)")
-axis(2, at=10^(-4:0), label=parse(text=paste("10^", -4:0, sep="")), las=1)
-title(main="f.", adj=0)
+axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
 SF_k14_r85_2100_SS = plot.sf(k14_r85_SS$t_2100, make.plot=FALSE)
-lines(SF_k14_r85_2100_SS$sf.num, SF_k14_r85_2100_SS$sf, col=RdGy[1], lwd=1.5)
+lines(1/SF_k14_r85_2100_SS$sf, SF_k14_r85_2100_SS$sf.num, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2100_SS = plot.sf(k14_r60_SS$t_2100, make.plot=FALSE)
-lines(SF_k14_r60_2100_SS$sf.num, SF_k14_r60_2100_SS$sf, col=RdGy[2], lwd=1.5)
+lines(1/SF_k14_r60_2100_SS$sf, SF_k14_r60_2100_SS$sf.num, col=RdGy[2], lwd=1.5)
 SF_k14_r45_2100_SS = plot.sf(k14_r45_SS$t_2100, make.plot=FALSE)
-lines(SF_k14_r45_2100_SS$sf.num, SF_k14_r45_2100_SS$sf, col=RdGy[3], lwd=1.5)
+lines(1/SF_k14_r45_2100_SS$sf, SF_k14_r45_2100_SS$sf.num, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2100_SS = plot.sf(k14_r26_SS$t_2100, make.plot=FALSE)
-lines(SF_k14_r26_2100_SS$sf.num, SF_k14_r26_2100_SS$sf, col=RdGy[4], lwd=1.5)
+lines(1/SF_k14_r26_2100_SS$sf, SF_k14_r26_2100_SS$sf.num, col=RdGy[4], lwd=1.5)
 
 SF_bfd_r85_2100_SS = plot.sf(bfd_r85_SS$t_2100, make.plot=FALSE)
-lines(SF_bfd_r85_2100_SS$sf.num, SF_bfd_r85_2100_SS$sf, col=BrBG[11], lwd=1.5)
+lines(1/SF_bfd_r85_2100_SS$sf, SF_bfd_r85_2100_SS$sf.num, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2100_SS = plot.sf(bfd_r60_SS$t_2100, make.plot=FALSE)
-lines(SF_bfd_r60_2100_SS$sf.num, SF_bfd_r60_2100_SS$sf, col=BrBG[10], lwd=1.5)
+lines(1/SF_bfd_r60_2100_SS$sf, SF_bfd_r60_2100_SS$sf.num, col=BrBG[10], lwd=1.5)
 SF_bfd_r45_2100_SS = plot.sf(bfd_r45_SS$t_2100, make.plot=FALSE)
-lines(SF_bfd_r45_2100_SS$sf.num, SF_bfd_r45_2100_SS$sf, col=BrBG[9], lwd=1.5)
+lines(1/SF_bfd_r45_2100_SS$sf, SF_bfd_r45_2100_SS$sf.num, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2100_SS = plot.sf(bfd_r26_SS$t_2100, make.plot=FALSE)
-lines(SF_bfd_r26_2100_SS$sf.num, SF_bfd_r26_2100_SS$sf, col=BrBG[8], lwd=1.5)
+lines(1/SF_bfd_r26_2100_SS$sf, SF_bfd_r26_2100_SS$sf.num, col=BrBG[8], lwd=1.5)
 
 SF_NOfd_r85_2100_SS = plot.sf(NOfd_r85_SS$t_2100, make.plot=FALSE)
-lines(SF_NOfd_r85_2100_SS$sf.num, SF_NOfd_r85_2100_SS$sf, col=PRGn[2], lwd=1.5)
+lines(1/SF_NOfd_r85_2100_SS$sf, SF_NOfd_r85_2100_SS$sf.num, col=PRGn[2], lwd=1.5)
 SF_NOfd_r60_2100_SS = plot.sf(NOfd_r60_SS$t_2100, make.plot=FALSE)
-lines(SF_NOfd_r60_2100_SS$sf.num, SF_NOfd_r60_2100_SS$sf, col=PRGn[3], lwd=1.5)
+lines(1/SF_NOfd_r60_2100_SS$sf, SF_NOfd_r60_2100_SS$sf.num, col=PRGn[3], lwd=1.5)
 SF_NOfd_r45_2100_SS = plot.sf(NOfd_r45_SS$t_2100, make.plot=FALSE)
-lines(SF_NOfd_r45_2100_SS$sf.num, SF_NOfd_r45_2100_SS$sf, col=PRGn[4], lwd=1.5)
+lines(1/SF_NOfd_r45_2100_SS$sf, SF_NOfd_r45_2100_SS$sf.num, col=PRGn[4], lwd=1.5)
 SF_NOfd_r26_2100_SS = plot.sf(NOfd_r26_SS$t_2100, make.plot=FALSE)
-lines(SF_NOfd_r26_2100_SS$sf.num, SF_NOfd_r26_2100_SS$sf, col=PRGn[5], lwd=1.5)
+lines(1/SF_NOfd_r26_2100_SS$sf, SF_NOfd_r26_2100_SS$sf.num, col=PRGn[5], lwd=1.5)
 
 dev.off()
 
