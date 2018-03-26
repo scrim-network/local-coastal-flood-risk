@@ -8,7 +8,7 @@ library(ash)
 library(fields)
 
 # Read in conversion functions
-source("conversion_functions.R")
+source("local-costal-flood-risk/R/conversion_functions.R")
 
 # Read in data ------------------------------------------------------------
 # Read in Kopp et al. 2014 MCMC LSLR data for sewells point
@@ -52,60 +52,41 @@ nc_close(fid1)
 # Kopp and Wong & Keller have different numbers of samples. Using the Kopp data randomly 
 # generate subsidence data to increase the sample size to match that of Wong & Keller
 states_w = dim(lsl_fdyn_rcp26)[2]
-BKkopp_subsid_2030 = rlnorm(states_w, meanlog=mean(log(kopp14_subsid$t_2030)), sdlog=sd(log(kopp14_subsid$t_2030)))
-BKkopp_subsid_2050 = rlnorm(states_w, meanlog=mean(log(kopp14_subsid$t_2050)), sdlog=sd(log(kopp14_subsid$t_2050)))
-BKkopp_subsid_2060 = rlnorm(states_w, meanlog=mean(log(kopp14_subsid$t_2060)), sdlog=sd(log(kopp14_subsid$t_2060)))
-BKkopp_subsid_2100 = rlnorm(states_w, meanlog=mean(log(kopp14_subsid$t_2100)), sdlog=sd(log(kopp14_subsid$t_2100)))
+BKkopp_subsid = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2060 = 1:states_w, t_2100 = 1:states_w)
+for(i in 1:4){
+  BKkopp_subsid[ ,i] = rlnorm(states_w, meanlog=mean(log(kopp14_subsid[ ,i])), sdlog=sd(log(kopp14_subsid[ ,i])))
+}
 
 # BRICK change from m to feet and add subsidence based on Kopp et al. 2014
-# RCP26
-brickfd_rcp26_2030ft = convert_m_to_ft(lsl_fdyn_rcp26[match(2030, year_proj), ]) + BKkopp_subsid_2030
-brickfd_rcp26_2050ft = convert_m_to_ft(lsl_fdyn_rcp26[match(2050, year_proj), ]) + BKkopp_subsid_2050
-brickfd_rcp26_2060ft = convert_m_to_ft(lsl_fdyn_rcp26[match(2060, year_proj), ]) + BKkopp_subsid_2060
-brickfd_rcp26_2100ft = convert_m_to_ft(lsl_fdyn_rcp26[match(2100, year_proj), ]) + BKkopp_subsid_2100
+combine_subsid_to_brick = function(out_name, brick_input, y_projection, subsidence){
+  years = c(2030, 2050, 2060, 2100)
+  for(i in 1:4){
+    out_name[ ,i] = convert_m_to_ft(brick_input[match(years[i], y_projection), ]) + subsidence[ ,i]
+  }
+  out_name
+}
 
-# RCP45
-brickfd_rcp45_2030ft = convert_m_to_ft(lsl_fdyn_rcp45[match(2030, year_proj), ]) + BKkopp_subsid_2030
-brickfd_rcp45_2050ft = convert_m_to_ft(lsl_fdyn_rcp45[match(2050, year_proj), ]) + BKkopp_subsid_2050
-brickfd_rcp45_2060ft = convert_m_to_ft(lsl_fdyn_rcp45[match(2060, year_proj), ]) + BKkopp_subsid_2060
-brickfd_rcp45_2100ft = convert_m_to_ft(lsl_fdyn_rcp45[match(2100, year_proj), ]) + BKkopp_subsid_2100
+# Fast feedbacks
+brickfd_rcp26 = 
+  brickfd_rcp45 = 
+  brickfd_rcp60 = 
+  brickfd_rcp85 = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2060 = 1:states_w, t_2100 = 1:states_w)
 
-# RCP60
-brickfd_rcp60_2030ft = convert_m_to_ft(lsl_fdyn_rcp60[match(2030, year_proj), ]) + BKkopp_subsid_2030
-brickfd_rcp60_2050ft = convert_m_to_ft(lsl_fdyn_rcp60[match(2050, year_proj), ]) + BKkopp_subsid_2050
-brickfd_rcp60_2060ft = convert_m_to_ft(lsl_fdyn_rcp60[match(2060, year_proj), ]) + BKkopp_subsid_2060
-brickfd_rcp60_2100ft = convert_m_to_ft(lsl_fdyn_rcp60[match(2100, year_proj), ]) + BKkopp_subsid_2100
+brickfd_rcp26 = combine_subsid_to_brick(brickfd_rcp26, lsl_fdyn_rcp26, year_proj, BKkopp_subsid)
+brickfd_rcp45 = combine_subsid_to_brick(brickfd_rcp45, lsl_fdyn_rcp45, year_proj, BKkopp_subsid)
+brickfd_rcp60 = combine_subsid_to_brick(brickfd_rcp60, lsl_fdyn_rcp60, year_proj, BKkopp_subsid)
+brickfd_rcp85 = combine_subsid_to_brick(brickfd_rcp85, lsl_fdyn_rcp85, year_proj, BKkopp_subsid)
 
-# RCP85
-brickfd_rcp85_2030ft = convert_m_to_ft(lsl_fdyn_rcp85[match(2030, year_proj), ]) + BKkopp_subsid_2030
-brickfd_rcp85_2050ft = convert_m_to_ft(lsl_fdyn_rcp85[match(2050, year_proj), ]) + BKkopp_subsid_2050
-brickfd_rcp85_2060ft = convert_m_to_ft(lsl_fdyn_rcp85[match(2060, year_proj), ]) + BKkopp_subsid_2060
-brickfd_rcp85_2100ft = convert_m_to_ft(lsl_fdyn_rcp85[match(2100, year_proj), ]) + BKkopp_subsid_2100
+# No Fast feedbacks
+NO_fdft_rcp26 = 
+  NO_fdft_rcp45 = 
+  NO_fdft_rcp60 = 
+  NO_fdft_rcp85 = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2060 = 1:states_w, t_2100 = 1:states_w)
 
-# BRICK change from m to feet and add subsidence based on Kopp et al. 2014
-# RCP26
-NO_fd_rcp26_2030ft = convert_m_to_ft(NO_fdyn_rcp26[match(2030, NO_fdyn_proj), ]) + BKkopp_subsid_2030
-NO_fd_rcp26_2050ft = convert_m_to_ft(NO_fdyn_rcp26[match(2050, NO_fdyn_proj), ]) + BKkopp_subsid_2050
-NO_fd_rcp26_2060ft = convert_m_to_ft(NO_fdyn_rcp26[match(2060, NO_fdyn_proj), ]) + BKkopp_subsid_2060
-NO_fd_rcp26_2100ft = convert_m_to_ft(NO_fdyn_rcp26[match(2100, NO_fdyn_proj), ]) + BKkopp_subsid_2100
-
-# RCP45
-NO_fd_rcp45_2030ft = convert_m_to_ft(NO_fdyn_rcp45[match(2030, NO_fdyn_proj), ]) + BKkopp_subsid_2030
-NO_fd_rcp45_2050ft = convert_m_to_ft(NO_fdyn_rcp45[match(2050, NO_fdyn_proj), ]) + BKkopp_subsid_2050
-NO_fd_rcp45_2060ft = convert_m_to_ft(NO_fdyn_rcp45[match(2060, NO_fdyn_proj), ]) + BKkopp_subsid_2060
-NO_fd_rcp45_2100ft = convert_m_to_ft(NO_fdyn_rcp45[match(2100, NO_fdyn_proj), ]) + BKkopp_subsid_2100
-
-# RCP60
-NO_fd_rcp60_2030ft = convert_m_to_ft(NO_fdyn_rcp60[match(2030, NO_fdyn_proj), ]) + BKkopp_subsid_2030
-NO_fd_rcp60_2050ft = convert_m_to_ft(NO_fdyn_rcp60[match(2050, NO_fdyn_proj), ]) + BKkopp_subsid_2050
-NO_fd_rcp60_2060ft = convert_m_to_ft(NO_fdyn_rcp60[match(2060, NO_fdyn_proj), ]) + BKkopp_subsid_2060
-NO_fd_rcp60_2100ft = convert_m_to_ft(NO_fdyn_rcp60[match(2100, NO_fdyn_proj), ]) + BKkopp_subsid_2100
-
-# RCP85
-NO_fd_rcp85_2030ft = convert_m_to_ft(NO_fdyn_rcp85[match(2030, NO_fdyn_proj), ]) + BKkopp_subsid_2030
-NO_fd_rcp85_2050ft = convert_m_to_ft(NO_fdyn_rcp85[match(2050, NO_fdyn_proj), ]) + BKkopp_subsid_2050
-NO_fd_rcp85_2060ft = convert_m_to_ft(NO_fdyn_rcp85[match(2060, NO_fdyn_proj), ]) + BKkopp_subsid_2060
-NO_fd_rcp85_2100ft = convert_m_to_ft(NO_fdyn_rcp85[match(2100, NO_fdyn_proj), ]) + BKkopp_subsid_2100
+NO_fdft_rcp26 = combine_subsid_to_brick(NO_fdft_rcp26, NO_fdyn_rcp26, NO_fdyn_proj, BKkopp_subsid)
+NO_fdft_rcp45 = combine_subsid_to_brick(NO_fdft_rcp45, NO_fdyn_rcp45, NO_fdyn_proj, BKkopp_subsid)
+NO_fdft_rcp60 = combine_subsid_to_brick(NO_fdft_rcp60, NO_fdyn_rcp60, NO_fdyn_proj, BKkopp_subsid)
+NO_fdft_rcp85 = combine_subsid_to_brick(NO_fdft_rcp85, NO_fdyn_rcp85, NO_fdyn_proj, BKkopp_subsid)
 
 # Convert baseline to 2000 ------------------------------------------------
 # Read in data from the USACE Sea level calculator for Sewells Point
@@ -168,32 +149,26 @@ stationary = readRDS("norfolk_MCMC-stationary.rds")
 
 burnin = 1:50000
 burn_stationary = stationary[[1]]$samples[-burnin, ]
-mean_stat = rep(NA,3)
 post_stat_25 = rep(NA,3)
 post_stat_975 = rep(NA,3)
 for(i in 1:3){
-  mean_stat[i] = mean(burn_stationary[ ,i])
   post_stat_25[i] = quantile(burn_stationary[ ,i],0.025) 
   post_stat_975[i] = quantile(burn_stationary[ ,i],0.975) 
 }
 
 # Random generation data in millimeters
-stat_gev = revd(nrow(burn_stationary), loc = burn_stationary[,1], scale = burn_stationary[,2], 
-                shape = burn_stationary[,3], type='GEV')
-stat_gev25 = revd(1e5, loc = post_stat_25[1], scale = post_stat_25[2], shape = post_stat_25[3], type='GEV')
-stat_gev975 = revd(1e5, loc = post_stat_975[1], scale = post_stat_975[2], shape = post_stat_975[3], type='GEV')
-
-stat_gev = convert_mm_to_ft(stat_gev)
-stat_gev25 = convert_mm_to_ft(stat_gev25)
-stat_gev975 = convert_mm_to_ft(stat_gev975)
+stat_gev = convert_mm_to_ft(revd(nrow(burn_stationary), loc = burn_stationary[,1], scale = burn_stationary[,2], 
+                shape = burn_stationary[,3], type='GEV'))
+stat_gev25 = convert_mm_to_ft(revd(1e5, loc = post_stat_25[1], scale = post_stat_25[2], shape = post_stat_25[3], type='GEV'))
+stat_gev975 = convert_mm_to_ft(revd(1e5, loc = post_stat_975[1], scale = post_stat_975[2], shape = post_stat_975[3], type='GEV'))
 
 #--------- Combined SLR + Storm surge
 # BRICK length stationary
-subbrick_length = length(brickfd_rcp26_2030ft)
+subbrick_length = length(brickfd_rcp26$t_2030)
 subbrick_stat = burn_stationary[sample(nrow(burn_stationary), size=subbrick_length, replace=FALSE), ]
 stationary_brick = convert_mm_to_ft(revd(nrow(subbrick_stat), loc = subbrick_stat[,1], scale = subbrick_stat[,2], 
                       shape = subbrick_stat[,3], type='GEV'))
-#KOPP length stationary
+# KOPP length stationary
 subkopp_length = length(kopp14_rcp26$t_2030)
 subkopp_stat = burn_stationary[sample(nrow(burn_stationary), size=subkopp_length, replace=FALSE), ]
 stationary_kopp = convert_mm_to_ft(revd(nrow(subkopp_stat), loc = subkopp_stat[,1], scale = subkopp_stat[,2], 
@@ -205,54 +180,20 @@ k14_r45_SS = kopp14_rcp45 + stationary_kopp
 k14_r60_SS = kopp14_rcp60 + stationary_kopp
 k14_r85_SS = kopp14_rcp85 + stationary_kopp
 
-#add storm surge to brick fast dynamics
-# RCP26
-bfd_r26_2030_SS = brickfd_rcp26_2030ft + stationary_brick
-bfd_r26_2050_SS = brickfd_rcp26_2050ft + stationary_brick
-bfd_r26_2060_SS = brickfd_rcp26_2060ft + stationary_brick
-bfd_r26_2100_SS = brickfd_rcp26_2100ft + stationary_brick
-# RCP45
-bfd_r45_2030_SS = brickfd_rcp45_2030ft + stationary_brick
-bfd_r45_2050_SS = brickfd_rcp45_2050ft + stationary_brick
-bfd_r45_2060_SS = brickfd_rcp45_2060ft + stationary_brick
-bfd_r45_2100_SS = brickfd_rcp45_2100ft + stationary_brick
-# RCP60
-bfd_r60_2030_SS = brickfd_rcp60_2030ft + stationary_brick
-bfd_r60_2050_SS = brickfd_rcp60_2050ft + stationary_brick
-bfd_r60_2060_SS = brickfd_rcp60_2060ft + stationary_brick
-bfd_r60_2100_SS = brickfd_rcp60_2100ft + stationary_brick
-# RCP85
-bfd_r85_2030_SS = brickfd_rcp85_2030ft + stationary_brick
-bfd_r85_2050_SS = brickfd_rcp85_2050ft + stationary_brick
-bfd_r85_2060_SS = brickfd_rcp85_2060ft + stationary_brick
-bfd_r85_2100_SS = brickfd_rcp85_2100ft + stationary_brick
+# add storm surge to brick fast dynamics
+bfd_r26_SS = brickfd_rcp26 + stationary_brick
+bfd_r45_SS = brickfd_rcp45 + stationary_brick
+bfd_r60_SS = brickfd_rcp60 + stationary_brick
+bfd_r85_SS = brickfd_rcp85 + stationary_brick
 
-#add storm surge to brick non fast dynamics
-# RCP26
-NOfd_r26_2030_SS = NO_fd_rcp26_2030ft + stationary_brick
-NOfd_r26_2050_SS = NO_fd_rcp26_2050ft + stationary_brick
-NOfd_r26_2060_SS = NO_fd_rcp26_2060ft + stationary_brick
-NOfd_r26_2100_SS = NO_fd_rcp26_2100ft + stationary_brick
-# RCP45
-NOfd_r45_2030_SS = NO_fd_rcp45_2030ft + stationary_brick
-NOfd_r45_2050_SS = NO_fd_rcp45_2050ft + stationary_brick
-NOfd_r45_2060_SS = NO_fd_rcp45_2060ft + stationary_brick
-NOfd_r45_2100_SS = NO_fd_rcp45_2100ft + stationary_brick
-# RCP60
-NOfd_r60_2030_SS = NO_fd_rcp60_2030ft + stationary_brick
-NOfd_r60_2050_SS = NO_fd_rcp60_2050ft + stationary_brick
-NOfd_r60_2060_SS = NO_fd_rcp60_2060ft + stationary_brick
-NOfd_r60_2100_SS = NO_fd_rcp60_2100ft + stationary_brick
-# RCP85
-NOfd_r85_2030_SS = NO_fd_rcp85_2030ft + stationary_brick
-NOfd_r85_2050_SS = NO_fd_rcp85_2050ft + stationary_brick
-NOfd_r85_2060_SS = NO_fd_rcp85_2060ft + stationary_brick
-NOfd_r85_2100_SS = NO_fd_rcp85_2100ft + stationary_brick
+# add storm surge to brick non fast dynamics
+NOfd_r26_SS = NO_fdft_rcp26 + stationary_brick
+NOfd_r45_SS = NO_fdft_rcp45 + stationary_brick
+NOfd_r60_SS = NO_fdft_rcp60 + stationary_brick
+NOfd_r85_SS = NO_fdft_rcp85 + stationary_brick
 
 # add Tebadli et al 100-yr return period to kopp
 k14_r26_Teb = kopp14_rcp26 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
 k14_r45_Teb = kopp14_rcp45 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
 k14_r60_Teb = kopp14_rcp60 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
 k14_r85_Teb = kopp14_rcp85 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-
-
