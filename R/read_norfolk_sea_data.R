@@ -7,34 +7,8 @@ library(plotrix)
 library(ash)
 library(fields)
 
-# Functions ---------------------------------------------------------------
-# Conversion of metric to ft
-convert_mm_to_ft = function(mm){
-  mm * 0.00328084
-} 
-
-convert_cm_to_ft = function(cm){
-  cm * 0.0328084
-} 
-
-convert_m_to_ft = function(m){
-  m * 3.28084
-}
-
-# Conversion of datums
-convert_mhw_to_msl = function(mhw_levels){
-  MHW = 6.94
-  MSL = 5.74
-  mhw_levels + (MHW - MSL)
-}
-
-convert_mhhw_to_msl = function(mhhw_levels){
-  MHHW = 7.14
-  MSL = 5.74
-  mhhw_levels + (MHHW - MSL)
-}
-#   -----------------------------------------------------------------------
-
+# Read in conversion functions
+source("conversion_functions.R")
 
 # Read in data ------------------------------------------------------------
 # Read in Kopp et al. 2014 MCMC LSLR data for sewells point
