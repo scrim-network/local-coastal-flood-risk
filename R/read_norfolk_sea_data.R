@@ -74,14 +74,6 @@ NO_fdyn_rcp85 <- ncvar_get(fid1,"LocalSeaLevel_RCP85")
 NO_fdyn_proj <- ncvar_get(fid1,"time_proj")
 nc_close(fid1)
 
-# # Read in data from the USACE Sea level calculator for Sewells Point
-# # This data includes: NOAA et al. 2012, USACE 2013, CARSWG 2016, and NOAA et al. 2017
-# # Data is ft above 1992, so 0cm is 1992
-# NOAA_etal_2017 = read.csv("NOAA_etal_2017_SewellsPoint.csv", skip=1, header=TRUE) 
-# SL_calculator = read.csv("USACE_SL_Calculator_SewellsPoint.csv", skip=1, header=TRUE)
-# NOAA_etal_2017 = as.matrix(NOAA_etal_2017)
-# SL_calculator = as.matrix(SL_calculator)
-
 # Convert to feet ---------------------------------------------------------
 # Kopp and Wong & Keller have different numbers of samples. Using the Kopp data randomly 
 # generate subsidence data to increase the sample size to match that of Wong & Keller
@@ -318,27 +310,13 @@ nonstat_kopp2060 = convert_mm_to_ft(revd(nrow(subkopp_nonstat), loc = lambda_kop
                                          shape = subkopp_nonstat[,4], type='GEV'))
 nonstat_kopp2100 = convert_mm_to_ft(revd(nrow(subkopp_nonstat), loc = lambda_kopp2100, scale = subkopp_nonstat[,3], 
                                          shape = subkopp_nonstat[,4], type='GEV'))
-#add storm surge to kopp
-# RCP26
-k14_r26_2030_SS = kopp14_rcp26$t_2030 + stationary_kopp
-k14_r26_2050_SS = kopp14_rcp26$t_2050 + stationary_kopp
-k14_r26_2060_SS = kopp14_rcp26$t_2060 + stationary_kopp
-k14_r26_2100_SS = kopp14_rcp26$t_2100 + stationary_kopp
-# RCP45
-k14_r45_2030_SS = kopp14_rcp45$t_2030 + stationary_kopp
-k14_r45_2050_SS = kopp14_rcp45$t_2050 + stationary_kopp 
-k14_r45_2060_SS = kopp14_rcp45$t_2060 + stationary_kopp
-k14_r45_2100_SS = kopp14_rcp45$t_2100 + stationary_kopp
-# RCP60
-k14_r60_2030_SS = kopp14_rcp60$t_2030 + stationary_kopp
-k14_r60_2050_SS = kopp14_rcp60$t_2050 + stationary_kopp 
-k14_r60_2060_SS = kopp14_rcp60$t_2060 + stationary_kopp
-k14_r60_2100_SS = kopp14_rcp60$t_2100 + stationary_kopp 
-# RCP85
-k14_r85_2030_SS = kopp14_rcp85$t_2030 + stationary_kopp
-k14_r85_2050_SS = kopp14_rcp85$t_2050 + stationary_kopp 
-k14_r85_2060_SS = kopp14_rcp85$t_2060 + stationary_kopp
-k14_r85_2100_SS = kopp14_rcp85$t_2100 + stationary_kopp
+# add stationary storm surge to kopp
+k14_r26_SS = kopp14_rcp26 + stationary_kopp
+k14_r45_SS = kopp14_rcp45 + stationary_kopp
+k14_r60_SS = kopp14_rcp60 + stationary_kopp
+k14_r85_SS = kopp14_rcp85 + stationary_kopp
+
+# add non-stationary storm surge to kopp
 k14_r85_2030_SSN = kopp14_rcp85$t_2030 + nonstat_kopp2030
 k14_r85_2050_SSN = kopp14_rcp85$t_2050 + nonstat_kopp2050 
 k14_r85_2060_SSN = kopp14_rcp85$t_2060 + nonstat_kopp2060
@@ -396,26 +374,10 @@ NOfd_r85_2050_SSN = NO_fd_rcp85_2050ft + nonstat_brick2050
 NOfd_r85_2060_SSN = NO_fd_rcp85_2060ft + nonstat_brick2060
 NOfd_r85_2100_SSN = NO_fd_rcp85_2100ft + nonstat_brick2100
 
-#add Tebadli et al 100-yr return period to kopp
-# RCP26
-k14_r26_2030_Teb = kopp14_rcp26$t_2030 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r26_2050_Teb = kopp14_rcp26$t_2050 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r26_2060_Teb = kopp14_rcp26$t_2060 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r26_2100_Teb = kopp14_rcp26$t_2100 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-# RCP45
-k14_r45_2030_Teb = kopp14_rcp45$t_2030 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r45_2050_Teb = kopp14_rcp45$t_2050 + tebaldi12$rl_50[which(tebaldi12$rp == 100)] 
-k14_r45_2060_Teb = kopp14_rcp45$t_2060 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r45_2100_Teb = kopp14_rcp45$t_2100 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-# RCP60
-k14_r60_2030_Teb = kopp14_rcp60$t_2030 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r60_2050_Teb = kopp14_rcp60$t_2050 + tebaldi12$rl_50[which(tebaldi12$rp == 100)] 
-k14_r60_2060_Teb = kopp14_rcp60$t_2060 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r60_2100_Teb = kopp14_rcp60$t_2100 + tebaldi12$rl_50[which(tebaldi12$rp == 100)] 
-# RCP85
-k14_r85_2030_Teb = kopp14_rcp85$t_2030 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r85_2050_Teb = kopp14_rcp85$t_2050 + tebaldi12$rl_50[which(tebaldi12$rp == 100)] 
-k14_r85_2060_Teb = kopp14_rcp85$t_2060 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r85_2100_Teb = kopp14_rcp85$t_2100 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+# add Tebadli et al 100-yr return period to kopp
+k14_r26_Teb = kopp14_rcp26 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r45_Teb = kopp14_rcp45 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r60_Teb = kopp14_rcp60 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
+k14_r85_Teb = kopp14_rcp85 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
 
 
