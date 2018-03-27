@@ -30,7 +30,7 @@ library(ash)
 library(fields)
 
 # Read in conversion functions
-source("local-costal-flood-risk/R/conversion_functions.R")
+source("local-costal-flood-risk/R/Helper_scripts/conversion_functions.R")
 
 ################################### SEA-LEVEL DATA ##################################
 ##=========================== READ KOPP ET AL. 2014 DATA ===================================

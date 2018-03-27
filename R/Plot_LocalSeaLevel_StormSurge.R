@@ -30,10 +30,10 @@ library(ash)
 library(fields)
 
 # Source survival function, function.
-source("local-costal-flood-risk/R/plot_sf.r")
+source("local-costal-flood-risk/R/Helper_scripts/plot_sf.r")
 
 # Source Conversion functions.
-source("local-costal-flood-risk/R/conversion_functions.R")
+source("local-costal-flood-risk/R/Helper_scripts/conversion_functions.R")
 
 # Read in modified sea level and storm surge data.
 source("local-costal-flood-risk/R/ReadAnalysis_LocalSeaLevel_StormSurge.R")
