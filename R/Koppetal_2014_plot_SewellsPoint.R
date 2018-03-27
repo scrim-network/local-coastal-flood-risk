@@ -10,7 +10,7 @@ library(fields)
 source("local-costal-flood-risk/R/plot_sf.r")
 source("local-costal-flood-risk/R/conversion_functions.R")
 # Read in sea level and storm surge data 
-source("local-costal-flood-risk/R/read_norfolk_sea_data.R")
+source("local-costal-flood-risk/R/ReadAnalysis_LocalSeaLevel_StormSurge.R")
 
 # colors ------------------------------------------------------------------
 seq_color = function(num, maincol){
