@@ -1,3 +1,25 @@
+##==============================================================================
+## Plot_LocalSeaLevel_StormSurge.R
+##
+## Script reads in sea level and storm surge data from various studies/ datasets
+## and plots them for comparison.
+##
+## Contact Kelsey Ruckert (klr324@psu.edu) regarding questions.
+##==============================================================================
+## Copyright 2018 Kelsey Ruckert
+## This file is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This file is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this file.  If not, see <http://www.gnu.org/licenses/>.
+##==============================================================================
 setwd('/Users/klr324/Documents/Data_LSL')
 
 library(ncdf4)
@@ -7,16 +29,30 @@ library(plotrix)
 library(ash)
 library(fields)
 
+# Source survival function, function.
 source("local-costal-flood-risk/R/plot_sf.r")
+
+# Source Conversion functions.
 source("local-costal-flood-risk/R/conversion_functions.R")
-# Read in sea level and storm surge data 
+
+# Read in modified sea level and storm surge data.
 source("local-costal-flood-risk/R/ReadAnalysis_LocalSeaLevel_StormSurge.R")
 
-# colors ------------------------------------------------------------------
+##=========================== CREATE COLORS ===================================
+RdGy = brewer.pal(11, "RdGy")
+BrBG = brewer.pal(11, "BrBG")
+RdBu = brewer.pal(11, "RdBu")
+PRGn = brewer.pal(11, "PRGn")
+PiYG = brewer.pal(11, "PiYG")
+tebaldi_gold = c("#f0cf0c", "#fcf5ce")
+
+# Create sequence with black and white function.
 seq_color = function(num, maincol){
   col_fun <- colorRampPalette(c("white", maincol, "black"))
   col_fun(num)
 }
+noaa_cols = seq_color(9, PiYG[1:5])
+col_grad = seq_color(150, RdGy[7:11])
 
 # Transparent Color Function 
 makeTransparent<- function(someColor, alpha=100){
@@ -29,17 +65,6 @@ makeTransparent<- function(someColor, alpha=100){
              blue=curcoldata[3], alpha=alpha,
              maxColorValue=255)})
 }
-
-RdGy = brewer.pal(11, "RdGy")
-BrBG = brewer.pal(11, "BrBG")
-RdBu = brewer.pal(11, "RdBu")
-PRGn = brewer.pal(11, "PRGn")
-PiYG = brewer.pal(11, "PiYG")
-
-noaa_cols = seq_color(9, PiYG[1:5])
-col_grad = seq_color(150, RdGy[7:11])
-tebaldi_gold = c("#f0cf0c", "#fcf5ce")
-
 trans_RdGy = makeTransparent(RdGy, 75)
 trans_BrBG = makeTransparent(BrBG, 75)
 trans_RdBu = makeTransparent(RdBu, 75)
@@ -48,7 +73,7 @@ trans_PiYG = makeTransparent(PiYG, 75)
 trans_noaa_cols = makeTransparent(noaa_cols, 75)
 trans_tebaldi_gold = makeTransparent(tebaldi_gold, 200)
 
-#-------------------------- Set widths and heights ------------------------------
+##=========================== PUBLICATION FIGURE SIZES ===================================
 inches_to_dpi = function(inch){ inch * 300 }
 
 text_column_width   = 5.2
@@ -57,13 +82,14 @@ full_page_width     = 7.5
 full_page_height    = 8.75
 single_panel_height = 4
 
-#---------------------------- Plot PDFS -----------------------------------
-################################ 2030 #####################################
+##=========================== SLR / STORM SURGE / COMBINED PLOTS ===================================
+#---------------------------- 2030 -----------------------------------
 pdf(file="SLR_2030.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
                 2,3,4), 4, 3, byrow = TRUE))
+# Add legend
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
@@ -78,6 +104,8 @@ gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
 arrows(8.75, 1.5, 9, 1.5, length=0.075)
 text(8,1.5, "Higher scenario")
 
+#   -----------------------------------------------------------------------
+# a) Sea-level rise probability density function
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
 plot(density(kopp14_rcp85$t_2030), xlab="Projected sea level in 2030 (ft)", ylab="Probability density", yaxt="n", 
      main="",col=RdGy[1], lwd=2, xlim=c(-0.2,2), ylim = c(0, 6.75), bty="l")
@@ -107,6 +135,7 @@ points(carswg2016$t_2030, rep(5.5, 5), col=RdGy[7:11], pch=19)
 points(noaa2017$t_2030, rep(5, length(noaa2017$t_2030)), col=noaa_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
+# b) Storm surge return period 
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2.85, 12), 
      xaxt = 'n', cex=1, bty="l",
@@ -134,7 +163,8 @@ lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
-# ----------------------------------------------------------------------
+#   -----------------------------------------------------------------------
+# c) Combined sea level and storm surge return period 
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2.85, 12), 
@@ -145,40 +175,41 @@ title(main="c.", adj=0)
 axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
 SF_k14_r85_2030_SS = plot.sf(k14_r85_SS$t_2030, make.plot=FALSE)
-lines(1/SF_k14_r85_2030_SS$sf, SF_k14_r85_2030_SS$sf.num, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2030_SS = plot.sf(k14_r60_SS$t_2030, make.plot=FALSE)
-lines(1/SF_k14_r60_2030_SS$sf, SF_k14_r60_2030_SS$sf.num, col=RdGy[2], lwd=1.5)
 SF_k14_r45_2030_SS = plot.sf(k14_r45_SS$t_2030, make.plot=FALSE)
-lines(1/SF_k14_r45_2030_SS$sf, SF_k14_r45_2030_SS$sf.num, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2030_SS = plot.sf(k14_r26_SS$t_2030, make.plot=FALSE)
+lines(1/SF_k14_r85_2030_SS$sf, SF_k14_r85_2030_SS$sf.num, col=RdGy[1], lwd=1.5)
+lines(1/SF_k14_r60_2030_SS$sf, SF_k14_r60_2030_SS$sf.num, col=RdGy[2], lwd=1.5)
+lines(1/SF_k14_r45_2030_SS$sf, SF_k14_r45_2030_SS$sf.num, col=RdGy[3], lwd=1.5)
 lines(1/SF_k14_r26_2030_SS$sf, SF_k14_r26_2030_SS$sf.num, col=RdGy[4], lwd=1.5)
 
 SF_bfd_r85_2030_SS = plot.sf(bfd_r85_SS$t_2030, make.plot=FALSE)
-lines(1/SF_bfd_r85_2030_SS$sf, SF_bfd_r85_2030_SS$sf.num, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2030_SS = plot.sf(bfd_r60_SS$t_2030, make.plot=FALSE)
-lines(1/SF_bfd_r60_2030_SS$sf, SF_bfd_r60_2030_SS$sf.num, col=BrBG[10], lwd=1.5)
 SF_bfd_r45_2030_SS = plot.sf(bfd_r45_SS$t_2030, make.plot=FALSE)
-lines(1/SF_bfd_r45_2030_SS$sf, SF_bfd_r45_2030_SS$sf.num, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2030_SS = plot.sf(bfd_r26_SS$t_2030, make.plot=FALSE)
+lines(1/SF_bfd_r85_2030_SS$sf, SF_bfd_r85_2030_SS$sf.num, col=BrBG[11], lwd=1.5)
+lines(1/SF_bfd_r60_2030_SS$sf, SF_bfd_r60_2030_SS$sf.num, col=BrBG[10], lwd=1.5)
+lines(1/SF_bfd_r45_2030_SS$sf, SF_bfd_r45_2030_SS$sf.num, col=BrBG[9], lwd=1.5)
 lines(1/SF_bfd_r26_2030_SS$sf, SF_bfd_r26_2030_SS$sf.num, col=BrBG[8], lwd=1.5)
 
 SF_NOfd_r85_2030_SS = plot.sf(NOfd_r85_SS$t_2030, make.plot=FALSE)
-lines(1/SF_NOfd_r85_2030_SS$sf, SF_NOfd_r85_2030_SS$sf.num, col=PRGn[2], lwd=1.5)
 SF_NOfd_r60_2030_SS = plot.sf(NOfd_r60_SS$t_2030, make.plot=FALSE)
-lines(1/SF_NOfd_r60_2030_SS$sf, SF_NOfd_r60_2030_SS$sf.num, col=PRGn[3], lwd=1.5)
 SF_NOfd_r45_2030_SS = plot.sf(NOfd_r45_SS$t_2030, make.plot=FALSE)
-lines(1/SF_NOfd_r45_2030_SS$sf, SF_NOfd_r45_2030_SS$sf.num, col=PRGn[4], lwd=1.5)
 SF_NOfd_r26_2030_SS = plot.sf(NOfd_r26_SS$t_2030, make.plot=FALSE)
+lines(1/SF_NOfd_r85_2030_SS$sf, SF_NOfd_r85_2030_SS$sf.num, col=PRGn[2], lwd=1.5)
+lines(1/SF_NOfd_r60_2030_SS$sf, SF_NOfd_r60_2030_SS$sf.num, col=PRGn[3], lwd=1.5)
+lines(1/SF_NOfd_r45_2030_SS$sf, SF_NOfd_r45_2030_SS$sf.num, col=PRGn[4], lwd=1.5)
 lines(1/SF_NOfd_r26_2030_SS$sf, SF_NOfd_r26_2030_SS$sf.num, col=PRGn[5], lwd=1.5)
 
 dev.off()
 
-################################ 2050 #####################################
+#---------------------------- 2050 -----------------------------------
 pdf(file="SLR_2050.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
                 2,3,4), 4, 3, byrow = TRUE))
+# Add legend
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
@@ -193,7 +224,8 @@ gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
 arrows(8.75, 1.5, 9, 1.5, length=0.075)
 text(8,1.5, "Higher scenario")
 
-# Plot LSLR in 2050
+#   -----------------------------------------------------------------------
+# a) Sea-level rise probability density function
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
 plot(density(kopp14_rcp85$t_2050), xlab="Projected sea level in 2050 (ft)", ylab="Probability density", yaxt="n", 
      main="", col=RdGy[1], lwd=2, xlim=c(-0.2,4), ylim = c(0, 3.5), bty="l")
@@ -223,6 +255,7 @@ points(carswg2016$t_2050, rep(2.75, 5), col=RdGy[7:11], pch=19)
 points(noaa2017$t_2050, rep(2.5, length(noaa2017$t_2050)), col=noaa_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
+# b) Storm surge return period 
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2.85, 12), 
      xaxt = 'n', cex=1, bty="l",
@@ -250,7 +283,8 @@ lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
-# ----------------------------------------------------------------------
+#   -----------------------------------------------------------------------
+# c) Combined sea level and storm surge return period 
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2.85, 15), 
@@ -261,40 +295,41 @@ title(main="c.", adj=0)
 axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
 SF_k14_r85_2050_SS = plot.sf(k14_r85_SS$t_2050, make.plot=FALSE)
-lines(1/SF_k14_r85_2050_SS$sf, SF_k14_r85_2050_SS$sf.num, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2050_SS = plot.sf(k14_r60_SS$t_2050, make.plot=FALSE)
-lines(1/SF_k14_r60_2050_SS$sf, SF_k14_r60_2050_SS$sf.num, col=RdGy[2], lwd=1.5)
 SF_k14_r45_2050_SS = plot.sf(k14_r45_SS$t_2050, make.plot=FALSE)
-lines(1/SF_k14_r45_2050_SS$sf, SF_k14_r45_2050_SS$sf.num, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2050_SS = plot.sf(k14_r26_SS$t_2050, make.plot=FALSE)
+lines(1/SF_k14_r85_2050_SS$sf, SF_k14_r85_2050_SS$sf.num, col=RdGy[1], lwd=1.5)
+lines(1/SF_k14_r60_2050_SS$sf, SF_k14_r60_2050_SS$sf.num, col=RdGy[2], lwd=1.5)
+lines(1/SF_k14_r45_2050_SS$sf, SF_k14_r45_2050_SS$sf.num, col=RdGy[3], lwd=1.5)
 lines(1/SF_k14_r26_2050_SS$sf, SF_k14_r26_2050_SS$sf.num, col=RdGy[4], lwd=1.5)
 
 SF_bfd_r85_2050_SS = plot.sf(bfd_r85_SS$t_2050, make.plot=FALSE)
-lines(1/SF_bfd_r85_2050_SS$sf, SF_bfd_r85_2050_SS$sf.num, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2050_SS = plot.sf(bfd_r60_SS$t_2050, make.plot=FALSE)
-lines(1/SF_bfd_r60_2050_SS$sf, SF_bfd_r60_2050_SS$sf.num, col=BrBG[10], lwd=1.5)
 SF_bfd_r45_2050_SS = plot.sf(bfd_r45_SS$t_2050, make.plot=FALSE)
-lines(1/SF_bfd_r45_2050_SS$sf, SF_bfd_r45_2050_SS$sf.num, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2050_SS = plot.sf(bfd_r26_SS$t_2050, make.plot=FALSE)
+lines(1/SF_bfd_r85_2050_SS$sf, SF_bfd_r85_2050_SS$sf.num, col=BrBG[11], lwd=1.5)
+lines(1/SF_bfd_r60_2050_SS$sf, SF_bfd_r60_2050_SS$sf.num, col=BrBG[10], lwd=1.5)
+lines(1/SF_bfd_r45_2050_SS$sf, SF_bfd_r45_2050_SS$sf.num, col=BrBG[9], lwd=1.5)
 lines(1/SF_bfd_r26_2050_SS$sf, SF_bfd_r26_2050_SS$sf.num, col=BrBG[8], lwd=1.5)
 
 SF_NOfd_r85_2050_SS = plot.sf(NOfd_r85_SS$t_2050, make.plot=FALSE)
-lines(1/SF_NOfd_r85_2050_SS$sf, SF_NOfd_r85_2050_SS$sf.num, col=PRGn[2], lwd=1.5)
 SF_NOfd_r60_2050_SS = plot.sf(NOfd_r60_SS$t_2050, make.plot=FALSE)
-lines(1/SF_NOfd_r60_2050_SS$sf, SF_NOfd_r60_2050_SS$sf.num, col=PRGn[3], lwd=1.5)
 SF_NOfd_r45_2050_SS = plot.sf(NOfd_r45_SS$t_2050, make.plot=FALSE)
-lines(1/SF_NOfd_r45_2050_SS$sf, SF_NOfd_r45_2050_SS$sf.num, col=PRGn[4], lwd=1.5)
 SF_NOfd_r26_2050_SS = plot.sf(NOfd_r26_SS$t_2050, make.plot=FALSE)
+lines(1/SF_NOfd_r85_2050_SS$sf, SF_NOfd_r85_2050_SS$sf.num, col=PRGn[2], lwd=1.5)
+lines(1/SF_NOfd_r60_2050_SS$sf, SF_NOfd_r60_2050_SS$sf.num, col=PRGn[3], lwd=1.5)
+lines(1/SF_NOfd_r45_2050_SS$sf, SF_NOfd_r45_2050_SS$sf.num, col=PRGn[4], lwd=1.5)
 lines(1/SF_NOfd_r26_2050_SS$sf, SF_NOfd_r26_2050_SS$sf.num, col=PRGn[5], lwd=1.5)
 
 dev.off()
 
-################################ 2060 #####################################
+#---------------------------- 2060 -----------------------------------
 pdf(file="SLR_2060.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
                 2,3,4), 4, 3, byrow = TRUE))
+# Add legend
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
@@ -309,7 +344,8 @@ gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
 arrows(8.75, 1.5, 9, 1.5, length=0.075)
 text(8,1.5, "Higher scenario")
 
-# Plot LSLR in 2060
+#   -----------------------------------------------------------------------
+# a) Sea-level rise probability density function
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
 plot(density(kopp14_rcp85$t_2060), xlab="Projected sea level in 2060 (ft)", ylab="Probability density", yaxt="n",
      main="", col=RdGy[1], lwd=2, xlim=c(-0.2,6), ylim = c(0, 3), bty="l")
@@ -339,6 +375,7 @@ points(carswg2016$t_2060, rep(2.25, 5), col=RdGy[7:11], pch=19)
 points(noaa2017$t_2060, rep(2, length(noaa2017$t_2060)), col=noaa_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
+# b) Storm surge return period 
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2.25, 12), 
      xaxt = 'n', cex=1, bty="l",
@@ -366,7 +403,8 @@ lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
-# ----------------------------------------------------------------------
+#   -----------------------------------------------------------------------
+# c) Combined sea level and storm surge return period 
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2.25, 20), 
@@ -377,40 +415,41 @@ title(main="c.", adj=0)
 axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
 
 SF_k14_r85_2060_SS = plot.sf(k14_r85_SS$t_2060, make.plot=FALSE)
-lines(1/SF_k14_r85_2060_SS$sf, SF_k14_r85_2060_SS$sf.num, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2060_SS = plot.sf(k14_r60_SS$t_2060, make.plot=FALSE)
-lines(1/SF_k14_r60_2060_SS$sf, SF_k14_r60_2060_SS$sf.num, col=RdGy[2], lwd=1.5)
 SF_k14_r45_2060_SS = plot.sf(k14_r45_SS$t_2060, make.plot=FALSE)
-lines(1/SF_k14_r45_2060_SS$sf, SF_k14_r45_2060_SS$sf.num, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2060_SS = plot.sf(k14_r26_SS$t_2060, make.plot=FALSE)
+lines(1/SF_k14_r85_2060_SS$sf, SF_k14_r85_2060_SS$sf.num, col=RdGy[1], lwd=1.5)
+lines(1/SF_k14_r60_2060_SS$sf, SF_k14_r60_2060_SS$sf.num, col=RdGy[2], lwd=1.5)
+lines(1/SF_k14_r45_2060_SS$sf, SF_k14_r45_2060_SS$sf.num, col=RdGy[3], lwd=1.5)
 lines(1/SF_k14_r26_2060_SS$sf, SF_k14_r26_2060_SS$sf.num, col=RdGy[4], lwd=1.5)
 
 SF_bfd_r85_2060_SS = plot.sf(bfd_r85_SS$t_2060, make.plot=FALSE)
-lines(1/SF_bfd_r85_2060_SS$sf, SF_bfd_r85_2060_SS$sf.num, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2060_SS = plot.sf(bfd_r60_SS$t_2060, make.plot=FALSE)
-lines(1/SF_bfd_r60_2060_SS$sf, SF_bfd_r60_2060_SS$sf.num, col=BrBG[10], lwd=1.5)
 SF_bfd_r45_2060_SS = plot.sf(bfd_r45_SS$t_2060, make.plot=FALSE)
-lines(1/SF_bfd_r45_2060_SS$sf, SF_bfd_r45_2060_SS$sf.num, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2060_SS = plot.sf(bfd_r26_SS$t_2060, make.plot=FALSE)
+lines(1/SF_bfd_r85_2060_SS$sf, SF_bfd_r85_2060_SS$sf.num, col=BrBG[11], lwd=1.5)
+lines(1/SF_bfd_r60_2060_SS$sf, SF_bfd_r60_2060_SS$sf.num, col=BrBG[10], lwd=1.5)
+lines(1/SF_bfd_r45_2060_SS$sf, SF_bfd_r45_2060_SS$sf.num, col=BrBG[9], lwd=1.5)
 lines(1/SF_bfd_r26_2060_SS$sf, SF_bfd_r26_2060_SS$sf.num, col=BrBG[8], lwd=1.5)
 
 SF_NOfd_r85_2060_SS = plot.sf(NOfd_r85_SS$t_2060, make.plot=FALSE)
-lines(1/SF_NOfd_r85_2060_SS$sf, SF_NOfd_r85_2060_SS$sf.num, col=PRGn[2], lwd=1.5)
 SF_NOfd_r60_2060_SS = plot.sf(NOfd_r60_SS$t_2060, make.plot=FALSE)
-lines(1/SF_NOfd_r60_2060_SS$sf, SF_NOfd_r60_2060_SS$sf.num, col=PRGn[3], lwd=1.5)
 SF_NOfd_r45_2060_SS = plot.sf(NOfd_r45_SS$t_2060, make.plot=FALSE)
-lines(1/SF_NOfd_r45_2060_SS$sf, SF_NOfd_r45_2060_SS$sf.num, col=PRGn[4], lwd=1.5)
 SF_NOfd_r26_2060_SS = plot.sf(NOfd_r26_SS$t_2060, make.plot=FALSE)
+lines(1/SF_NOfd_r85_2060_SS$sf, SF_NOfd_r85_2060_SS$sf.num, col=PRGn[2], lwd=1.5)
+lines(1/SF_NOfd_r60_2060_SS$sf, SF_NOfd_r60_2060_SS$sf.num, col=PRGn[3], lwd=1.5)
+lines(1/SF_NOfd_r45_2060_SS$sf, SF_NOfd_r45_2060_SS$sf.num, col=PRGn[4], lwd=1.5)
 lines(1/SF_NOfd_r26_2060_SS$sf, SF_NOfd_r26_2060_SS$sf.num, col=PRGn[5], lwd=1.5)
 
 dev.off()
 
-################################ 2100 #####################################
+#---------------------------- 2100 -----------------------------------
 pdf(file="SLR_2100.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
                 2,3,4), 4, 3, byrow = TRUE))
+# Add legend
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
@@ -425,7 +464,8 @@ gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
 arrows(8.75, 1.5, 9, 1.5, length=0.075)
 text(8,1.5, "Higher scenario")
 
-# Plot LSLR in 2100
+#   -----------------------------------------------------------------------
+# a) Sea-level rise probability density function
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
 plot(density(kopp14_rcp85$t_2100), xlab="Projected sea level in 2100 (ft)", ylab="Probability density", yaxt="n", 
      main="", col=RdGy[1], lwd=2, xlim=c(-0.5,15), ylim = c(0, 1.5), bty="l")
@@ -455,6 +495,7 @@ points(carswg2016$t_2100, rep(1.15, 5), col=RdGy[7:11], pch=19)
 points(noaa2017$t_2100, rep(1, length(noaa2017$t_2100)), col=noaa_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
+# b) Storm surge return period 
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2, 13), 
      xaxt = 'n', cex=1, bty="l",
@@ -482,7 +523,8 @@ lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 
-# ----------------------------------------------------------------------
+#   -----------------------------------------------------------------------
+# c) Combined sea level and storm surge return period 
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
      ylim = c(2, 25), 
@@ -521,7 +563,7 @@ lines(1/SF_NOfd_r26_2100_SS$sf, SF_NOfd_r26_2100_SS$sf.num, col=PRGn[5], lwd=1.5
 
 dev.off()
 
-################################ 2100 #####################################
+##=========================== MULTIPLE YEAR SLR DENSITY PLOT ===================================
 # 2030
 denskopp14_rcp85_2030 <- density(kopp14_rcp85$t_2030)
 denskopp14_rcp60_2030 <- density(kopp14_rcp60$t_2030)
@@ -710,3 +752,8 @@ gradient.rect(-0.35,5,8,5.25, col=col_grad, gradient="x")
 arrows(6.75, 4.75, 8, 4.75, length=0.075)
 text(3.5,4.75, "Higher scenario")
 dev.off()
+
+##==============================================================================
+## End
+##==============================================================================
+

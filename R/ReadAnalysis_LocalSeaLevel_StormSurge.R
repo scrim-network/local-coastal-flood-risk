@@ -4,7 +4,7 @@
 ## Script reads in sea level and storm surge data from various studies/ datasets
 ## and modifies/ converts the data to be comparible.
 ##
-## Contact Kelsey Ruckert (klr324g@psu.edu) regarding questions.
+## Contact Kelsey Ruckert (klr324@psu.edu) regarding questions.
 ##==============================================================================
 ## Copyright 2018 Kelsey Ruckert
 ## This file is free software: you can redistribute it and/or modify
