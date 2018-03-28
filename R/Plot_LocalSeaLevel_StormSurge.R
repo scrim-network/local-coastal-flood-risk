@@ -136,13 +136,13 @@ points(noaa2017$t_2030, rep(5, length(noaa2017$t_2030)), col=noaa_cols[8:2], pch
 
 #   -----------------------------------------------------------------------
 # b) Storm surge return period 
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
-     ylim = c(2.85, 12), 
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
+     ylim = c(2.85, 18), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
      ylab = "Storm surge (ft MSL)")
 title(main="b.", adj=0)
-axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
+axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 
 SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
 SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
@@ -166,13 +166,13 @@ points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 #   -----------------------------------------------------------------------
 # c) Combined sea level and storm surge return period 
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
      ylim = c(2.85, 12), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
      ylab = "Projected sea+surge level (ft MSL)")
 title(main="c.", adj=0)
-axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
+axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 
 SF_k14_r85_2030_SS = plot.sf(k14_r85_SS$t_2030, make.plot=FALSE)
 SF_k14_r60_2030_SS = plot.sf(k14_r60_SS$t_2030, make.plot=FALSE)
@@ -256,13 +256,13 @@ points(noaa2017$t_2050, rep(2.5, length(noaa2017$t_2050)), col=noaa_cols[8:2], p
 
 #   -----------------------------------------------------------------------
 # b) Storm surge return period 
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
-     ylim = c(2.85, 12), 
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
+     ylim = c(2.85, 18), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
      ylab = "Storm surge (ft MSL)")
 title(main="b.", adj=0)
-axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
+axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 
 SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
 SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
@@ -286,13 +286,13 @@ points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 #   -----------------------------------------------------------------------
 # c) Combined sea level and storm surge return period 
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
-     ylim = c(2.85, 15), 
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
+     ylim = c(2.85, 12.5), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
      ylab = "Projected sea+surge level (ft MSL)")
 title(main="c.", adj=0)
-axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
+axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 
 SF_k14_r85_2050_SS = plot.sf(k14_r85_SS$t_2050, make.plot=FALSE)
 SF_k14_r60_2050_SS = plot.sf(k14_r60_SS$t_2050, make.plot=FALSE)
@@ -348,7 +348,7 @@ text(8,1.5, "Higher scenario")
 # a) Sea-level rise probability density function
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
 plot(density(kopp14_rcp85$t_2070), xlab="Projected sea level in 2070 (ft)", ylab="Probability density", yaxt="n",
-     main="", col=RdGy[1], lwd=2, xlim=c(-0.2,6), ylim = c(0, 3), bty="l")
+     main="", col=RdGy[1], lwd=2, xlim=c(-0.3,8), ylim = c(0, 3), bty="l")
 title(main="a.", adj=0)
 lines(density(kopp14_rcp60$t_2070), col=RdGy[2], lwd=2)
 lines(density(kopp14_rcp45$t_2070), col=RdGy[3], lwd=2)
@@ -376,13 +376,13 @@ points(noaa2017$t_2070, rep(2, length(noaa2017$t_2070)), col=noaa_cols[8:2], pch
 
 #   -----------------------------------------------------------------------
 # b) Storm surge return period 
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
-     ylim = c(2.25, 12), 
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
+     ylim = c(2.85, 18), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
      ylab = "Storm surge (ft MSL)")
 title(main="b.", adj=0)
-axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
+axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 
 SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
 SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
@@ -406,13 +406,13 @@ points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 #   -----------------------------------------------------------------------
 # c) Combined sea level and storm surge return period 
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
-     ylim = c(2.25, 20), 
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
+     ylim = c(2.85, 14), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
      ylab = "Projected sea+surge level (ft MSL)")
 title(main="c.", adj=0)
-axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
+axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 
 SF_k14_r85_2070_SS = plot.sf(k14_r85_SS$t_2070, make.plot=FALSE)
 SF_k14_r60_2070_SS = plot.sf(k14_r60_SS$t_2070, make.plot=FALSE)
@@ -496,13 +496,13 @@ points(noaa2017$t_2100, rep(1, length(noaa2017$t_2100)), col=noaa_cols[8:2], pch
 
 #   -----------------------------------------------------------------------
 # b) Storm surge return period 
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
-     ylim = c(2, 13), 
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
+     ylim = c(2.85, 18), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
      ylab = "Storm surge (ft MSL)")
 title(main="b.", adj=0)
-axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
+axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 
 SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
 SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
@@ -526,39 +526,39 @@ points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=RdBu[10])
 #   -----------------------------------------------------------------------
 # c) Combined sea level and storm surge return period 
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 90),
-     ylim = c(2, 25), 
+plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
+     ylim = c(2.85, 16), 
      xaxt = 'n', cex=1, bty="l",
      xlab = "Return period (years)", 
      ylab = "Projected sea+surge level (ft MSL)")
 title(main="c.", adj=0)
-axis(1, lwd = 1, at=10^(seq(-1,log10(10^2), by = 1)), label=c(0.1, 1, 10, 100))
+axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 
 SF_k14_r85_2100_SS = plot.sf(k14_r85_SS$t_2100, make.plot=FALSE)
-lines(1/SF_k14_r85_2100_SS$sf, SF_k14_r85_2100_SS$sf.num, col=RdGy[1], lwd=1.5)
 SF_k14_r60_2100_SS = plot.sf(k14_r60_SS$t_2100, make.plot=FALSE)
-lines(1/SF_k14_r60_2100_SS$sf, SF_k14_r60_2100_SS$sf.num, col=RdGy[2], lwd=1.5)
 SF_k14_r45_2100_SS = plot.sf(k14_r45_SS$t_2100, make.plot=FALSE)
-lines(1/SF_k14_r45_2100_SS$sf, SF_k14_r45_2100_SS$sf.num, col=RdGy[3], lwd=1.5)
 SF_k14_r26_2100_SS = plot.sf(k14_r26_SS$t_2100, make.plot=FALSE)
+lines(1/SF_k14_r85_2100_SS$sf, SF_k14_r85_2100_SS$sf.num, col=RdGy[1], lwd=1.5)
+lines(1/SF_k14_r60_2100_SS$sf, SF_k14_r60_2100_SS$sf.num, col=RdGy[2], lwd=1.5)
+lines(1/SF_k14_r45_2100_SS$sf, SF_k14_r45_2100_SS$sf.num, col=RdGy[3], lwd=1.5)
 lines(1/SF_k14_r26_2100_SS$sf, SF_k14_r26_2100_SS$sf.num, col=RdGy[4], lwd=1.5)
 
 SF_bfd_r85_2100_SS = plot.sf(bfd_r85_SS$t_2100, make.plot=FALSE)
-lines(1/SF_bfd_r85_2100_SS$sf, SF_bfd_r85_2100_SS$sf.num, col=BrBG[11], lwd=1.5)
 SF_bfd_r60_2100_SS = plot.sf(bfd_r60_SS$t_2100, make.plot=FALSE)
-lines(1/SF_bfd_r60_2100_SS$sf, SF_bfd_r60_2100_SS$sf.num, col=BrBG[10], lwd=1.5)
 SF_bfd_r45_2100_SS = plot.sf(bfd_r45_SS$t_2100, make.plot=FALSE)
-lines(1/SF_bfd_r45_2100_SS$sf, SF_bfd_r45_2100_SS$sf.num, col=BrBG[9], lwd=1.5)
 SF_bfd_r26_2100_SS = plot.sf(bfd_r26_SS$t_2100, make.plot=FALSE)
+lines(1/SF_bfd_r85_2100_SS$sf, SF_bfd_r85_2100_SS$sf.num, col=BrBG[11], lwd=1.5)
+lines(1/SF_bfd_r60_2100_SS$sf, SF_bfd_r60_2100_SS$sf.num, col=BrBG[10], lwd=1.5)
+lines(1/SF_bfd_r45_2100_SS$sf, SF_bfd_r45_2100_SS$sf.num, col=BrBG[9], lwd=1.5)
 lines(1/SF_bfd_r26_2100_SS$sf, SF_bfd_r26_2100_SS$sf.num, col=BrBG[8], lwd=1.5)
 
 SF_NOfd_r85_2100_SS = plot.sf(NOfd_r85_SS$t_2100, make.plot=FALSE)
-lines(1/SF_NOfd_r85_2100_SS$sf, SF_NOfd_r85_2100_SS$sf.num, col=PRGn[2], lwd=1.5)
 SF_NOfd_r60_2100_SS = plot.sf(NOfd_r60_SS$t_2100, make.plot=FALSE)
-lines(1/SF_NOfd_r60_2100_SS$sf, SF_NOfd_r60_2100_SS$sf.num, col=PRGn[3], lwd=1.5)
 SF_NOfd_r45_2100_SS = plot.sf(NOfd_r45_SS$t_2100, make.plot=FALSE)
-lines(1/SF_NOfd_r45_2100_SS$sf, SF_NOfd_r45_2100_SS$sf.num, col=PRGn[4], lwd=1.5)
 SF_NOfd_r26_2100_SS = plot.sf(NOfd_r26_SS$t_2100, make.plot=FALSE)
+lines(1/SF_NOfd_r85_2100_SS$sf, SF_NOfd_r85_2100_SS$sf.num, col=PRGn[2], lwd=1.5)
+lines(1/SF_NOfd_r60_2100_SS$sf, SF_NOfd_r60_2100_SS$sf.num, col=PRGn[3], lwd=1.5)
+lines(1/SF_NOfd_r45_2100_SS$sf, SF_NOfd_r45_2100_SS$sf.num, col=PRGn[4], lwd=1.5)
 lines(1/SF_NOfd_r26_2100_SS$sf, SF_NOfd_r26_2100_SS$sf.num, col=PRGn[5], lwd=1.5)
 
 dev.off()
