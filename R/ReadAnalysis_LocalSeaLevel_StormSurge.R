@@ -166,11 +166,11 @@ for(i in 2:22){
 #--------------------------- Extract specific years --------------------------
 match_NOAA17 = match(c(2030,2050,2070,2100), NOAA_etal_2017[,1])
 
-# Medians are in columns 3,6,9,12,15,18, and 21; hence sequence from 3 to 21 by 3.
-noaa2017 = data.frame(t_2030 = c(NOAA_etal_2017_ref2000[match_NOAA17[1], seq(3,21,3)]), 
-                      t_2050 = c(NOAA_etal_2017_ref2000[match_NOAA17[2], seq(3,21,3)]),
-                      t_2070 = c(NOAA_etal_2017_ref2000[match_NOAA17[3], seq(3,21,3)]), 
-                      t_2100 = c(NOAA_etal_2017_ref2000[match_NOAA17[4], seq(3,21,3)]), row.names = NULL)
+# Medians are in columns 6,9,12,15,18, and 21; hence sequence from 6 to 21 by 3.
+noaa2017 = data.frame(t_2030 = c(NOAA_etal_2017_ref2000[match_NOAA17[1], seq(6,21,3)]), 
+                      t_2050 = c(NOAA_etal_2017_ref2000[match_NOAA17[2], seq(6,21,3)]),
+                      t_2070 = c(NOAA_etal_2017_ref2000[match_NOAA17[3], seq(6,21,3)]), 
+                      t_2100 = c(NOAA_etal_2017_ref2000[match_NOAA17[4], seq(6,21,3)]), row.names = NULL)
 
 ################################### STORM SURGE DATA ##################################
 ##=========================== READ USACE 2014 EXTREME WATER LEVEL DATA ===================================
