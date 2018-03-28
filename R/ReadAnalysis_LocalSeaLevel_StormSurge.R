@@ -38,26 +38,26 @@ source("local-costal-flood-risk/R/Helper_scripts/conversion_functions.R")
 # Data is cm above 2000, so 0cm is 2000. Data is projected with RCP26, 45, 60, and 85.
 kopp14_rcp26 = read.csv("LSLproj_MC_299_rcp26.tsv.csv") 
 kopp14_rcp26 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp26$X2030, t_2050 = kopp14_rcp26$X2050, 
-                                           t_2060 = kopp14_rcp26$X2060, t_2100 = kopp14_rcp26$X2100))
+                                           t_2070 = kopp14_rcp26$X2070, t_2100 = kopp14_rcp26$X2100))
 
 kopp14_rcp45 = read.csv("LSLproj_MC_299_rcp45.tsv.csv")
 kopp14_rcp45 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp45$X2030, t_2050 = kopp14_rcp45$X2050, 
-                                           t_2060 = kopp14_rcp45$X2060, t_2100 = kopp14_rcp45$X2100))
+                                           t_2070 = kopp14_rcp45$X2070, t_2100 = kopp14_rcp45$X2100))
 
 kopp14_rcp60 = read.csv("LSLproj_MC_299_rcp60.tsv.csv")
 kopp14_rcp60 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp60$X2030, t_2050 = kopp14_rcp60$X2050, 
-                                           t_2060 = kopp14_rcp60$X2060, t_2100 = kopp14_rcp60$X2100))
+                                           t_2070 = kopp14_rcp60$X2070, t_2100 = kopp14_rcp60$X2100))
 
 kopp14_rcp85 = read.csv("LSLproj_MC_299_rcp85.tsv.csv")
 kopp14_rcp85 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp85$X2030, t_2050 = kopp14_rcp85$X2050, 
-                                           t_2060 = kopp14_rcp85$X2060, t_2100 = kopp14_rcp85$X2100))
+                                           t_2070 = kopp14_rcp85$X2070, t_2100 = kopp14_rcp85$X2100))
 
 # Kopp et al. 2014 Local subsidence data at Sewells point tide gauge
 # Data is cm above 2000, so 0cm is 2000. This will be used
 # to account for subsidence in the Wong and Keller 2017 data.
 kopp14_subsid = read.csv("LSLProj_bkgd_299_rcp26.csv")
 kopp14_subsid = convert_cm_to_ft(data.frame(t_2030 = kopp14_subsid$X2030, t_2050 = kopp14_subsid$X2050, 
-                                            t_2060 = kopp14_subsid$X2060, t_2100 = kopp14_subsid$X2100))
+                                            t_2070 = kopp14_subsid$X2070, t_2100 = kopp14_subsid$X2100))
 
 ##=========================== READ WONG & KELLER 2017 DATA ===================================
 # Wong and Keller 2017 Local sea-level rise data with Fast dynamics at Sewells point tide gauge
@@ -84,7 +84,7 @@ nc_close(fid1)
 # Kopp et al. 2014 and Wong & Keller 2017 have different numbers of samples. Randomly generate subsidence
 # data using Kopp et al. 2014 data. This new ensemble will match the sample size of Wong & Keller 2017
 states_w = dim(lsl_fdyn_rcp26)[2]
-BKkopp_subsid = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2060 = 1:states_w, t_2100 = 1:states_w)
+BKkopp_subsid = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2070 = 1:states_w, t_2100 = 1:states_w)
 for(i in 1:4){
   BKkopp_subsid[ ,i] = rlnorm(states_w, meanlog=mean(log(kopp14_subsid[ ,i])), sdlog=sd(log(kopp14_subsid[ ,i])))
 }
@@ -92,7 +92,7 @@ for(i in 1:4){
 #------------------------- Add subsidence to Wong & Keller 2017 data --------------------------------
 # Function changing BRICK from m to feet and adding subsidence based on Kopp et al. 2014
 combine_subsid_to_brick = function(out_name, brick_input, y_projection, subsidence){
-  years = c(2030, 2050, 2060, 2100)
+  years = c(2030, 2050, 2070, 2100)
   for(i in 1:4){
     out_name[ ,i] = convert_m_to_ft(brick_input[match(years[i], y_projection), ]) + subsidence[ ,i]
   }
@@ -103,7 +103,7 @@ combine_subsid_to_brick = function(out_name, brick_input, y_projection, subsiden
 brickfd_rcp26 = 
   brickfd_rcp45 = 
   brickfd_rcp60 = 
-  brickfd_rcp85 = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2060 = 1:states_w, t_2100 = 1:states_w)
+  brickfd_rcp85 = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2070 = 1:states_w, t_2100 = 1:states_w)
 
 brickfd_rcp26 = combine_subsid_to_brick(brickfd_rcp26, lsl_fdyn_rcp26, year_proj, BKkopp_subsid)
 brickfd_rcp45 = combine_subsid_to_brick(brickfd_rcp45, lsl_fdyn_rcp45, year_proj, BKkopp_subsid)
@@ -114,7 +114,7 @@ brickfd_rcp85 = combine_subsid_to_brick(brickfd_rcp85, lsl_fdyn_rcp85, year_proj
 NO_fdft_rcp26 = 
   NO_fdft_rcp45 = 
   NO_fdft_rcp60 = 
-  NO_fdft_rcp85 = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2060 = 1:states_w, t_2100 = 1:states_w)
+  NO_fdft_rcp85 = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2070 = 1:states_w, t_2100 = 1:states_w)
 
 NO_fdft_rcp26 = combine_subsid_to_brick(NO_fdft_rcp26, NO_fdyn_rcp26, NO_fdyn_proj, BKkopp_subsid)
 NO_fdft_rcp45 = combine_subsid_to_brick(NO_fdft_rcp45, NO_fdyn_rcp45, NO_fdyn_proj, BKkopp_subsid)
@@ -134,21 +134,21 @@ for(i in 2:13){
 }
 
 #--------------------------- Extract specific years for each study --------------------------
-match_SLC = match(c(2030,2050,2060,2100), SL_calculator[,1])
+match_SLC = match(c(2030,2050,2070,2100), SL_calculator[,1])
 # Parris et al. 2012
 noaa2012 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 2:5]), 
                       t_2050 = c(SL_calculator_ref2000[match_SLC[2], 2:5]),
-                      t_2060 = c(SL_calculator_ref2000[match_SLC[3], 2:5]), 
+                      t_2070 = c(SL_calculator_ref2000[match_SLC[3], 2:5]), 
                       t_2100 = c(SL_calculator_ref2000[match_SLC[4], 2:5]), row.names = NULL)
 # USACE 2014
 usace2013 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 6:8]), 
                        t_2050 = c(SL_calculator_ref2000[match_SLC[2], 6:8]),
-                       t_2060 = c(SL_calculator_ref2000[match_SLC[3], 6:8]), 
+                       t_2070 = c(SL_calculator_ref2000[match_SLC[3], 6:8]), 
                        t_2100 = c(SL_calculator_ref2000[match_SLC[4], 6:8]), row.names = NULL)
 # Hall et al. 2016
 carswg2016 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 9:13]), 
                         t_2050 = c(SL_calculator_ref2000[match_SLC[2], 9:13]),
-                        t_2060 = c(SL_calculator_ref2000[match_SLC[3], 9:13]), 
+                        t_2070 = c(SL_calculator_ref2000[match_SLC[3], 9:13]), 
                         t_2100 = c(SL_calculator_ref2000[match_SLC[4], 9:13]), row.names = NULL)
 
 ##=========================== READ SWEET ET AL 2017 DATA ===================================
@@ -164,12 +164,12 @@ for(i in 2:22){
 }
 
 #--------------------------- Extract specific years --------------------------
-match_NOAA17 = match(c(2030,2050,2060,2100), NOAA_etal_2017[,1])
+match_NOAA17 = match(c(2030,2050,2070,2100), NOAA_etal_2017[,1])
 
 # Medians are in columns 3,6,9,12,15,18, and 21; hence sequence from 3 to 21 by 3.
 noaa2017 = data.frame(t_2030 = c(NOAA_etal_2017_ref2000[match_NOAA17[1], seq(3,21,3)]), 
                       t_2050 = c(NOAA_etal_2017_ref2000[match_NOAA17[2], seq(3,21,3)]),
-                      t_2060 = c(NOAA_etal_2017_ref2000[match_NOAA17[3], seq(3,21,3)]), 
+                      t_2070 = c(NOAA_etal_2017_ref2000[match_NOAA17[3], seq(3,21,3)]), 
                       t_2100 = c(NOAA_etal_2017_ref2000[match_NOAA17[4], seq(3,21,3)]), row.names = NULL)
 
 ################################### STORM SURGE DATA ##################################
