@@ -36,28 +36,29 @@ source("local-costal-flood-risk/R/Helper_scripts/conversion_functions.R")
 ##=========================== READ KOPP ET AL. 2014 DATA ===================================
 # Kopp et al. 2014 Local sea-level rise data at Sewells point tide gauge
 # Data is cm above 2000, so 0cm is 2000. Data is projected with RCP26, 45, 60, and 85.
-kopp14_rcp26 = read.csv("LSLproj_MC_299_rcp26.tsv.csv") 
-kopp14_rcp26 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp26$X2030, t_2050 = kopp14_rcp26$X2050, 
-                                           t_2070 = kopp14_rcp26$X2070, t_2100 = kopp14_rcp26$X2100))
+kopp14_rcp26_dat = read.csv("LSLproj_MC_299_rcp26.tsv.csv") 
+kopp14_rcp26 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp26_dat$X2030, t_2050 = kopp14_rcp26_dat$X2050, 
+                                           t_2070 = kopp14_rcp26_dat$X2070, t_2100 = kopp14_rcp26_dat$X2100))
 
-kopp14_rcp45 = read.csv("LSLproj_MC_299_rcp45.tsv.csv")
-kopp14_rcp45 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp45$X2030, t_2050 = kopp14_rcp45$X2050, 
-                                           t_2070 = kopp14_rcp45$X2070, t_2100 = kopp14_rcp45$X2100))
+kopp14_rcp45_dat = read.csv("LSLproj_MC_299_rcp45.tsv.csv")
+kopp14_rcp45 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp45_dat$X2030, t_2050 = kopp14_rcp45_dat$X2050, 
+                                           t_2070 = kopp14_rcp45_dat$X2070, t_2100 = kopp14_rcp45_dat$X2100))
 
-kopp14_rcp60 = read.csv("LSLproj_MC_299_rcp60.tsv.csv")
-kopp14_rcp60 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp60$X2030, t_2050 = kopp14_rcp60$X2050, 
-                                           t_2070 = kopp14_rcp60$X2070, t_2100 = kopp14_rcp60$X2100))
+kopp14_rcp60_dat = read.csv("LSLproj_MC_299_rcp60.tsv.csv")
+kopp14_rcp60 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp60_dat$X2030, t_2050 = kopp14_rcp60_dat$X2050, 
+                                           t_2070 = kopp14_rcp60_dat$X2070, t_2100 = kopp14_rcp60_dat$X2100))
 
-kopp14_rcp85 = read.csv("LSLproj_MC_299_rcp85.tsv.csv")
-kopp14_rcp85 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp85$X2030, t_2050 = kopp14_rcp85$X2050, 
-                                           t_2070 = kopp14_rcp85$X2070, t_2100 = kopp14_rcp85$X2100))
+kopp14_rcp85_dat = read.csv("LSLproj_MC_299_rcp85.tsv.csv")
+kopp14_rcp85 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp85_dat$X2030, t_2050 = kopp14_rcp85_dat$X2050, 
+                                           t_2070 = kopp14_rcp85_dat$X2070, t_2100 = kopp14_rcp85_dat$X2100))
+k14_years = seq(2010, 2200, 10)
 
 # Kopp et al. 2014 Local subsidence data at Sewells point tide gauge
 # Data is cm above 2000, so 0cm is 2000. This will be used
 # to account for subsidence in the Wong and Keller 2017 data.
-kopp14_subsid = read.csv("LSLProj_bkgd_299_rcp26.csv")
-kopp14_subsid = convert_cm_to_ft(data.frame(t_2030 = kopp14_subsid$X2030, t_2050 = kopp14_subsid$X2050, 
-                                            t_2070 = kopp14_subsid$X2070, t_2100 = kopp14_subsid$X2100))
+kopp14_subsid_dat = read.csv("LSLProj_bkgd_299_rcp26.csv")
+kopp14_subsid = convert_cm_to_ft(data.frame(t_2030 = kopp14_subsid_dat$X2030, t_2050 = kopp14_subsid_dat$X2050, 
+                                            t_2070 = kopp14_subsid_dat$X2070, t_2100 = kopp14_subsid_dat$X2100))
 
 ##=========================== READ WONG & KELLER 2017 DATA ===================================
 # Wong and Keller 2017 Local sea-level rise data with Fast dynamics at Sewells point tide gauge
@@ -87,6 +88,40 @@ states_w = dim(lsl_fdyn_rcp26)[2]
 BKkopp_subsid = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2070 = 1:states_w, t_2100 = 1:states_w)
 for(i in 1:4){
   BKkopp_subsid[ ,i] = rlnorm(states_w, meanlog=mean(log(kopp14_subsid[ ,i])), sdlog=sd(log(kopp14_subsid[ ,i])))
+}
+
+BKkopp_subsid_dat = mat.or.vec(states_w, length(k14_years))
+for(i in 1:length(k14_years)){
+  BKkopp_subsid_dat[ ,i] = convert_cm_to_ft(rlnorm(states_w, meanlog=mean(log(kopp14_subsid_dat[ ,i])), sdlog=sd(log(kopp14_subsid_dat[ ,i]))))
+}
+
+# Linear regression of subsidence to add to BRICK data
+t.time = 2010:2100
+subsid.fit = mat.or.vec(states_w, length(t.time))
+for(i in 1:states_w){
+  fit = lm(BKkopp_subsid_dat[i,1:10] ~ k14_years[1:10])
+  subsid.fit[i,] = fit$coefficients[1] + t.time*fit$coefficients[2]
+}
+
+# Add subsidence linear fit to BRICK data
+lsl_fdyn_rcp26_sub = 
+  lsl_fdyn_rcp45_sub = 
+  lsl_fdyn_rcp60_sub = 
+  lsl_fdyn_rcp85_sub = 
+  NO_fdyn_rcp26_sub = 
+  NO_fdyn_rcp45_sub = 
+  NO_fdyn_rcp60_sub = 
+  NO_fdyn_rcp85_sub = mat.or.vec(length(t.time), states_w)
+for(i in 1:states_w){
+  lsl_fdyn_rcp26_sub[ ,i] = convert_m_to_ft(lsl_fdyn_rcp26[match(2010:2100, year_proj),i]) + subsid.fit[i, ]
+  lsl_fdyn_rcp45_sub[ ,i] = convert_m_to_ft(lsl_fdyn_rcp45[match(2010:2100, year_proj),i]) + subsid.fit[i, ]
+  lsl_fdyn_rcp60_sub[ ,i] = convert_m_to_ft(lsl_fdyn_rcp60[match(2010:2100, year_proj),i]) + subsid.fit[i, ]
+  lsl_fdyn_rcp85_sub[ ,i] = convert_m_to_ft(lsl_fdyn_rcp85[match(2010:2100, year_proj),i]) + subsid.fit[i, ]
+  
+  NO_fdyn_rcp26_sub[ ,i] = convert_m_to_ft(NO_fdyn_rcp26[match(2010:2100, year_proj),i]) + subsid.fit[i, ]
+  NO_fdyn_rcp45_sub[ ,i] = convert_m_to_ft(NO_fdyn_rcp45[match(2010:2100, year_proj),i]) + subsid.fit[i, ]
+  NO_fdyn_rcp60_sub[ ,i] = convert_m_to_ft(NO_fdyn_rcp60[match(2010:2100, year_proj),i]) + subsid.fit[i, ]
+  NO_fdyn_rcp85_sub[ ,i] = convert_m_to_ft(NO_fdyn_rcp85[match(2010:2100, year_proj),i]) + subsid.fit[i, ]
 }
 
 #------------------------- Add subsidence to Wong & Keller 2017 data --------------------------------

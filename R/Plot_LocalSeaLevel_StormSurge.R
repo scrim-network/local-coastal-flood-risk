@@ -757,3 +757,269 @@ dev.off()
 ## End
 ##==============================================================================
 
+k14_26_5 =
+k14_45_5 =
+k14_60_5 =
+k14_85_5 =
+k14_26_95 =
+k14_45_95 =
+k14_60_95 =
+k14_85_95 = rep(NA, length(k14_years))
+for(i in 1:length(k14_years)){
+  k14_26_5[i] <- quantile(convert_cm_to_ft(kopp14_rcp26_dat[,i]), 0.05)
+  k14_45_5[i] <- quantile(convert_cm_to_ft(kopp14_rcp45_dat[,i]), 0.05)
+  k14_60_5[i] <- quantile(convert_cm_to_ft(kopp14_rcp60_dat[,i]), 0.05, na.rm=TRUE) #goes to 2100
+  k14_85_5[i] <- quantile(convert_cm_to_ft(kopp14_rcp85_dat[,i]), 0.05)
+  
+  k14_26_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp26_dat[,i]), 0.95)
+  k14_45_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp45_dat[,i]), 0.95)
+  k14_60_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp60_dat[,i]), 0.95, na.rm=TRUE) #goes to 2100
+  k14_85_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp85_dat[,i]), 0.95)
+}
+
+  lsl_fdyn_26_5 =  
+  lsl_fdyn_45_5 =
+  lsl_fdyn_60_5 =
+  lsl_fdyn_85_5 =
+  lsl_fdyn_26_95 =
+  lsl_fdyn_45_95 =
+  lsl_fdyn_60_95 =
+  lsl_fdyn_85_95 = 
+    NO_fdyn_26_5 =
+    NO_fdyn_45_5 =
+    NO_fdyn_60_5 =
+    NO_fdyn_85_5 =
+    NO_fdyn_26_95 =
+    NO_fdyn_45_95 =
+    NO_fdyn_60_95 =
+    NO_fdyn_85_95 = rep(NA, length(t.time))
+for(i in 1:length(t.time)){
+  lsl_fdyn_26_5[i] <- quantile(lsl_fdyn_rcp26_sub[i,], 0.05)
+  lsl_fdyn_45_5[i] <- quantile(lsl_fdyn_rcp45_sub[i,], 0.05)
+  lsl_fdyn_60_5[i] <- quantile(lsl_fdyn_rcp60_sub[i,], 0.05) 
+  lsl_fdyn_85_5[i] <- quantile(lsl_fdyn_rcp85_sub[i,], 0.05)
+  
+  lsl_fdyn_26_95[i] <- quantile(lsl_fdyn_rcp26_sub[i,], 0.95)
+  lsl_fdyn_45_95[i] <- quantile(lsl_fdyn_rcp45_sub[i,], 0.95)
+  lsl_fdyn_60_95[i] <- quantile(lsl_fdyn_rcp60_sub[i,], 0.95) 
+  lsl_fdyn_85_95[i] <- quantile(lsl_fdyn_rcp85_sub[i,], 0.95)
+  
+  NO_fdyn_26_5[i] <- quantile(NO_fdyn_rcp26_sub[i,], 0.05)
+  NO_fdyn_45_5[i] <- quantile(NO_fdyn_rcp45_sub[i,], 0.05)
+  NO_fdyn_60_5[i] <- quantile(NO_fdyn_rcp60_sub[i,], 0.05) 
+  NO_fdyn_85_5[i] <- quantile(NO_fdyn_rcp85_sub[i,], 0.05)
+  
+  NO_fdyn_26_95[i] <- quantile(NO_fdyn_rcp26_sub[i,], 0.95)
+  NO_fdyn_45_95[i] <- quantile(NO_fdyn_rcp45_sub[i,], 0.95)
+  NO_fdyn_60_95[i] <- quantile(NO_fdyn_rcp60_sub[i,], 0.95) 
+  NO_fdyn_85_95[i] <- quantile(NO_fdyn_rcp85_sub[i,], 0.95)
+}
+
+pdf(file="SLR_proj_pdf.pdf", family="Times", width=text_column_width, height=full_page_height, pointsize=12)
+layout(matrix(c(1,1,
+                2,3,
+                4,5), 3, 2, byrow = TRUE))
+par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
+plot(k14_years, k14_85_95, type="n",xlab="Year", ylab="Projected sea level (ft)",
+     ylim=c(0,11.5), xlim=c(2010, 2098), xaxt="n")
+title(main="a.", adj=0)
+axis(1, lwd = 1, at=seq(2010,2100, 10), label=seq(2010,2100, 10))
+
+polygon(y = c(k14_85_5, rev(k14_85_95)), x = c(k14_years, rev(k14_years)), col = trans_RdGy[1], border = NA)
+polygon(y = c(k14_60_5[1:10], rev(k14_60_95[1:10])), x = c(k14_years[1:10], rev(k14_years[1:10])), 
+        col = trans_RdGy[2], border = NA)
+polygon(y = c(k14_45_5, rev(k14_45_95)), x = c(k14_years, rev(k14_years)), col = trans_RdGy[3], border = NA)
+polygon(y = c(k14_26_5, rev(k14_26_95)), x = c(k14_years, rev(k14_years)), col = trans_RdGy[4], border = NA)
+
+polygon(y = c(lsl_fdyn_85_5, rev(lsl_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_BrBG[11], border = NA)
+polygon(y = c(lsl_fdyn_60_5, rev(lsl_fdyn_60_95)), x = c(t.time, rev(t.time)), col = trans_BrBG[10], border = NA)
+polygon(y = c(lsl_fdyn_45_5, rev(lsl_fdyn_45_95)), x = c(t.time, rev(t.time)), col = trans_BrBG[9], border = NA)
+polygon(y = c(lsl_fdyn_26_5, rev(lsl_fdyn_26_95)), x = c(t.time, rev(t.time)), col = trans_BrBG[8], border = NA)
+
+polygon(y = c(NO_fdyn_85_5, rev(NO_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_PRGn[2], border = NA)
+polygon(y = c(NO_fdyn_60_5, rev(NO_fdyn_60_95)), x = c(t.time, rev(t.time)), col = trans_PRGn[3], border = NA)
+polygon(y = c(NO_fdyn_45_5, rev(NO_fdyn_45_95)), x = c(t.time, rev(t.time)), col = trans_PRGn[4], border = NA)
+polygon(y = c(NO_fdyn_26_5, rev(NO_fdyn_26_95)), x = c(t.time, rev(t.time)), col = trans_PRGn[5], border = NA)
+
+# # NOAA et al 2012
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,2], col=BrBG[4])
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,3], col=BrBG[3])
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,4], col=BrBG[2])
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,5], col=BrBG[1])
+# 
+# # USACE 2013
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,6], col=RdBu[9])
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,7], col=RdBu[10])
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,8], col=RdBu[11])
+# 
+# # Hall et al 2016
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,9], col=RdGy[7])
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,10], col=RdGy[8])
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,11], col=RdGy[9])
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,12], col=RdGy[10])
+# lines(SL_calculator_ref2000[ ,1], SL_calculator_ref2000[ ,13], col=RdGy[11])
+# 
+# # Sweet et al 2017
+# lines(NOAA_etal_2017_ref2000[ ,1], NOAA_etal_2017_ref2000[ ,6], col=noaa_cols[8])
+# lines(NOAA_etal_2017_ref2000[ ,1], NOAA_etal_2017_ref2000[ ,9], col=noaa_cols[7])
+# lines(NOAA_etal_2017_ref2000[ ,1], NOAA_etal_2017_ref2000[ ,12], col=noaa_cols[6])
+# lines(NOAA_etal_2017_ref2000[ ,1], NOAA_etal_2017_ref2000[ ,15], col=noaa_cols[5])
+# lines(NOAA_etal_2017_ref2000[ ,1], NOAA_etal_2017_ref2000[ ,18], col=noaa_cols[4])
+# lines(NOAA_etal_2017_ref2000[ ,1], NOAA_etal_2017_ref2000[ ,21], col=noaa_cols[3])
+
+points(rep(2030, 4), noaa2012$t_2030, col=BrBG[4:1], pch=19)
+points(rep(2030, 3), usace2013$t_2030, col=RdBu[9:11], pch=19)
+points(rep(2030, 5), carswg2016$t_2030, col=RdGy[7:11], pch=19)
+points(rep(2030, length(noaa2017$t_2030)), noaa2017$t_2030, col=noaa_cols[8:2], pch=19)
+
+points(rep(2050, 4), noaa2012$t_2050, col=BrBG[4:1], pch=19)
+points(rep(2050, 3), usace2013$t_2050, col=RdBu[9:11], pch=19)
+points(rep(2050, 5), carswg2016$t_2050, col=RdGy[7:11], pch=19)
+points(rep(2050, length(noaa2017$t_2050)), noaa2017$t_2050, col=noaa_cols[8:3], pch=19)
+
+points(rep(2070, 4), noaa2012$t_2070, col=BrBG[4:1], pch=19)
+points(rep(2070, 3), usace2013$t_2070, col=RdBu[9:11], pch=19)
+points(rep(2070, 5), carswg2016$t_2070, col=RdGy[7:11], pch=19)
+points(rep(2070, length(noaa2017$t_2070)), noaa2017$t_2070, col=noaa_cols[8:3], pch=19)
+
+points(rep(2100, 4), noaa2012$t_2100, col=BrBG[4:1], pch=19)
+points(rep(2100, 3), usace2013$t_2100, col=RdBu[9:11], pch=19)
+points(rep(2100, 5), carswg2016$t_2100, col=RdGy[7:11], pch=19)
+points(rep(2100, length(noaa2017$t_2100)), noaa2017$t_2100, col=noaa_cols[8:3], pch=19)
+
+legend("topleft", legend=c("Wong & Keller 2017 FD 90% CI", "Kopp et al. 2014 90% CI", 
+                           "Wong & Keller 2017 no FD 90% CI", "Wong & Keller 2017 FD", 
+                           "Kopp et al. 2014", "Wong & Keller 2017 no FD", "Sweet et al. 2017", 
+                           "Parris et al. 2012", 
+                           "USACE 2014", "Hall et al. 2016"),
+       lty=c(NA,NA,NA,1,1,1,NA,NA,NA,NA), lwd=c(NA,NA,NA,2,2,2,NA,NA,NA,NA), pch=c(22,22,22,NA,NA,NA,19,19,19,19), 
+       col=c("black", "black", "black", BrBG[9], RdGy[3], PRGn[3], noaa_cols[5], BrBG[2], RdBu[10], RdGy[9]),
+       bty='n', pt.bg=c(BrBG[9], RdGy[3], PRGn[3],NA,NA,NA,NA,NA,NA,NA), pt.cex = c(2,2,2,NA,NA,NA,1,1,1,1))
+gradient.rect(2008,4,2012,4.5, col=col_grad, gradient="x")
+arrows(2028.5, 4.25, 2030.5, 4.25, length=0.075)
+text(2020.5,4.25, "Higher scenario")
+
+#--------------------------
+# b) Sea-level rise probability density function 2030
+plot(density(kopp14_rcp85$t_2030), xlab="Projected sea level in 2030 (ft)", ylab="Probability density", yaxt="n", 
+     main="",col=RdGy[1], lwd=2, xlim=c(-0.2,2), ylim = c(0, 6.75), bty="l")
+title(main="b.", adj=0)
+lines(density(kopp14_rcp60$t_2030), col=RdGy[2], lwd=2)
+lines(density(kopp14_rcp45$t_2030), col=RdGy[3], lwd=2)
+lines(density(kopp14_rcp26$t_2030), col=RdGy[4], lwd=2)
+
+lines(density(brickfd_rcp85$t_2030), col=BrBG[11], lwd=2)
+lines(density(brickfd_rcp60$t_2030), col=BrBG[10], lwd=2)
+lines(density(brickfd_rcp45$t_2030), col=BrBG[9], lwd=2)
+lines(density(brickfd_rcp26$t_2030), col=BrBG[8], lwd=2)
+
+lines(density(NO_fdft_rcp85$t_2030), col=PRGn[2], lwd=2)
+lines(density(NO_fdft_rcp60$t_2030), col=PRGn[3], lwd=2)
+lines(density(NO_fdft_rcp45$t_2030), col=PRGn[4], lwd=2)
+lines(density(NO_fdft_rcp26$t_2030), col=PRGn[5], lwd=2)
+
+lines(noaa2012$t_2030, rep(6.5, 4), col=BrBG[4:1], lwd=1.5, lty=3)
+lines(usace2013$t_2030, rep(6, 3), col=RdBu[9:11], lwd=1.5, lty=3)
+lines(carswg2016$t_2030, rep(5.5, 5), col=RdGy[7:11], lwd=1.5, lty=3)
+lines(noaa2017$t_2030, rep(5, length(noaa2017$t_2030)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+
+points(noaa2012$t_2030, rep(6.5, 4), col=BrBG[4:1], pch=19)
+points(usace2013$t_2030, rep(6, 3), col=RdBu[9:11], pch=19)
+points(carswg2016$t_2030, rep(5.5, 5), col=RdGy[7:11], pch=19)
+points(noaa2017$t_2030, rep(5, length(noaa2017$t_2030)), col=noaa_cols[8:2], pch=19)
+
+#   -----------------------------------------------------------------------
+# c) Sea-level rise probability density function 2050
+par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
+plot(density(kopp14_rcp85$t_2050), xlab="Projected sea level in 2050 (ft)", ylab="Probability density", yaxt="n", 
+     main="", col=RdGy[1], lwd=2, xlim=c(-0.2,4), ylim = c(0, 3.5), bty="l")
+title(main="c.", adj=0)
+lines(density(kopp14_rcp60$t_2050), col=RdGy[2], lwd=2)
+lines(density(kopp14_rcp45$t_2050), col=RdGy[3], lwd=2)
+lines(density(kopp14_rcp26$t_2050), col=RdGy[4], lwd=2)
+
+lines(density(brickfd_rcp85$t_2050), col=BrBG[11], lwd=2)
+lines(density(brickfd_rcp60$t_2050), col=BrBG[10], lwd=2)
+lines(density(brickfd_rcp45$t_2050), col=BrBG[9], lwd=2)
+lines(density(brickfd_rcp26$t_2050), col=BrBG[8], lwd=2)
+
+lines(density(NO_fdft_rcp85$t_2050), col=PRGn[2], lwd=2)
+lines(density(NO_fdft_rcp60$t_2050), col=PRGn[3], lwd=2)
+lines(density(NO_fdft_rcp45$t_2050), col=PRGn[4], lwd=2)
+lines(density(NO_fdft_rcp26$t_2050), col=PRGn[5], lwd=2)
+
+lines(noaa2012$t_2050, rep(3.25, 4), col=BrBG[4:1], lwd=2, lty=3)
+lines(usace2013$t_2050, rep(3, 3), col=RdBu[9:11], lwd=2, lty=3)
+lines(carswg2016$t_2050, rep(2.75, 5), col=RdGy[7:11], lwd=2, lty=3)
+lines(noaa2017$t_2050, rep(2.5, length(noaa2017$t_2050)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+
+points(noaa2012$t_2050, rep(3.25, 4), col=BrBG[4:1], pch=19)
+points(usace2013$t_2050, rep(3, 3), col=RdBu[9:11], pch=19)
+points(carswg2016$t_2050, rep(2.75, 5), col=RdGy[7:11], pch=19)
+points(noaa2017$t_2050, rep(2.5, length(noaa2017$t_2050)), col=noaa_cols[8:2], pch=19)
+
+#   -----------------------------------------------------------------------
+# d) Sea-level rise probability density function 2070
+par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
+plot(density(kopp14_rcp85$t_2070), xlab="Projected sea level in 2070 (ft)", ylab="Probability density", yaxt="n",
+     main="", col=RdGy[1], lwd=2, xlim=c(-0.3,8), ylim = c(0, 3), bty="l")
+title(main="d.", adj=0)
+lines(density(kopp14_rcp60$t_2070), col=RdGy[2], lwd=2)
+lines(density(kopp14_rcp45$t_2070), col=RdGy[3], lwd=2)
+lines(density(kopp14_rcp26$t_2070), col=RdGy[4], lwd=2)
+
+lines(density(brickfd_rcp85$t_2070), col=BrBG[11], lwd=2)
+lines(density(brickfd_rcp60$t_2070), col=BrBG[10], lwd=2)
+lines(density(brickfd_rcp45$t_2070), col=BrBG[9], lwd=2)
+lines(density(brickfd_rcp26$t_2070), col=BrBG[8], lwd=2)
+
+lines(density(NO_fdft_rcp85$t_2070), col=PRGn[2], lwd=2)
+lines(density(NO_fdft_rcp60$t_2070), col=PRGn[3], lwd=2)
+lines(density(NO_fdft_rcp45$t_2070), col=PRGn[4], lwd=2)
+lines(density(NO_fdft_rcp26$t_2070), col=PRGn[5], lwd=2)
+
+lines(noaa2012$t_2070, rep(2.75, 4), col=BrBG[4:1], lwd=2, lty=3)
+lines(usace2013$t_2070, rep(2.5, 3), col=RdBu[9:11], lwd=2, lty=3)
+lines(carswg2016$t_2070, rep(2.25, 5), col=RdGy[7:11], lwd=2, lty=3)
+lines(noaa2017$t_2070, rep(2, length(noaa2017$t_2070)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+
+points(noaa2012$t_2070, rep(2.75, 4), col=BrBG[4:1], pch=19)
+points(usace2013$t_2070, rep(2.5, 3), col=RdBu[9:11], pch=19)
+points(carswg2016$t_2070, rep(2.25, 5), col=RdGy[7:11], pch=19)
+points(noaa2017$t_2070, rep(2, length(noaa2017$t_2070)), col=noaa_cols[8:2], pch=19)
+
+#   -----------------------------------------------------------------------
+par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
+# e) Sea-level rise probability density function 2100
+plot(density(kopp14_rcp85$t_2100), xlab="Projected sea level in 2100 (ft)", ylab="Probability density", yaxt="n", 
+     main="", col=RdGy[1], lwd=2, xlim=c(-0.5,15), ylim = c(0, 1.5), bty="l")
+title(main="e.", adj=0)
+lines(density(kopp14_rcp60$t_2100), col=RdGy[2], lwd=2)
+lines(density(kopp14_rcp45$t_2100), col=RdGy[3], lwd=2)
+lines(density(kopp14_rcp26$t_2100), col=RdGy[4], lwd=2)
+
+lines(density(brickfd_rcp85$t_2100), col=BrBG[11], lwd=2)
+lines(density(brickfd_rcp60$t_2100), col=BrBG[10], lwd=2)
+lines(density(brickfd_rcp45$t_2100), col=BrBG[9], lwd=2)
+lines(density(brickfd_rcp26$t_2100), col=BrBG[8], lwd=2)
+
+lines(density(NO_fdft_rcp85$t_2100), col=PRGn[2], lwd=2)
+lines(density(NO_fdft_rcp60$t_2100), col=PRGn[3], lwd=2)
+lines(density(NO_fdft_rcp45$t_2100), col=PRGn[4], lwd=2)
+lines(density(NO_fdft_rcp26$t_2100), col=PRGn[5], lwd=2)
+
+lines(noaa2012$t_2100, rep(1.45, 4), col=BrBG[4:1], lwd=2, lty=3)
+lines(usace2013$t_2100, rep(1.3, 3), col=RdBu[9:11], lwd=2, lty=3)
+lines(carswg2016$t_2100, rep(1.15, 5), col=RdGy[7:11], lwd=2, lty=3)
+lines(noaa2017$t_2100, rep(1, length(noaa2017$t_2100)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+
+points(noaa2012$t_2100, rep(1.45, 4), col=BrBG[4:1], pch=19)
+points(usace2013$t_2100, rep(1.3, 3), col=RdBu[9:11], pch=19)
+points(carswg2016$t_2100, rep(1.15, 5), col=RdGy[7:11], pch=19)
+points(noaa2017$t_2100, rep(1, length(noaa2017$t_2100)), col=noaa_cols[8:2], pch=19)
+
+dev.off()
+
+##==============================================================================
+## End
+##==============================================================================
