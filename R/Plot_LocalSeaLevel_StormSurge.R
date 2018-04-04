@@ -63,7 +63,7 @@ PRGn = brewer.pal(11, "PRGn")
 PiYG = brewer.pal(11, "PiYG")
 tebaldi_gold = c("#f0cf0c", "#fcf5ce")
 
-noaa_cols = seq_color(9, PiYG[1:5])
+sweet_cols = seq_color(9, PiYG[1:5])
 col_grad = seq_color(150, RdGy[7:11])
 
 trans_RdGy = makeTransparent(RdGy, 100)
@@ -71,7 +71,7 @@ trans_BrBG = makeTransparent(BrBG, 100)
 trans_RdBu = makeTransparent(RdBu, 100)
 trans_PRGn = makeTransparent(PRGn, 100)
 trans_PiYG = makeTransparent(PiYG, 100)
-trans_noaa_cols = makeTransparent(noaa_cols, 100)
+trans_sweet_cols = makeTransparent(sweet_cols, 100)
 trans_tebaldi_gold = makeTransparent(tebaldi_gold, 200)
 
 ##=========================== PUBLICATION FIGURE SIZES ===================================
@@ -99,7 +99,7 @@ legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014",
                            "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
                            "Zervas 2013\n 95% CI", "Observations"),
        lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
-       col=c(RdBu[9], RdGy[3], PRGn[3], tebaldi_gold[1], noaa_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
+       col=c(RdBu[9], RdGy[3], PRGn[3], tebaldi_gold[1], sweet_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
        bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
 gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
 arrows(8.75, 1.5, 9, 1.5, length=0.075)
@@ -125,15 +125,15 @@ lines(density(NO_fdft_rcp60$t_2030), col=PRGn[3], lwd=2)
 lines(density(NO_fdft_rcp45$t_2030), col=PRGn[4], lwd=2)
 lines(density(NO_fdft_rcp26$t_2030), col=PRGn[5], lwd=2)
 
-lines(noaa2012$t_2030, rep(6.5, 4), col=BrBG[4:1], lwd=1.5, lty=3)
-lines(usace2013$t_2030, rep(6, 3), col=BrBG[8:10], lwd=1.5, lty=3)
-lines(carswg2016$t_2030, rep(5.5, 5), col=RdGy[7:11], lwd=1.5, lty=3)
-lines(noaa2017$t_2030, rep(5, length(noaa2017$t_2030)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+lines(parris_etal_2012$t_2030, rep(6.5, 4), col=BrBG[4:1], lwd=1.5, lty=3)
+lines(usace2014$t_2030, rep(6, 3), col=BrBG[8:10], lwd=1.5, lty=3)
+lines(hall_etal_2016$t_2030, rep(5.5, 5), col=RdGy[7:11], lwd=1.5, lty=3)
+lines(sweet2017$t_2030, rep(5, length(sweet2017$t_2030)), col=sweet_cols[8:2], lwd=1.5, lty=3)
 
-points(noaa2012$t_2030, rep(6.5, 4), col=BrBG[4:1], pch=19)
-points(usace2013$t_2030, rep(6, 3), col=BrBG[8:10], pch=19)
-points(carswg2016$t_2030, rep(5.5, 5), col=RdGy[7:11], pch=19)
-points(noaa2017$t_2030, rep(5, length(noaa2017$t_2030)), col=noaa_cols[8:2], pch=19)
+points(parris_etal_2012$t_2030, rep(6.5, 4), col=BrBG[4:1], pch=19)
+points(usace2014$t_2030, rep(6, 3), col=BrBG[8:10], pch=19)
+points(hall_etal_2016$t_2030, rep(5.5, 5), col=RdGy[7:11], pch=19)
+points(sweet2017$t_2030, rep(5, length(sweet2017$t_2030)), col=sweet_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
 # b) Storm surge return period 
@@ -219,7 +219,7 @@ legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014",
                            "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
                            "Zervas 2013\n 95% CI", "Observations"),
        lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
-       col=c(RdBu[9], RdGy[3], PRGn[3], tebaldi_gold[1], noaa_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
+       col=c(RdBu[9], RdGy[3], PRGn[3], tebaldi_gold[1], sweet_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
        bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
 gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
 arrows(8.75, 1.5, 9, 1.5, length=0.075)
@@ -245,15 +245,15 @@ lines(density(NO_fdft_rcp60$t_2050), col=PRGn[3], lwd=2)
 lines(density(NO_fdft_rcp45$t_2050), col=PRGn[4], lwd=2)
 lines(density(NO_fdft_rcp26$t_2050), col=PRGn[5], lwd=2)
 
-lines(noaa2012$t_2050, rep(3.25, 4), col=BrBG[4:1], lwd=2, lty=3)
-lines(usace2013$t_2050, rep(3, 3), col=BrBG[8:10], lwd=2, lty=3)
-lines(carswg2016$t_2050, rep(2.75, 5), col=RdGy[7:11], lwd=2, lty=3)
-lines(noaa2017$t_2050, rep(2.5, length(noaa2017$t_2050)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+lines(parris_etal_2012$t_2050, rep(3.25, 4), col=BrBG[4:1], lwd=2, lty=3)
+lines(usace2014$t_2050, rep(3, 3), col=BrBG[8:10], lwd=2, lty=3)
+lines(hall_etal_2016$t_2050, rep(2.75, 5), col=RdGy[7:11], lwd=2, lty=3)
+lines(sweet2017$t_2050, rep(2.5, length(sweet2017$t_2050)), col=sweet_cols[8:2], lwd=1.5, lty=3)
 
-points(noaa2012$t_2050, rep(3.25, 4), col=BrBG[4:1], pch=19)
-points(usace2013$t_2050, rep(3, 3), col=BrBG[8:10], pch=19)
-points(carswg2016$t_2050, rep(2.75, 5), col=RdGy[7:11], pch=19)
-points(noaa2017$t_2050, rep(2.5, length(noaa2017$t_2050)), col=noaa_cols[8:2], pch=19)
+points(parris_etal_2012$t_2050, rep(3.25, 4), col=BrBG[4:1], pch=19)
+points(usace2014$t_2050, rep(3, 3), col=BrBG[8:10], pch=19)
+points(hall_etal_2016$t_2050, rep(2.75, 5), col=RdGy[7:11], pch=19)
+points(sweet2017$t_2050, rep(2.5, length(sweet2017$t_2050)), col=sweet_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
 # b) Storm surge return period 
@@ -339,7 +339,7 @@ legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014",
                            "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
                            "Zervas 2013\n 95% CI", "Observations"),
        lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
-       col=c(RdBu[9], RdGy[3], PRGn[3], tebaldi_gold[1], noaa_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
+       col=c(RdBu[9], RdGy[3], PRGn[3], tebaldi_gold[1], sweet_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
        bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
 gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
 arrows(8.75, 1.5, 9, 1.5, length=0.075)
@@ -365,15 +365,15 @@ lines(density(NO_fdft_rcp60$t_2070), col=PRGn[3], lwd=2)
 lines(density(NO_fdft_rcp45$t_2070), col=PRGn[4], lwd=2)
 lines(density(NO_fdft_rcp26$t_2070), col=PRGn[5], lwd=2)
 
-lines(noaa2012$t_2070, rep(2.75, 4), col=BrBG[4:1], lwd=2, lty=3)
-lines(usace2013$t_2070, rep(2.5, 3), col=BrBG[8:10], lwd=2, lty=3)
-lines(carswg2016$t_2070, rep(2.25, 5), col=RdGy[7:11], lwd=2, lty=3)
-lines(noaa2017$t_2070, rep(2, length(noaa2017$t_2070)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+lines(parris_etal_2012$t_2070, rep(2.75, 4), col=BrBG[4:1], lwd=2, lty=3)
+lines(usace2014$t_2070, rep(2.5, 3), col=BrBG[8:10], lwd=2, lty=3)
+lines(hall_etal_2016$t_2070, rep(2.25, 5), col=RdGy[7:11], lwd=2, lty=3)
+lines(sweet2017$t_2070, rep(2, length(sweet2017$t_2070)), col=sweet_cols[8:2], lwd=1.5, lty=3)
 
-points(noaa2012$t_2070, rep(2.75, 4), col=BrBG[4:1], pch=19)
-points(usace2013$t_2070, rep(2.5, 3), col=BrBG[8:10], pch=19)
-points(carswg2016$t_2070, rep(2.25, 5), col=RdGy[7:11], pch=19)
-points(noaa2017$t_2070, rep(2, length(noaa2017$t_2070)), col=noaa_cols[8:2], pch=19)
+points(parris_etal_2012$t_2070, rep(2.75, 4), col=BrBG[4:1], pch=19)
+points(usace2014$t_2070, rep(2.5, 3), col=BrBG[8:10], pch=19)
+points(hall_etal_2016$t_2070, rep(2.25, 5), col=RdGy[7:11], pch=19)
+points(sweet2017$t_2070, rep(2, length(sweet2017$t_2070)), col=sweet_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
 # b) Storm surge return period 
@@ -459,7 +459,7 @@ legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014",
                            "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
                            "Zervas 2013\n 95% CI", "Observations"),
        lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
-       col=c(RdBu[9], RdGy[3], PRGn[3], tebaldi_gold[1], noaa_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
+       col=c(RdBu[9], RdGy[3], PRGn[3], tebaldi_gold[1], sweet_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
        bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
 gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
 arrows(8.75, 1.5, 9, 1.5, length=0.075)
@@ -485,15 +485,15 @@ lines(density(NO_fdft_rcp60$t_2100), col=PRGn[3], lwd=2)
 lines(density(NO_fdft_rcp45$t_2100), col=PRGn[4], lwd=2)
 lines(density(NO_fdft_rcp26$t_2100), col=PRGn[5], lwd=2)
 
-lines(noaa2012$t_2100, rep(1.45, 4), col=BrBG[4:1], lwd=2, lty=3)
-lines(usace2013$t_2100, rep(1.3, 3), col=BrBG[8:10], lwd=2, lty=3)
-lines(carswg2016$t_2100, rep(1.15, 5), col=RdGy[7:11], lwd=2, lty=3)
-lines(noaa2017$t_2100, rep(1, length(noaa2017$t_2100)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+lines(parris_etal_2012$t_2100, rep(1.45, 4), col=BrBG[4:1], lwd=2, lty=3)
+lines(usace2014$t_2100, rep(1.3, 3), col=BrBG[8:10], lwd=2, lty=3)
+lines(hall_etal_2016$t_2100, rep(1.15, 5), col=RdGy[7:11], lwd=2, lty=3)
+lines(sweet2017$t_2100, rep(1, length(sweet2017$t_2100)), col=sweet_cols[8:2], lwd=1.5, lty=3)
 
-points(noaa2012$t_2100, rep(1.45, 4), col=BrBG[4:1], pch=19)
-points(usace2013$t_2100, rep(1.3, 3), col=BrBG[8:10], pch=19)
-points(carswg2016$t_2100, rep(1.15, 5), col=RdGy[7:11], pch=19)
-points(noaa2017$t_2100, rep(1, length(noaa2017$t_2100)), col=noaa_cols[8:2], pch=19)
+points(parris_etal_2012$t_2100, rep(1.45, 4), col=BrBG[4:1], pch=19)
+points(usace2014$t_2100, rep(1.3, 3), col=BrBG[8:10], pch=19)
+points(hall_etal_2016$t_2100, rep(1.15, 5), col=RdGy[7:11], pch=19)
+points(sweet2017$t_2100, rep(1, length(sweet2017$t_2100)), col=sweet_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
 # b) Storm surge return period 
@@ -643,7 +643,7 @@ legend("topleft", legend=c("Wong & Keller 2017 FD RCP85 90% CI", "Wong & Keller 
                            "Parris et al. 2012",
                            "USACE 2014", "Hall et al. 2016"),
        lty=c(NA,NA,NA,1,1,1,NA,NA,NA,NA), lwd=c(NA,NA,NA,2,2,2,NA,NA,NA,NA), pch=c(22,22,22,NA,NA,NA,19,19,19,19),
-       col=c("black", "black", "black", RdBu[9], PRGn[3], RdGy[3], noaa_cols[5], BrBG[2], BrBG[9], RdGy[9]),
+       col=c("black", "black", "black", RdBu[9], PRGn[3], RdGy[3], sweet_cols[5], BrBG[2], BrBG[9], RdGy[9]),
        bty='n', pt.bg=c(trans_RdBu[10], trans_PRGn[2], trans_RdGy[1],NA,NA,NA,NA,NA,NA,NA), pt.cex = c(2,2,2,NA,NA,NA,1,1,1,1))
 gradient.rect(2008,2,2012,2.25, col=col_grad, gradient="x")
 arrows(2028.5, 2.12, 2030.5, 2.12, length=0.075)
@@ -668,15 +668,15 @@ lines(density(NO_fdft_rcp60$t_2030), col=PRGn[3], lwd=2)
 lines(density(NO_fdft_rcp45$t_2030), col=PRGn[4], lwd=2)
 lines(density(NO_fdft_rcp26$t_2030), col=PRGn[5], lwd=2)
 
-lines(noaa2012$t_2030, rep(6.5, 4), col=BrBG[4:1], lwd=1.5, lty=3)
-lines(usace2013$t_2030, rep(6, 3), col=BrBG[8:10], lwd=1.5, lty=3)
-lines(carswg2016$t_2030, rep(5.5, 5), col=RdGy[7:11], lwd=1.5, lty=3)
-lines(noaa2017$t_2030, rep(5, length(noaa2017$t_2030)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+lines(parris_etal_2012$t_2030, rep(6.5, 4), col=BrBG[4:1], lwd=1.5, lty=3)
+lines(usace2014$t_2030, rep(6, 3), col=BrBG[8:10], lwd=1.5, lty=3)
+lines(hall_etal_2016$t_2030, rep(5.5, 5), col=RdGy[7:11], lwd=1.5, lty=3)
+lines(sweet2017$t_2030, rep(5, length(sweet2017$t_2030)), col=sweet_cols[8:2], lwd=1.5, lty=3)
 
-points(noaa2012$t_2030, rep(6.5, 4), col=BrBG[4:1], pch=19)
-points(usace2013$t_2030, rep(6, 3), col=BrBG[8:10], pch=19)
-points(carswg2016$t_2030, rep(5.5, 5), col=RdGy[7:11], pch=19)
-points(noaa2017$t_2030, rep(5, length(noaa2017$t_2030)), col=noaa_cols[8:2], pch=19)
+points(parris_etal_2012$t_2030, rep(6.5, 4), col=BrBG[4:1], pch=19)
+points(usace2014$t_2030, rep(6, 3), col=BrBG[8:10], pch=19)
+points(hall_etal_2016$t_2030, rep(5.5, 5), col=RdGy[7:11], pch=19)
+points(sweet2017$t_2030, rep(5, length(sweet2017$t_2030)), col=sweet_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
 # c) Sea-level rise probability density function 2050
@@ -698,15 +698,15 @@ lines(density(NO_fdft_rcp60$t_2050), col=PRGn[3], lwd=2)
 lines(density(NO_fdft_rcp45$t_2050), col=PRGn[4], lwd=2)
 lines(density(NO_fdft_rcp26$t_2050), col=PRGn[5], lwd=2)
 
-lines(noaa2012$t_2050, rep(3.25, 4), col=BrBG[4:1], lwd=2, lty=3)
-lines(usace2013$t_2050, rep(3, 3), col=BrBG[8:10], lwd=2, lty=3)
-lines(carswg2016$t_2050, rep(2.75, 5), col=RdGy[7:11], lwd=2, lty=3)
-lines(noaa2017$t_2050, rep(2.5, length(noaa2017$t_2050)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+lines(parris_etal_2012$t_2050, rep(3.25, 4), col=BrBG[4:1], lwd=2, lty=3)
+lines(usace2014$t_2050, rep(3, 3), col=BrBG[8:10], lwd=2, lty=3)
+lines(hall_etal_2016$t_2050, rep(2.75, 5), col=RdGy[7:11], lwd=2, lty=3)
+lines(sweet2017$t_2050, rep(2.5, length(sweet2017$t_2050)), col=sweet_cols[8:2], lwd=1.5, lty=3)
 
-points(noaa2012$t_2050, rep(3.25, 4), col=BrBG[4:1], pch=19)
-points(usace2013$t_2050, rep(3, 3), col=BrBG[8:10], pch=19)
-points(carswg2016$t_2050, rep(2.75, 5), col=RdGy[7:11], pch=19)
-points(noaa2017$t_2050, rep(2.5, length(noaa2017$t_2050)), col=noaa_cols[8:2], pch=19)
+points(parris_etal_2012$t_2050, rep(3.25, 4), col=BrBG[4:1], pch=19)
+points(usace2014$t_2050, rep(3, 3), col=BrBG[8:10], pch=19)
+points(hall_etal_2016$t_2050, rep(2.75, 5), col=RdGy[7:11], pch=19)
+points(sweet2017$t_2050, rep(2.5, length(sweet2017$t_2050)), col=sweet_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
 # d) Sea-level rise probability density function 2070
@@ -728,15 +728,15 @@ lines(density(NO_fdft_rcp60$t_2070), col=PRGn[3], lwd=2)
 lines(density(NO_fdft_rcp45$t_2070), col=PRGn[4], lwd=2)
 lines(density(NO_fdft_rcp26$t_2070), col=PRGn[5], lwd=2)
 
-lines(noaa2012$t_2070, rep(2.75, 4), col=BrBG[4:1], lwd=2, lty=3)
-lines(usace2013$t_2070, rep(2.5, 3), col=BrBG[8:10], lwd=2, lty=3)
-lines(carswg2016$t_2070, rep(2.25, 5), col=RdGy[7:11], lwd=2, lty=3)
-lines(noaa2017$t_2070, rep(2, length(noaa2017$t_2070)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+lines(parris_etal_2012$t_2070, rep(2.75, 4), col=BrBG[4:1], lwd=2, lty=3)
+lines(usace2014$t_2070, rep(2.5, 3), col=BrBG[8:10], lwd=2, lty=3)
+lines(hall_etal_2016$t_2070, rep(2.25, 5), col=RdGy[7:11], lwd=2, lty=3)
+lines(sweet2017$t_2070, rep(2, length(sweet2017$t_2070)), col=sweet_cols[8:2], lwd=1.5, lty=3)
 
-points(noaa2012$t_2070, rep(2.75, 4), col=BrBG[4:1], pch=19)
-points(usace2013$t_2070, rep(2.5, 3), col=BrBG[8:10], pch=19)
-points(carswg2016$t_2070, rep(2.25, 5), col=RdGy[7:11], pch=19)
-points(noaa2017$t_2070, rep(2, length(noaa2017$t_2070)), col=noaa_cols[8:2], pch=19)
+points(parris_etal_2012$t_2070, rep(2.75, 4), col=BrBG[4:1], pch=19)
+points(usace2014$t_2070, rep(2.5, 3), col=BrBG[8:10], pch=19)
+points(hall_etal_2016$t_2070, rep(2.25, 5), col=RdGy[7:11], pch=19)
+points(sweet2017$t_2070, rep(2, length(sweet2017$t_2070)), col=sweet_cols[8:2], pch=19)
 
 #   -----------------------------------------------------------------------
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
@@ -758,15 +758,15 @@ lines(density(NO_fdft_rcp60$t_2100), col=PRGn[3], lwd=2)
 lines(density(NO_fdft_rcp45$t_2100), col=PRGn[4], lwd=2)
 lines(density(NO_fdft_rcp26$t_2100), col=PRGn[5], lwd=2)
 
-lines(noaa2012$t_2100, rep(1.45, 4), col=BrBG[4:1], lwd=2, lty=3)
-lines(usace2013$t_2100, rep(1.3, 3), col=BrBG[8:10], lwd=2, lty=3)
-lines(carswg2016$t_2100, rep(1.15, 5), col=RdGy[7:11], lwd=2, lty=3)
-lines(noaa2017$t_2100, rep(1, length(noaa2017$t_2100)), col=noaa_cols[8:2], lwd=1.5, lty=3)
+lines(parris_etal_2012$t_2100, rep(1.45, 4), col=BrBG[4:1], lwd=2, lty=3)
+lines(usace2014$t_2100, rep(1.3, 3), col=BrBG[8:10], lwd=2, lty=3)
+lines(hall_etal_2016$t_2100, rep(1.15, 5), col=RdGy[7:11], lwd=2, lty=3)
+lines(sweet2017$t_2100, rep(1, length(sweet2017$t_2100)), col=sweet_cols[8:2], lwd=1.5, lty=3)
 
-points(noaa2012$t_2100, rep(1.45, 4), col=BrBG[4:1], pch=19)
-points(usace2013$t_2100, rep(1.3, 3), col=BrBG[8:10], pch=19)
-points(carswg2016$t_2100, rep(1.15, 5), col=RdGy[7:11], pch=19)
-points(noaa2017$t_2100, rep(1, length(noaa2017$t_2100)), col=noaa_cols[8:2], pch=19)
+points(parris_etal_2012$t_2100, rep(1.45, 4), col=BrBG[4:1], pch=19)
+points(usace2014$t_2100, rep(1.3, 3), col=BrBG[8:10], pch=19)
+points(hall_etal_2016$t_2100, rep(1.15, 5), col=RdGy[7:11], pch=19)
+points(sweet2017$t_2100, rep(1, length(sweet2017$t_2100)), col=sweet_cols[8:2], pch=19)
 
 dev.off()
 

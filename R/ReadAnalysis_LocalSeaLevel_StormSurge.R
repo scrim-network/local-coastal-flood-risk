@@ -36,19 +36,19 @@ source("local-costal-flood-risk/R/Helper_scripts/conversion_functions.R")
 ##=========================== READ KOPP ET AL. 2014 DATA ===================================
 # Kopp et al. 2014 Local sea-level rise data at Sewells point tide gauge
 # Data is cm above 2000, so 0cm is 2000. Data is projected with RCP26, 45, 60, and 85.
-kopp14_rcp26_dat = read.csv("LSLproj_MC_299_rcp26.tsv.csv") 
+kopp14_rcp26_dat = read.csv("LSLproj_MC_299_rcp26.csv") 
 kopp14_rcp26 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp26_dat$X2030, t_2050 = kopp14_rcp26_dat$X2050, 
                                            t_2070 = kopp14_rcp26_dat$X2070, t_2100 = kopp14_rcp26_dat$X2100))
 
-kopp14_rcp45_dat = read.csv("LSLproj_MC_299_rcp45.tsv.csv")
+kopp14_rcp45_dat = read.csv("LSLproj_MC_299_rcp45.csv")
 kopp14_rcp45 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp45_dat$X2030, t_2050 = kopp14_rcp45_dat$X2050, 
                                            t_2070 = kopp14_rcp45_dat$X2070, t_2100 = kopp14_rcp45_dat$X2100))
 
-kopp14_rcp60_dat = read.csv("LSLproj_MC_299_rcp60.tsv.csv")
+kopp14_rcp60_dat = read.csv("LSLproj_MC_299_rcp60.csv")
 kopp14_rcp60 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp60_dat$X2030, t_2050 = kopp14_rcp60_dat$X2050, 
                                            t_2070 = kopp14_rcp60_dat$X2070, t_2100 = kopp14_rcp60_dat$X2100))
 
-kopp14_rcp85_dat = read.csv("LSLproj_MC_299_rcp85.tsv.csv")
+kopp14_rcp85_dat = read.csv("LSLproj_MC_299_rcp85.csv")
 kopp14_rcp85 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp85_dat$X2030, t_2050 = kopp14_rcp85_dat$X2050, 
                                            t_2070 = kopp14_rcp85_dat$X2070, t_2100 = kopp14_rcp85_dat$X2100))
 k14_years = seq(2010, 2200, 10)
@@ -159,7 +159,7 @@ NO_fdft_rcp85 = combine_subsid_to_brick(NO_fdft_rcp85, NO_fdyn_rcp85, NO_fdyn_pr
 ##===================== READ PARRIS ET AL 2012; USACE 2014; HALL ET AL 2016 DATA ===========================
 # Read in data from the USACE Sea level calculator for Sewells Point: http://www.corpsclimate.us/ccaceslcurves.cfm
 # Data is ft above 1992, so 0 ft is 1992
-SL_calculator = read.csv("USACE_SL_Calculator_SewellsPoint.csv", skip=1, header=TRUE)
+SL_calculator = read.csv("SewellsPoint_Parris12_USACE14_Hall16_SL_data.csv", skip=1, header=TRUE)
 SL_calculator = as.matrix(SL_calculator)
 
 #----------------------------- Convert baseline to 2000 -------------------------------------
@@ -171,17 +171,17 @@ for(i in 2:13){
 #--------------------------- Extract specific years for each study --------------------------
 match_SLC = match(c(2030,2050,2070,2100), SL_calculator[,1])
 # Parris et al. 2012
-noaa2012 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 2:5]), 
+parris_etal_2012 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 2:5]), 
                       t_2050 = c(SL_calculator_ref2000[match_SLC[2], 2:5]),
                       t_2070 = c(SL_calculator_ref2000[match_SLC[3], 2:5]), 
                       t_2100 = c(SL_calculator_ref2000[match_SLC[4], 2:5]), row.names = NULL)
 # USACE 2014
-usace2013 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 6:8]), 
+usace2014 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 6:8]), 
                        t_2050 = c(SL_calculator_ref2000[match_SLC[2], 6:8]),
                        t_2070 = c(SL_calculator_ref2000[match_SLC[3], 6:8]), 
                        t_2100 = c(SL_calculator_ref2000[match_SLC[4], 6:8]), row.names = NULL)
 # Hall et al. 2016
-carswg2016 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 9:13]), 
+hall_etal_2016 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 9:13]), 
                         t_2050 = c(SL_calculator_ref2000[match_SLC[2], 9:13]),
                         t_2070 = c(SL_calculator_ref2000[match_SLC[3], 9:13]), 
                         t_2100 = c(SL_calculator_ref2000[match_SLC[4], 9:13]), row.names = NULL)
@@ -189,23 +189,23 @@ carswg2016 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 9:13]),
 ##=========================== READ SWEET ET AL 2017 DATA ===================================
 # Read in data from the USACE Sea level calculator for Sewells Point: http://www.corpsclimate.us/ccaceslcurves.cfm
 # Data is ft above 1992, so 0 ft is 1992
-NOAA_etal_2017 = read.csv("NOAA_etal_2017_SewellsPoint.csv", skip=1, header=TRUE) 
-NOAA_etal_2017 = as.matrix(NOAA_etal_2017)
+sweet_etal_2017 = read.csv("Sweet_etal_2017_SewellsPoint.csv", skip=1, header=TRUE) 
+sweet_etal_2017 = as.matrix(sweet_etal_2017)
 
 #----------------------------- Convert baseline to 2000 -------------------------------------
-NOAA_etal_2017_ref2000 = NOAA_etal_2017
+sweet_etal_2017_ref2000 = sweet_etal_2017
 for(i in 2:22){
-  NOAA_etal_2017_ref2000[,i] = NOAA_etal_2017[,i] - NOAA_etal_2017[match(2000, NOAA_etal_2017[,1]),i]
+  sweet_etal_2017_ref2000[,i] = sweet_etal_2017[,i] - sweet_etal_2017[match(2000, sweet_etal_2017[,1]),i]
 }
 
 #--------------------------- Extract specific years --------------------------
-match_NOAA17 = match(c(2030,2050,2070,2100), NOAA_etal_2017[,1])
+match_sweet17 = match(c(2030,2050,2070,2100), sweet_etal_2017[,1])
 
 # Medians are in columns 6,9,12,15,18, and 21; hence sequence from 6 to 21 by 3.
-noaa2017 = data.frame(t_2030 = c(NOAA_etal_2017_ref2000[match_NOAA17[1], seq(6,21,3)]), 
-                      t_2050 = c(NOAA_etal_2017_ref2000[match_NOAA17[2], seq(6,21,3)]),
-                      t_2070 = c(NOAA_etal_2017_ref2000[match_NOAA17[3], seq(6,21,3)]), 
-                      t_2100 = c(NOAA_etal_2017_ref2000[match_NOAA17[4], seq(6,21,3)]), row.names = NULL)
+sweet2017 = data.frame(t_2030 = c(sweet_etal_2017_ref2000[match_sweet17[1], seq(6,21,3)]), 
+                      t_2050 = c(sweet_etal_2017_ref2000[match_sweet17[2], seq(6,21,3)]),
+                      t_2070 = c(sweet_etal_2017_ref2000[match_sweet17[3], seq(6,21,3)]), 
+                      t_2100 = c(sweet_etal_2017_ref2000[match_sweet17[4], seq(6,21,3)]), row.names = NULL)
 
 ################################### STORM SURGE DATA ##################################
 ##=========================== READ USACE 2014 EXTREME WATER LEVEL DATA ===================================
