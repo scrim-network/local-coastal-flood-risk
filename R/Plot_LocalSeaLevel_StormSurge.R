@@ -638,10 +638,6 @@ polygon(y = c(k14_85_5, rev(k14_85_95)), x = c(k14_years, rev(k14_years)), col =
 polygon(y = c(lsl_fdyn_85_5, rev(lsl_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_RdBu[10], border = NA)
 polygon(y = c(NO_fdyn_85_5, rev(NO_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_PRGn[2], border = NA)
 
-# legend("topleft", legend=c("Wong & Keller 2017 FD RCP85 90% CI", "Kopp et al. 2014 RCP85 90% CI", 
-#                            "Wong & Keller 2017 no FD RCP85 90% CI"),pch=22, 
-#        col="black", bty='n', pt.bg=c(trans_RdBu[10], trans_BrBG[1], trans_PRGn[2]), pt.cex = 2)
-
 legend("topleft", legend=c("Wong & Keller 2017 FD RCP85 90% CI", "Wong & Keller 2017 no FD RCP85 90% CI", "Kopp et al. 2014 RCP85 90% CI",
                            "Wong & Keller 2017 FD", "Wong & Keller 2017 no FD", "Kopp et al. 2014", "Sweet et al. 2017",
                            "Parris et al. 2012",
