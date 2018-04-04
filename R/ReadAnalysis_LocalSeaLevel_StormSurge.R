@@ -288,13 +288,6 @@ NOfd_r26_SS = NO_fdft_rcp26 + stationary_brick
 NOfd_r45_SS = NO_fdft_rcp45 + stationary_brick
 NOfd_r60_SS = NO_fdft_rcp60 + stationary_brick
 NOfd_r85_SS = NO_fdft_rcp85 + stationary_brick
-
-# Add Tebadli et al 2012 to 100-yr return period to Kopp et al. 2014
-k14_r26_Teb = kopp14_rcp26 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r45_Teb = kopp14_rcp45 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r60_Teb = kopp14_rcp60 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-k14_r85_Teb = kopp14_rcp85 + tebaldi12$rl_50[which(tebaldi12$rp == 100)]
-
 ##==============================================================================
 ## End
 ##==============================================================================
