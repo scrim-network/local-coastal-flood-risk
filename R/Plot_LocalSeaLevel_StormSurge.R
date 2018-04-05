@@ -153,8 +153,8 @@ polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
-polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
-        x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
+polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])), 
+        x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
@@ -273,8 +273,8 @@ polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
-polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
-        x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
+polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])), 
+        x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
@@ -393,8 +393,8 @@ polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
-polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
-        x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
+polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])), 
+        x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
@@ -513,8 +513,8 @@ polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary9
 polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi_gold[2], border = NA)
 
-polygon(y = c(zervas_2013$min_95, rev(zervas_2013$max_95)), 
-        x = c(1/zervas_2013$aep, rev(1/zervas_2013$aep)), col = trans_BrBG[2], border = NA)
+polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])), 
+        x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_BrBG[2], border = NA)
 points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
