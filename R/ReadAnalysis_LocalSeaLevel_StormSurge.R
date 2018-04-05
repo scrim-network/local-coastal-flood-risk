@@ -235,8 +235,8 @@ zervas_2013[,7:9] = convert_mhhw_to_msl(convert_m_to_ft(zervas_2013[,7:9]))
 
 ##=========================== READ SRIKRISHNAN ET AL. IN PREP. DATA ===================================
 # Millimeters above mean sea level
-stationary = readRDS("norfolk_MCMC-stationary.rds")
-# processed_data = readRDS("processed_norfolk_data.rds")
+stationary = readRDS("Srikrishnan_norfolk_MCMC-stationary.rds")
+# processed_data = readRDS("Srikrishnan_processed_norfolk_data.rds")
 
 #------------------- Remove a burnin and extraxt the 95% parameter estimates ------------------- 
 burnin = 1:50000
