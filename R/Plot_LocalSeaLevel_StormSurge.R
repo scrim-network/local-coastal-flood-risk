@@ -20,7 +20,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this file.  If not, see <http://www.gnu.org/licenses/>.
 ##==============================================================================
-setwd('/Users/klr324/Documents/Data_LSL')
+# setwd('/Users/klr324/Documents/Data_LSL')
 
 library(ncdf4)
 library(extRemes)
@@ -30,13 +30,13 @@ library(ash)
 library(fields)
 
 # Source survival function, function.
-source("local-costal-flood-risk/R/Helper_scripts/plot_sf.r")
+source("Helper_scripts/plot_sf.r")
 
 # Source Conversion functions.
-source("local-costal-flood-risk/R/Helper_scripts/conversion_functions.R")
+source("Helper_scripts/conversion_functions.R")
 
 # Read in modified sea level and storm surge data.
-source("local-costal-flood-risk/R/ReadAnalysis_LocalSeaLevel_StormSurge.R")
+source("ReadAnalysis_LocalSeaLevel_StormSurge.R")
 
 ##=========================== CREATE COLORS ===================================
 # Transparent Color Function 
@@ -85,7 +85,7 @@ single_panel_height = 4
 
 ##=========================== SLR / STORM SURGE / COMBINED PLOTS ===================================
 #---------------------------- 2030 -----------------------------------
-pdf(file="SLR_2030.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
+pdf(file="../Figures/SLR_2030.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
@@ -205,7 +205,7 @@ lines(1/SF_NOfd_r26_2030_SS$sf, SF_NOfd_r26_2030_SS$sf.num, col=PRGn[5], lwd=1.5
 dev.off()
 
 #---------------------------- 2050 -----------------------------------
-pdf(file="SLR_2050.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
+pdf(file="../Figures/SLR_2050.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
@@ -325,7 +325,7 @@ lines(1/SF_NOfd_r26_2050_SS$sf, SF_NOfd_r26_2050_SS$sf.num, col=PRGn[5], lwd=1.5
 dev.off()
 
 #---------------------------- 2070 -----------------------------------
-pdf(file="SLR_2070.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
+pdf(file="../Figures/SLR_2070.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
@@ -445,7 +445,7 @@ lines(1/SF_NOfd_r26_2070_SS$sf, SF_NOfd_r26_2070_SS$sf.num, col=PRGn[5], lwd=1.5
 dev.off()
 
 #---------------------------- 2100 -----------------------------------
-pdf(file="SLR_2100.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
+pdf(file="../Figures/SLR_2100.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
@@ -623,7 +623,7 @@ for(i in 1:length(t.time)){
   NO_fdyn_85_95[i] <- quantile(NO_fdyn_rcp85_sub[i,], 0.95)
 }
 
-pdf(file="SLR_proj_pdf.pdf", family="Times", width=text_column_width, height=full_page_height, pointsize=12)
+pdf(file="../Figures/SLR_proj_pdf.pdf", family="Times", width=text_column_width, height=full_page_height, pointsize=12)
 layout(matrix(c(1,1,
                 2,3,
                 4,5), 3, 2, byrow = TRUE))

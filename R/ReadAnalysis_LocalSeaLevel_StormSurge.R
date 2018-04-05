@@ -30,25 +30,25 @@ library(ash)
 library(fields)
 
 # Read in conversion functions
-source("local-costal-flood-risk/R/Helper_scripts/conversion_functions.R")
+source("Helper_scripts/conversion_functions.R")
 
 ################################### SEA-LEVEL DATA ##################################
 ##=========================== READ KOPP ET AL. 2014 DATA ===================================
 # Kopp et al. 2014 Local sea-level rise data at Sewells point tide gauge
 # Data is cm above 2000, so 0cm is 2000. Data is projected with RCP26, 45, 60, and 85.
-kopp14_rcp26_dat = read.csv("LSLproj_MC_299_rcp26.csv") 
+kopp14_rcp26_dat = read.csv("../Data/LSLproj_MC_299_rcp26.csv") 
 kopp14_rcp26 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp26_dat$X2030, t_2050 = kopp14_rcp26_dat$X2050, 
                                            t_2070 = kopp14_rcp26_dat$X2070, t_2100 = kopp14_rcp26_dat$X2100))
 
-kopp14_rcp45_dat = read.csv("LSLproj_MC_299_rcp45.csv")
+kopp14_rcp45_dat = read.csv("../Data/LSLproj_MC_299_rcp45.csv")
 kopp14_rcp45 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp45_dat$X2030, t_2050 = kopp14_rcp45_dat$X2050, 
                                            t_2070 = kopp14_rcp45_dat$X2070, t_2100 = kopp14_rcp45_dat$X2100))
 
-kopp14_rcp60_dat = read.csv("LSLproj_MC_299_rcp60.csv")
+kopp14_rcp60_dat = read.csv("../Data/LSLproj_MC_299_rcp60.csv")
 kopp14_rcp60 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp60_dat$X2030, t_2050 = kopp14_rcp60_dat$X2050, 
                                            t_2070 = kopp14_rcp60_dat$X2070, t_2100 = kopp14_rcp60_dat$X2100))
 
-kopp14_rcp85_dat = read.csv("LSLproj_MC_299_rcp85.csv")
+kopp14_rcp85_dat = read.csv("../Data/LSLproj_MC_299_rcp85.csv")
 kopp14_rcp85 = convert_cm_to_ft(data.frame(t_2030 = kopp14_rcp85_dat$X2030, t_2050 = kopp14_rcp85_dat$X2050, 
                                            t_2070 = kopp14_rcp85_dat$X2070, t_2100 = kopp14_rcp85_dat$X2100))
 k14_years = seq(2010, 2200, 10)
@@ -56,7 +56,7 @@ k14_years = seq(2010, 2200, 10)
 # Kopp et al. 2014 Local subsidence data at Sewells point tide gauge
 # Data is cm above 2000, so 0cm is 2000. This will be used
 # to account for subsidence in the Wong and Keller 2017 data.
-kopp14_subsid_dat = read.csv("LSLProj_bkgd_299_rcp26.csv")
+kopp14_subsid_dat = read.csv("../Data/LSLProj_bkgd_299_rcp26.csv")
 kopp14_subsid = convert_cm_to_ft(data.frame(t_2030 = kopp14_subsid_dat$X2030, t_2050 = kopp14_subsid_dat$X2050, 
                                             t_2070 = kopp14_subsid_dat$X2070, t_2100 = kopp14_subsid_dat$X2100))
 
@@ -64,7 +64,7 @@ kopp14_subsid = convert_cm_to_ft(data.frame(t_2030 = kopp14_subsid_dat$X2030, t_
 # Wong and Keller 2017 Local sea-level rise data with Fast dynamics at Sewells point tide gauge
 # Data is m above 2000, so 0 m is 2000. Data is projected with RCP26, 45, 60, and 85.
 # The model used is called BRICK, so any reference to BRICK refers to Wong and Keller 2017. LSL (sewells point) with fast dynamics. 
-fid1 <- nc_open("BRICK_SewellsPoint_FastDynamics_08May2017.nc")
+fid1 <- nc_open("../Data/BRICK_SewellsPoint_FastDynamics_08May2017.nc")
 lsl_fdyn_rcp26 <- ncvar_get(fid1,"LocalSeaLevel_RCP26")
 lsl_fdyn_rcp45 <- ncvar_get(fid1,"LocalSeaLevel_RCP45")
 lsl_fdyn_rcp60 <- ncvar_get(fid1,"LocalSeaLevel_RCP60")
@@ -73,7 +73,7 @@ year_proj <- ncvar_get(fid1,"time_proj")
 nc_close(fid1)
 
 # Wong and Keller 2017 Local sea-level rise data with NO Fast dynamics
-fid1 <- nc_open("BRICK_NOfastDynamics_SP_08May2017.nc")
+fid1 <- nc_open("../Data/BRICK_NOfastDynamics_SP_08May2017.nc")
 NO_fdyn_rcp26 <- ncvar_get(fid1,"LocalSeaLevel_RCP26")
 NO_fdyn_rcp45 <- ncvar_get(fid1,"LocalSeaLevel_RCP45")
 NO_fdyn_rcp60 <- ncvar_get(fid1,"LocalSeaLevel_RCP60")
@@ -159,7 +159,7 @@ NO_fdft_rcp85 = combine_subsid_to_brick(NO_fdft_rcp85, NO_fdyn_rcp85, NO_fdyn_pr
 ##===================== READ PARRIS ET AL 2012; USACE 2014; HALL ET AL 2016 DATA ===========================
 # Read in data from the USACE Sea level calculator for Sewells Point: http://www.corpsclimate.us/ccaceslcurves.cfm
 # Data is ft above 1992, so 0 ft is 1992
-SL_calculator = read.csv("SewellsPoint_Parris12_USACE14_Hall16_SL_data.csv", skip=1, header=TRUE)
+SL_calculator = read.csv("../Data/SewellsPoint_Parris12_USACE14_Hall16_SL_data.csv", skip=1, header=TRUE)
 SL_calculator = as.matrix(SL_calculator)
 
 #----------------------------- Convert baseline to 2000 -------------------------------------
@@ -189,7 +189,7 @@ hall_etal_2016 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 9:13]
 ##=========================== READ SWEET ET AL 2017 DATA ===================================
 # Read in data from the USACE Sea level calculator for Sewells Point: http://www.corpsclimate.us/ccaceslcurves.cfm
 # Data is ft above 1992, so 0 ft is 1992
-sweet_etal_2017 = read.csv("Sweet_etal_2017_SewellsPoint.csv", skip=1, header=TRUE) 
+sweet_etal_2017 = read.csv("../Data/Sweet_etal_2017_SewellsPoint.csv", skip=1, header=TRUE) 
 sweet_etal_2017 = as.matrix(sweet_etal_2017)
 
 #----------------------------- Convert baseline to 2000 -------------------------------------
@@ -210,17 +210,17 @@ sweet2017 = data.frame(t_2030 = c(sweet_etal_2017_ref2000[match_sweet17[1], seq(
 ################################### STORM SURGE DATA ##################################
 ##=========================== READ USACE 2014 EXTREME WATER LEVEL DATA ===================================
 # Data is presented in feet and meters above mean sea level
-USACE_EWL = read.csv("USACE_ExtremeWaterLevels_SewellsPoint.csv", skip=2, header=TRUE) 
+USACE_EWL = read.csv("../Data/USACE_ExtremeWaterLevels_SewellsPoint.csv", skip=2, header=TRUE) 
 USACE_rp = as.numeric(as.character(USACE_EWL$Datum_EWL[8:14]))
 
 ##=========================== READ TEBALDI ET AL 2012 DATA ===================================
 # Data is presented in meters above mean high water
-tebaldi12 = read.csv("SewellsPoint_allrpsGPD_Tebaldi_etal_2012.csv", col.names=c("rp", "rl_50", "rp.1", "rl_025", "rl_975"))
+tebaldi12 = read.csv("../Data/SewellsPoint_allrpsGPD_Tebaldi_etal_2012.csv", col.names=c("rp", "rl_50", "rp.1", "rl_025", "rl_975"))
 tebaldi12[,c(2,4,5)] = convert_mhw_to_msl(convert_m_to_ft(tebaldi12[,c(2,4,5)]))
 
 ##==================== READ GEV ANALYSIS OF HISTORIC TIDE GAUGE OBSERVATIONS ============================
 # Data is presented in meters above mean sea level; tide gauge observations are from Sewells Point.
-NOAA_methodGEV = read.csv("NOAA_method_stormsurge_sewellspoint.csv")
+NOAA_methodGEV = read.csv("../Data/NOAA_method_stormsurge_sewellspoint.csv")
 NOAA_methodGEV[,c(3,4,5,6,9)] = convert_m_to_ft(NOAA_methodGEV[,c(3,4,5,6,9)])
 
 ##=========================== READ ZERVAS 2013 (NOAA) DATA ===================================
@@ -228,15 +228,15 @@ NOAA_methodGEV[,c(3,4,5,6,9)] = convert_m_to_ft(NOAA_methodGEV[,c(3,4,5,6,9)])
 # http://www.corpsclimate.us/ccaceslcurves.cfm. Feet above MSL;
 # And MLE with 95% Confidence interval from Table C in Appendix III of Zervas 2013
 # Meters above MHHW; Loc = 0.678 ± 0.041, scale = 0.170 ± 0.031, shape = 0.120 ± 0.163
-zervas_2013 = read.csv("Zervas_2013_ExtremeWaterLevels_SewellsPoint.csv", skip=2, header=TRUE)
+zervas_2013 = read.csv("../Data/Zervas_2013_ExtremeWaterLevels_SewellsPoint.csv", skip=2, header=TRUE)
 
 # Convert the data collected from Table C to ft msl. Other data is already in ft above msl.
 zervas_2013[,7:9] = convert_mhhw_to_msl(convert_m_to_ft(zervas_2013[,7:9]))
 
 ##=========================== READ SRIKRISHNAN ET AL. IN PREP. DATA ===================================
 # Millimeters above mean sea level
-stationary = readRDS("Srikrishnan_norfolk_MCMC-stationary.rds")
-# processed_data = readRDS("Srikrishnan_processed_norfolk_data.rds")
+stationary = readRDS("../Data/Srikrishnan_norfolk_MCMC-stationary.rds")
+# processed_data = readRDS("../Data/Srikrishnan_processed_norfolk_data.rds")
 
 #------------------- Remove a burnin and extraxt the 95% parameter estimates ------------------- 
 burnin = 1:50000
