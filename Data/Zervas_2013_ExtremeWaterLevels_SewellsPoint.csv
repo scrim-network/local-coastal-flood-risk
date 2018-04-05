@@ -1,0 +1,10 @@
+﻿"Sewells Point, VA",8638610,Epoch: 1983-2001,,,,,,,
+NOAA GEV (feet and meters LMSL): 1927 - 2007 (80yrs); Last updated on the USACE sea level calculator: 5/17/17,,,Datum information at Sewells point in feet and meters,,,NOAA GEV (meters above MHHW): 1927 - 2010 (87yrs); Apendix III Table C Zervas (2013),,,
+NOAA_rp,NOAA_rl_feet,NOAA_rl_meters,Datum_EWL,feet,meters,mle,min_95,max_95,aep
+1,2.85,2.15,HAT,2.28,0.69,0.441,0.381,0.48,0.99
+2,3.84,1.95,MHHW,1.4,0.43,0.742,0.697,0.792,0.5
+5,4.55,1.71,MHW,1.2,0.37,1.117,1.018,1.279,0.1
+10,5.07,1.55,MSL,0,0,1.722,1.422,2.387,0.01
+20,5.62,1.39,MLW,-1.23,-0.37,,,,
+50,6.4,1.17,MLLW,-1.35,-0.41,,,,
+100,7.05,0.87,NAVD88,0.26,0.08,,,,

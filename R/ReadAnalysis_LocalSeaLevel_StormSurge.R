@@ -223,17 +223,15 @@ tebaldi12[,c(2,4,5)] = convert_mhw_to_msl(convert_m_to_ft(tebaldi12[,c(2,4,5)]))
 NOAA_methodGEV = read.csv("NOAA_method_stormsurge_sewellspoint.csv")
 NOAA_methodGEV[,c(3,4,5,6,9)] = convert_m_to_ft(NOAA_methodGEV[,c(3,4,5,6,9)])
 
-##=========================== READ ZERVAS 2013 DATA ===================================
-# Meters above MHHW; Loc = 0.678 ± 0.041, scale = 0.170 ± 0.031, 
-# shape = 0.120 ± 0.163 (in meters, with 95% Confidence interval)
-zervas_2013 = data.frame(mle = c(0.441, 0.742, 1.117, 1.722), min_95 = c(0.381, 0.697, 1.018, 1.422),
-                         max_95 = c(0.480, 0.792, 1.279, 2.387), aep = c(0.99, 0.5, 0.1, 0.01))
-zervas_2013[,1:3] = convert_mhhw_to_msl(convert_m_to_ft(zervas_2013[,1:3]))
+##=========================== READ ZERVAS 2013 (NOAA) DATA ===================================
+# NOAA MLE (Zervas data just with more points) from the USACE Sea level calculator for Sewells Point: 
+# http://www.corpsclimate.us/ccaceslcurves.cfm. Feet above MSL;
+# And MLE with 95% Confidence interval from Table C in Appendix III of Zervas 2013
+# Meters above MHHW; Loc = 0.678 ± 0.041, scale = 0.170 ± 0.031, shape = 0.120 ± 0.163
+zervas_2013 = read.csv("Zervas_2013_ExtremeWaterLevels_SewellsPoint.csv", skip=2, header=TRUE)
 
-# NOAA MLE (Zervas datajust with more points) from the USACE Sea level calculator for Sewells Point: 
-# http://www.corpsclimate.us/ccaceslcurves.cfm. Feet above MSL
-NOAA_rp = c(1,2,5,10,20,50,100)
-NOAA_rl = c(2.85,3.84,4.55,5.07,5.62,6.40,7.05)
+# Convert the data collected from Table C to ft msl. Other data is already in ft above msl.
+zervas_2013[,7:9] = convert_mhhw_to_msl(convert_m_to_ft(zervas_2013[,7:9]))
 
 ##=========================== READ SRIKRISHNAN ET AL. IN PREP. DATA ===================================
 # Millimeters above mean sea level

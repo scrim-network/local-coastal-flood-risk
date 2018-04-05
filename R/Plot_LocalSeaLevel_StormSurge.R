@@ -160,7 +160,7 @@ points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
-lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
+lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=BrBG[9])
 
@@ -280,7 +280,7 @@ points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
-lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
+lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=BrBG[9])
 
@@ -400,7 +400,7 @@ points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
-lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
+lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=BrBG[9])
 
@@ -520,7 +520,7 @@ points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19)
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=RdBu[11], lwd=2)
 
-lines(NOAA_rp, NOAA_rl, lwd=2, col=BrBG[2])
+lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=BrBG[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi_gold[1])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=BrBG[9])
 
