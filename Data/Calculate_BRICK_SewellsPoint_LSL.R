@@ -35,6 +35,8 @@
 # Clone the BRICK repository
 # git clone https://github.com/scrim-network/BRICK.git
 # cd BRICK
+# Make sure to snag the file: 
+# https://download.scrim.psu.edu/Wong_etal_BRICK/NOLA_Wong_etal_2017/output_model/BRICK_physical_fd-gamma_08May2017.nc
 
 library(ncdf4)
 
@@ -58,7 +60,7 @@ files <- list.files(recursive=TRUE)
 ifile <- which(files==filename.brick)
 
 if(length(ifile)==0) {
-  download.file(paste('https://download.scrim.psu.edu/Wong_etal_BRICK/',filename.brick, sep=''),
+  download.file(paste('https://download.scrim.psu.edu/Wong_etal_BRICK/NOLA_Wong_etal_2017/',filename.brick, sep=''),
                 filename.brick, method='curl')
 }
 
