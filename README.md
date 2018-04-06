@@ -40,7 +40,7 @@ source("Plot_LocalSeaLevel_StormSurge.R")
 
 The script `R/Plot_LocalSeaLevel_StormSurge.R` calls the script that runs the analysis, calls additional helper scripts, and creates the figures. The script that runs the analysis is called `R/ReadAnalysis_LocalSeaLevel_StormSurge.R`. The file `R/ReadAnalysis_LocalSeaLevel_StormSurge.R` reads in all the data and converts all dataset to the same background conditions (i.e., feet, local mean sea-level, anomalies with respect to 2000, incorporating local subsidence). Additionally, the analysis combines sea-level rise and storm surge distributions. The other additional files included are `R/Helper_files/conversion_functions.R`, which contains functions to convert values from different units of measurement or water level datums and `R/Helper_files/plot_sf.r`, which generates and plots the survivival function of a given vector of data.
 
-## Obtaining the data
+## Obtaining the data (optional)
 As stated. above, all of the data needed to run the analysis and create the plots are provided in the `Data/` directory. However, we also include the scripts used to extract the data or state how we extract the data for reproducibility. If you do not wish to rerun the scripts, you can skip ahead to running the analysis and plotting the figures.
 
 * Wong and Keller (2017; [view online](https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1002/2017EF000607))
