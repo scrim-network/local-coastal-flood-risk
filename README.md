@@ -13,7 +13,7 @@ In this analysis, we examine the differences in published flood risk projections
 This Github repository includes everything needed to reproduce the work described in Ruckert et al. (2018). To obtain the analysis data and codes:
 
 ```
-git clone https://github.com/scrim-network/
+git clone https://github.com/scrim-network/local-coastal-flood-risk.git
 ```
 
 The data files that correspond to the paper are available in the `Data/` directory. However, we also include the code and details to obtain the data in the following section and therefore invite any user to reproduce our data collection methods. Some of the data files are zipped (i.e., [Data/BRICK\_NOfastDynamics\_SP\_08May2017.nc](https://github.com/scrim-network/local-coastal-flood-risk/blob/master/Data/BRICK_NOfastDynamics_SP_08May2017.nc.zip) and [Data/BRICK\_SewellsPoint\_FastDynamics\_08May2017.nc](https://github.com/scrim-network/local-coastal-flood-risk/blob/master/Data/BRICK_SewellsPoint_FastDynamics_08May2017.nc.zip), so they could be uploaded to Github. These files need to be unzipped before running the analysis, otherwise R will complain.
