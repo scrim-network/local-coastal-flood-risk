@@ -21,10 +21,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this file.  If not, see <http://www.gnu.org/licenses/>.
 ##==============================================================================
-setwd('/Users/klr324/Documents/Data_LSL')
+# setwd('/Users/klr324/Documents/Data_LSL')
 
 # Source Conversion functions.
-source("local-costal-flood-risk/R/Helper_scripts/conversion_functions.R")
+source("../R/Helper_scripts/conversion_functions.R")
 
 ##================= Estimate scenarios with the NRC 1987 model =================
 # National Resource council 1987 model 
