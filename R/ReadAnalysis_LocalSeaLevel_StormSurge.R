@@ -60,6 +60,26 @@ kopp14_subsid_dat = read.csv("../Data/LSLProj_bkgd_299_rcp26.csv")
 kopp14_subsid = convert_cm_to_ft(data.frame(t_2030 = kopp14_subsid_dat$X2030, t_2050 = kopp14_subsid_dat$X2050, 
                                             t_2070 = kopp14_subsid_dat$X2070, t_2100 = kopp14_subsid_dat$X2100))
 
+##=========================== READ KOPP ET AL. 2017 DATA ===================================
+# Kopp et al. 2017 Local sea-level rise data at Sewells point tide gauge
+# Data is cm above 2000, so 0cm is 2000. Data is projected with RCP26, 45, 60, and 85.
+kopp17_DP16_SEW_rcp26_dat = read.csv("../Data/LSLproj_MC_DP16_SEW_299_rcp26.csv") 
+kopp17_DP16_SEW_rcp26 = convert_cm_to_ft(data.frame(t_2030 = kopp17_DP16_SEW_rcp26_dat$X2030, t_2050 = kopp17_DP16_SEW_rcp26_dat$X2050, 
+                                           t_2070 = kopp17_DP16_SEW_rcp26_dat$X2070, t_2100 = kopp17_DP16_SEW_rcp26_dat$X2100))
+
+kopp17_DP16_SEW_rcp45_dat = read.csv("../Data/LSLproj_MC_DP16_SEW_299_rcp45.csv")
+kopp17_DP16_SEW_rcp45 = convert_cm_to_ft(data.frame(t_2030 = kopp17_DP16_SEW_rcp45_dat$X2030, t_2050 = kopp17_DP16_SEW_rcp45_dat$X2050, 
+                                           t_2070 = kopp17_DP16_SEW_rcp45_dat$X2070, t_2100 = kopp17_DP16_SEW_rcp45_dat$X2100))
+
+kopp17_DP16_SEW_rcp60_dat = read.csv("../Data/LSLproj_MC_DP16_SEW_299_rcp60.csv")
+kopp17_DP16_SEW_rcp60 = convert_cm_to_ft(data.frame(t_2030 = kopp17_DP16_SEW_rcp60_dat$X2030, t_2050 = kopp17_DP16_SEW_rcp60_dat$X2050, 
+                                           t_2070 = kopp17_DP16_SEW_rcp60_dat$X2070, t_2100 = kopp17_DP16_SEW_rcp60_dat$X2100))
+
+kopp17_DP16_SEW_rcp85_dat = read.csv("../Data/LSLproj_MC_DP16_SEW_299_rcp85.csv")
+kopp17_DP16_SEW_rcp85 = convert_cm_to_ft(data.frame(t_2030 = kopp17_DP16_SEW_rcp85_dat$X2030, t_2050 = kopp17_DP16_SEW_rcp85_dat$X2050, 
+                                           t_2070 = kopp17_DP16_SEW_rcp85_dat$X2070, t_2100 = kopp17_DP16_SEW_rcp85_dat$X2100))
+k17_DP16_SEW_years = seq(2010, 2300, 10)
+
 ##=========================== READ WONG & KELLER 2017 DATA ===================================
 # Wong and Keller 2017 Local sea-level rise data with Fast dynamics at Sewells point tide gauge
 # Data is m above 2000, so 0 m is 2000. Data is projected with RCP26, 45, 60, and 85.
@@ -268,12 +288,24 @@ subkopp_stat = burn_stationary[sample(nrow(burn_stationary), size=subkopp_length
 stationary_kopp = convert_mm_to_ft(revd(nrow(subkopp_stat), loc = subkopp_stat[,1], scale = subkopp_stat[,2], 
                       shape = subkopp_stat[,3], type='GEV'))
 
+# Generate storm surge GEV distribution with an ensemble size matching Kopp et al. 2017
+subkopp17_DP16_SEW_length = length(kopp17_DP16_SEW_rcp26$t_2030)
+subkopp17_DP16_SEW_stat = burn_stationary[sample(nrow(burn_stationary), size=subkopp17_DP16_SEW_length, replace=FALSE), ]
+stationary_kopp17_DP16_SEW = convert_mm_to_ft(revd(nrow(subkopp17_DP16_SEW_stat), loc = subkopp17_DP16_SEW_stat[,1], 
+                                                   scale = subkopp17_DP16_SEW_stat[,2], shape = subkopp17_DP16_SEW_stat[,3], type='GEV'))
+
 #--------------------------- Add distribution of storm surge data to SLR data --------------------------
 # Add stationary storm surge to Kopp et al. 2014
 k14_r26_SS = kopp14_rcp26 + stationary_kopp
 k14_r45_SS = kopp14_rcp45 + stationary_kopp
 k14_r60_SS = kopp14_rcp60 + stationary_kopp
 k14_r85_SS = kopp14_rcp85 + stationary_kopp
+
+# Add stationary storm surge to Kopp et al. 2017
+k17_DP16_SEW_r26_SS = kopp17_DP16_SEW_rcp26 + stationary_kopp17_DP16_SEW
+k17_DP16_SEW_r45_SS = kopp17_DP16_SEW_rcp45 + stationary_kopp17_DP16_SEW
+k17_DP16_SEW_r60_SS = kopp17_DP16_SEW_rcp60 + stationary_kopp17_DP16_SEW
+k17_DP16_SEW_r85_SS = kopp17_DP16_SEW_rcp85 + stationary_kopp17_DP16_SEW
 
 # Add stationary storm surge to Wong and Keller 2017 fast dynamics
 bfd_r26_SS = brickfd_rcp26 + stationary_brick

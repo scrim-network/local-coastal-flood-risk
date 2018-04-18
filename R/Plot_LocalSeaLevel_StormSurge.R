@@ -61,6 +61,7 @@ BrBG = brewer.pal(11, "BrBG")
 RdBu = brewer.pal(11, "RdBu")
 PRGn = brewer.pal(11, "PRGn")
 PiYG = brewer.pal(11, "PiYG")
+Greens = brewer.pal(9, "Greens")
 tebaldi_gold = c("#f0cf0c", "#fcf5ce")
 
 sweet_cols = seq_color(9, PiYG[1:5])
@@ -71,6 +72,7 @@ trans_BrBG = makeTransparent(BrBG, 100)
 trans_RdBu = makeTransparent(RdBu, 100)
 trans_PRGn = makeTransparent(PRGn, 100)
 trans_PiYG = makeTransparent(PiYG, 100)
+trans_Greens = makeTransparent(Greens, 100)
 trans_sweet_cols = makeTransparent(sweet_cols, 100)
 trans_tebaldi_gold = makeTransparent(tebaldi_gold, 200)
 
@@ -109,11 +111,16 @@ text(8,1.5, "Higher scenario")
 # a) Sea-level rise probability density function
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
 plot(density(kopp14_rcp85$t_2030), xlab="Projected sea level in 2030 (ft)", ylab="Probability density", yaxt="n", 
-     main="",col=RdGy[1], lwd=2, xlim=c(-0.2,2), ylim = c(0, 6.75), bty="l")
+     main="",col=RdGy[1], lwd=2, xlim=c(-0.3,2), ylim = c(0, 6.75), bty="l")
 title(main="a.", adj=0)
 lines(density(kopp14_rcp60$t_2030), col=RdGy[2], lwd=2)
 lines(density(kopp14_rcp45$t_2030), col=RdGy[3], lwd=2)
 lines(density(kopp14_rcp26$t_2030), col=RdGy[4], lwd=2)
+
+lines(density(kopp17_DP16_SEW_rcp85$t_2030), col=Greens[7], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp60$t_2030), col=Greens[6], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp45$t_2030), col=Greens[5], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp26$t_2030), col=Greens[4], lwd=2)
 
 lines(density(brickfd_rcp85$t_2030), col=RdBu[11], lwd=2)
 lines(density(brickfd_rcp60$t_2030), col=RdBu[10], lwd=2)
@@ -184,6 +191,15 @@ lines(1/SF_k14_r60_2030_SS$sf, SF_k14_r60_2030_SS$sf.num, col=RdGy[2], lwd=1.5)
 lines(1/SF_k14_r45_2030_SS$sf, SF_k14_r45_2030_SS$sf.num, col=RdGy[3], lwd=1.5)
 lines(1/SF_k14_r26_2030_SS$sf, SF_k14_r26_2030_SS$sf.num, col=RdGy[4], lwd=1.5)
 
+SF_k17_DP16_SEW_r85_2030_SS = plot.sf(k17_DP16_SEW_r85_SS$t_2030, make.plot=FALSE)
+SF_k17_DP16_SEW_r60_2030_SS = plot.sf(k17_DP16_SEW_r60_SS$t_2030, make.plot=FALSE)
+SF_k17_DP16_SEW_r45_2030_SS = plot.sf(k17_DP16_SEW_r45_SS$t_2030, make.plot=FALSE)
+SF_k17_DP16_SEW_r26_2030_SS = plot.sf(k17_DP16_SEW_r26_SS$t_2030, make.plot=FALSE)
+lines(1/SF_k17_DP16_SEW_r85_2030_SS$sf, SF_k17_DP16_SEW_r85_2030_SS$sf.num, col=Greens[7], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r60_2030_SS$sf, SF_k17_DP16_SEW_r60_2030_SS$sf.num, col=Greens[6], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r45_2030_SS$sf, SF_k17_DP16_SEW_r45_2030_SS$sf.num, col=Greens[5], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r26_2030_SS$sf, SF_k17_DP16_SEW_r26_2030_SS$sf.num, col=Greens[4], lwd=1.5)
+
 SF_bfd_r85_2030_SS = plot.sf(bfd_r85_SS$t_2030, make.plot=FALSE)
 SF_bfd_r60_2030_SS = plot.sf(bfd_r60_SS$t_2030, make.plot=FALSE)
 SF_bfd_r45_2030_SS = plot.sf(bfd_r45_SS$t_2030, make.plot=FALSE)
@@ -234,6 +250,11 @@ title(main="a.", adj=0)
 lines(density(kopp14_rcp60$t_2050), col=RdGy[2], lwd=2)
 lines(density(kopp14_rcp45$t_2050), col=RdGy[3], lwd=2)
 lines(density(kopp14_rcp26$t_2050), col=RdGy[4], lwd=2)
+
+lines(density(kopp17_DP16_SEW_rcp85$t_2050), col=Greens[7], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp60$t_2050), col=Greens[6], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp45$t_2050), col=Greens[5], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp26$t_2050), col=Greens[4], lwd=2)
 
 lines(density(brickfd_rcp85$t_2050), col=RdBu[11], lwd=2)
 lines(density(brickfd_rcp60$t_2050), col=RdBu[10], lwd=2)
@@ -304,6 +325,15 @@ lines(1/SF_k14_r60_2050_SS$sf, SF_k14_r60_2050_SS$sf.num, col=RdGy[2], lwd=1.5)
 lines(1/SF_k14_r45_2050_SS$sf, SF_k14_r45_2050_SS$sf.num, col=RdGy[3], lwd=1.5)
 lines(1/SF_k14_r26_2050_SS$sf, SF_k14_r26_2050_SS$sf.num, col=RdGy[4], lwd=1.5)
 
+SF_k17_DP16_SEW_r85_2050_SS = plot.sf(k17_DP16_SEW_r85_SS$t_2050, make.plot=FALSE)
+SF_k17_DP16_SEW_r60_2050_SS = plot.sf(k17_DP16_SEW_r60_SS$t_2050, make.plot=FALSE)
+SF_k17_DP16_SEW_r45_2050_SS = plot.sf(k17_DP16_SEW_r45_SS$t_2050, make.plot=FALSE)
+SF_k17_DP16_SEW_r26_2050_SS = plot.sf(k17_DP16_SEW_r26_SS$t_2050, make.plot=FALSE)
+lines(1/SF_k17_DP16_SEW_r85_2050_SS$sf, SF_k17_DP16_SEW_r85_2050_SS$sf.num, col=Greens[7], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r60_2050_SS$sf, SF_k17_DP16_SEW_r60_2050_SS$sf.num, col=Greens[6], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r45_2050_SS$sf, SF_k17_DP16_SEW_r45_2050_SS$sf.num, col=Greens[5], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r26_2050_SS$sf, SF_k17_DP16_SEW_r26_2050_SS$sf.num, col=Greens[4], lwd=1.5)
+
 SF_bfd_r85_2050_SS = plot.sf(bfd_r85_SS$t_2050, make.plot=FALSE)
 SF_bfd_r60_2050_SS = plot.sf(bfd_r60_SS$t_2050, make.plot=FALSE)
 SF_bfd_r45_2050_SS = plot.sf(bfd_r45_SS$t_2050, make.plot=FALSE)
@@ -354,6 +384,11 @@ title(main="a.", adj=0)
 lines(density(kopp14_rcp60$t_2070), col=RdGy[2], lwd=2)
 lines(density(kopp14_rcp45$t_2070), col=RdGy[3], lwd=2)
 lines(density(kopp14_rcp26$t_2070), col=RdGy[4], lwd=2)
+
+lines(density(kopp17_DP16_SEW_rcp85$t_2070), col=Greens[7], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp60$t_2070), col=Greens[6], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp45$t_2070), col=Greens[5], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp26$t_2070), col=Greens[4], lwd=2)
 
 lines(density(brickfd_rcp85$t_2070), col=RdBu[11], lwd=2)
 lines(density(brickfd_rcp60$t_2070), col=RdBu[10], lwd=2)
@@ -424,6 +459,15 @@ lines(1/SF_k14_r60_2070_SS$sf, SF_k14_r60_2070_SS$sf.num, col=RdGy[2], lwd=1.5)
 lines(1/SF_k14_r45_2070_SS$sf, SF_k14_r45_2070_SS$sf.num, col=RdGy[3], lwd=1.5)
 lines(1/SF_k14_r26_2070_SS$sf, SF_k14_r26_2070_SS$sf.num, col=RdGy[4], lwd=1.5)
 
+SF_k17_DP16_SEW_r85_2070_SS = plot.sf(k17_DP16_SEW_r85_SS$t_2070, make.plot=FALSE)
+SF_k17_DP16_SEW_r60_2070_SS = plot.sf(k17_DP16_SEW_r60_SS$t_2070, make.plot=FALSE)
+SF_k17_DP16_SEW_r45_2070_SS = plot.sf(k17_DP16_SEW_r45_SS$t_2070, make.plot=FALSE)
+SF_k17_DP16_SEW_r26_2070_SS = plot.sf(k17_DP16_SEW_r26_SS$t_2070, make.plot=FALSE)
+lines(1/SF_k17_DP16_SEW_r85_2070_SS$sf, SF_k17_DP16_SEW_r85_2070_SS$sf.num, col=Greens[7], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r60_2070_SS$sf, SF_k17_DP16_SEW_r60_2070_SS$sf.num, col=Greens[6], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r45_2070_SS$sf, SF_k17_DP16_SEW_r45_2070_SS$sf.num, col=Greens[5], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r26_2070_SS$sf, SF_k17_DP16_SEW_r26_2070_SS$sf.num, col=Greens[4], lwd=1.5)
+
 SF_bfd_r85_2070_SS = plot.sf(bfd_r85_SS$t_2070, make.plot=FALSE)
 SF_bfd_r60_2070_SS = plot.sf(bfd_r60_SS$t_2070, make.plot=FALSE)
 SF_bfd_r45_2070_SS = plot.sf(bfd_r45_SS$t_2070, make.plot=FALSE)
@@ -474,6 +518,11 @@ title(main="a.", adj=0)
 lines(density(kopp14_rcp60$t_2100), col=RdGy[2], lwd=2)
 lines(density(kopp14_rcp45$t_2100), col=RdGy[3], lwd=2)
 lines(density(kopp14_rcp26$t_2100), col=RdGy[4], lwd=2)
+
+lines(density(kopp17_DP16_SEW_rcp85$t_2100), col=Greens[7], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp60$t_2100), col=Greens[6], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp45$t_2100), col=Greens[5], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp26$t_2100), col=Greens[4], lwd=2)
 
 lines(density(brickfd_rcp85$t_2100), col=RdBu[11], lwd=2)
 lines(density(brickfd_rcp60$t_2100), col=RdBu[10], lwd=2)
@@ -544,6 +593,15 @@ lines(1/SF_k14_r60_2100_SS$sf, SF_k14_r60_2100_SS$sf.num, col=RdGy[2], lwd=1.5)
 lines(1/SF_k14_r45_2100_SS$sf, SF_k14_r45_2100_SS$sf.num, col=RdGy[3], lwd=1.5)
 lines(1/SF_k14_r26_2100_SS$sf, SF_k14_r26_2100_SS$sf.num, col=RdGy[4], lwd=1.5)
 
+SF_k17_DP16_SEW_r85_2100_SS = plot.sf(k17_DP16_SEW_r85_SS$t_2100, make.plot=FALSE)
+SF_k17_DP16_SEW_r60_2100_SS = plot.sf(k17_DP16_SEW_r60_SS$t_2100, make.plot=FALSE)
+SF_k17_DP16_SEW_r45_2100_SS = plot.sf(k17_DP16_SEW_r45_SS$t_2100, make.plot=FALSE)
+SF_k17_DP16_SEW_r26_2100_SS = plot.sf(k17_DP16_SEW_r26_SS$t_2100, make.plot=FALSE)
+lines(1/SF_k17_DP16_SEW_r85_2100_SS$sf, SF_k17_DP16_SEW_r85_2100_SS$sf.num, col=Greens[7], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r60_2100_SS$sf, SF_k17_DP16_SEW_r60_2100_SS$sf.num, col=Greens[6], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r45_2100_SS$sf, SF_k17_DP16_SEW_r45_2100_SS$sf.num, col=Greens[5], lwd=1.5)
+lines(1/SF_k17_DP16_SEW_r26_2100_SS$sf, SF_k17_DP16_SEW_r26_2100_SS$sf.num, col=Greens[4], lwd=1.5)
+
 SF_bfd_r85_2100_SS = plot.sf(bfd_r85_SS$t_2100, make.plot=FALSE)
 SF_bfd_r60_2100_SS = plot.sf(bfd_r60_SS$t_2100, make.plot=FALSE)
 SF_bfd_r45_2100_SS = plot.sf(bfd_r45_SS$t_2100, make.plot=FALSE)
@@ -584,6 +642,25 @@ for(i in 1:length(k14_years)){
   k14_45_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp45_dat[,i]), 0.95)
   k14_60_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp60_dat[,i]), 0.95, na.rm=TRUE) #goes to 2100
   k14_85_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp85_dat[,i]), 0.95)
+}
+k17_DP16_SEW_26_5 =
+  k17_DP16_SEW_45_5 =
+  k17_DP16_SEW_60_5 =
+  k17_DP16_SEW_85_5 =
+  k17_DP16_SEW_26_95 =
+  k17_DP16_SEW_45_95 =
+  k17_DP16_SEW_60_95 =
+  k17_DP16_SEW_85_95 = rep(NA, length(k17_DP16_SEW_years))
+for(i in 1:length(k17_DP16_SEW_years)){
+  k17_DP16_SEW_26_5[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp26_dat[,i]), 0.05)
+  k17_DP16_SEW_45_5[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp45_dat[,i]), 0.05)
+  k17_DP16_SEW_60_5[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp60_dat[,i]), 0.05, na.rm=TRUE) #goes to 2100
+  k17_DP16_SEW_85_5[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp85_dat[,i]), 0.05)
+  
+  k17_DP16_SEW_26_95[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp26_dat[,i]), 0.95)
+  k17_DP16_SEW_45_95[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp45_dat[,i]), 0.95)
+  k17_DP16_SEW_60_95[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp60_dat[,i]), 0.95, na.rm=TRUE) #goes to 2100
+  k17_DP16_SEW_85_95[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp85_dat[,i]), 0.95)
 }
   lsl_fdyn_26_5 =  
   lsl_fdyn_45_5 =
@@ -629,12 +706,13 @@ layout(matrix(c(1,1,
                 4,5), 3, 2, byrow = TRUE))
 par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
 plot(k14_years, k14_85_95, type="n",xlab="Year", ylab="Projected sea level (ft)",
-     ylim=c(0,6), xlim=c(2010, 2098), xaxt="n")
+     ylim=c(0,10), xlim=c(2010, 2098), xaxt="n")
 title(main="a.", adj=0)
 axis(1, lwd = 1, at=seq(2010,2100, 10), label=seq(2010,2100, 10))
 
 # Only plot RCP 8.5
 polygon(y = c(k14_85_5, rev(k14_85_95)), x = c(k14_years, rev(k14_years)), col = trans_RdGy[1], border = NA)
+polygon(y = c(k17_DP16_SEW_85_5, rev(k17_DP16_SEW_85_95)), x = c(k17_DP16_SEW_years, rev(k17_DP16_SEW_years)), col = trans_Greens[7], border = NA)
 polygon(y = c(lsl_fdyn_85_5, rev(lsl_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_RdBu[10], border = NA)
 polygon(y = c(NO_fdyn_85_5, rev(NO_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_PRGn[2], border = NA)
 
@@ -657,6 +735,11 @@ title(main="b.", adj=0)
 lines(density(kopp14_rcp60$t_2030), col=RdGy[2], lwd=2)
 lines(density(kopp14_rcp45$t_2030), col=RdGy[3], lwd=2)
 lines(density(kopp14_rcp26$t_2030), col=RdGy[4], lwd=2)
+
+lines(density(kopp17_DP16_SEW_rcp85$t_2030), col=Greens[7], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp60$t_2030), col=Greens[6], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp45$t_2030), col=Greens[5], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp26$t_2030), col=Greens[4], lwd=2)
 
 lines(density(brickfd_rcp85$t_2030), col=RdBu[11], lwd=2)
 lines(density(brickfd_rcp60$t_2030), col=RdBu[10], lwd=2)
@@ -688,6 +771,11 @@ lines(density(kopp14_rcp60$t_2050), col=RdGy[2], lwd=2)
 lines(density(kopp14_rcp45$t_2050), col=RdGy[3], lwd=2)
 lines(density(kopp14_rcp26$t_2050), col=RdGy[4], lwd=2)
 
+lines(density(kopp17_DP16_SEW_rcp85$t_2050), col=Greens[7], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp60$t_2050), col=Greens[6], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp45$t_2050), col=Greens[5], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp26$t_2050), col=Greens[4], lwd=2)
+
 lines(density(brickfd_rcp85$t_2050), col=RdBu[11], lwd=2)
 lines(density(brickfd_rcp60$t_2050), col=RdBu[10], lwd=2)
 lines(density(brickfd_rcp45$t_2050), col=RdBu[9], lwd=2)
@@ -718,6 +806,11 @@ lines(density(kopp14_rcp60$t_2070), col=RdGy[2], lwd=2)
 lines(density(kopp14_rcp45$t_2070), col=RdGy[3], lwd=2)
 lines(density(kopp14_rcp26$t_2070), col=RdGy[4], lwd=2)
 
+lines(density(kopp17_DP16_SEW_rcp85$t_2070), col=Greens[7], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp60$t_2070), col=Greens[6], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp45$t_2070), col=Greens[5], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp26$t_2070), col=Greens[4], lwd=2)
+
 lines(density(brickfd_rcp85$t_2070), col=RdBu[11], lwd=2)
 lines(density(brickfd_rcp60$t_2070), col=RdBu[10], lwd=2)
 lines(density(brickfd_rcp45$t_2070), col=RdBu[9], lwd=2)
@@ -747,6 +840,11 @@ title(main="e.", adj=0)
 lines(density(kopp14_rcp60$t_2100), col=RdGy[2], lwd=2)
 lines(density(kopp14_rcp45$t_2100), col=RdGy[3], lwd=2)
 lines(density(kopp14_rcp26$t_2100), col=RdGy[4], lwd=2)
+
+lines(density(kopp17_DP16_SEW_rcp85$t_2100), col=Greens[7], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp60$t_2100), col=Greens[6], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp45$t_2100), col=Greens[5], lwd=2)
+lines(density(kopp17_DP16_SEW_rcp26$t_2100), col=Greens[4], lwd=2)
 
 lines(density(brickfd_rcp85$t_2100), col=RdBu[11], lwd=2)
 lines(density(brickfd_rcp60$t_2100), col=RdBu[10], lwd=2)
