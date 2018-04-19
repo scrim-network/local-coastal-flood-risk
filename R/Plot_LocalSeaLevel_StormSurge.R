@@ -87,11 +87,14 @@ single_panel_height = 4
 
 ##=========================== SLR / STORM SURGE / COMBINED PLOTS ===================================
 #---------------------------- 2030 -----------------------------------
-pdf(file="../Figures/SLR_2030.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
+pdf(file="../Figures/SLR_2030a.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=14)
+# layout(matrix(c(1,1,1,
+#                 2,3,4,
+#                 2,3,4,
+#                 2,3,4), 4, 3, byrow = TRUE))
 layout(matrix(c(1,1,1,
                 2,3,4,
-                2,3,4,
-                2,3,4), 4, 3, byrow = TRUE))
+                2,3,4), 3, 3, byrow = TRUE))
 # Add legend
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
@@ -221,11 +224,10 @@ lines(1/SF_NOfd_r26_2030_SS$sf, SF_NOfd_r26_2030_SS$sf.num, col=PRGn[5], lwd=1.5
 dev.off()
 
 #---------------------------- 2050 -----------------------------------
-pdf(file="../Figures/SLR_2050.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
+pdf(file="../Figures/SLR_2050a.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=14)
 layout(matrix(c(1,1,1,
                 2,3,4,
-                2,3,4,
-                2,3,4), 4, 3, byrow = TRUE))
+                2,3,4), 3, 3, byrow = TRUE))
 # Add legend
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
@@ -355,11 +357,10 @@ lines(1/SF_NOfd_r26_2050_SS$sf, SF_NOfd_r26_2050_SS$sf.num, col=PRGn[5], lwd=1.5
 dev.off()
 
 #---------------------------- 2070 -----------------------------------
-pdf(file="../Figures/SLR_2070.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
+pdf(file="../Figures/SLR_2070.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=14)
 layout(matrix(c(1,1,1,
                 2,3,4,
-                2,3,4,
-                2,3,4), 4, 3, byrow = TRUE))
+                2,3,4), 3, 3, byrow = TRUE))
 # Add legend
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
@@ -489,11 +490,10 @@ lines(1/SF_NOfd_r26_2070_SS$sf, SF_NOfd_r26_2070_SS$sf.num, col=PRGn[5], lwd=1.5
 dev.off()
 
 #---------------------------- 2100 -----------------------------------
-pdf(file="../Figures/SLR_2100.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=12)
+pdf(file="../Figures/SLR_2100.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=14)
 layout(matrix(c(1,1,1,
                 2,3,4,
-                2,3,4,
-                2,3,4), 4, 3, byrow = TRUE))
+                2,3,4), 3, 3, byrow = TRUE))
 # Add legend
 par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
