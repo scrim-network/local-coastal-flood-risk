@@ -80,6 +80,51 @@ kopp17_DP16_SEW_rcp85 = convert_cm_to_ft(data.frame(t_2030 = kopp17_DP16_SEW_rcp
                                            t_2070 = kopp17_DP16_SEW_rcp85_dat$X2070, t_2100 = kopp17_DP16_SEW_rcp85_dat$X2100))
 k17_DP16_SEW_years = seq(2010, 2300, 10)
 
+##=========================== READ RASMUSSEN ET AL. 2018 DATA ===================================
+# Rasmussen et al. 2018 Local sea-level rise data at Sewells point tide gauge
+# Data is cm above 2000, so 0cm is 2000. Data is projected with global mean surface temperatures that hit stabilization targets of
+# 1.5°C, 2.0°C, and 2.5°C above pre-industrial levels by 2100.
+Ras18_SEW_1p5deg_dat = read.csv("../Data/LSLproj_MC_Ras18_SEW_299_1p5degree.csv") 
+Ras18_SEW_1p5deg = convert_cm_to_ft(data.frame(t_2030 = Ras18_SEW_1p5deg_dat$X2030, t_2050 = Ras18_SEW_1p5deg_dat$X2050, 
+                                                    t_2070 = Ras18_SEW_1p5deg_dat$X2070, t_2100 = Ras18_SEW_1p5deg_dat$X2100))
+
+Ras18_SEW_2p0deg_dat = read.csv("../Data/LSLproj_MC_Ras18_SEW_299_2p0degree.csv") 
+Ras18_SEW_2p0deg = convert_cm_to_ft(data.frame(t_2030 = Ras18_SEW_2p0deg_dat$X2030, t_2050 = Ras18_SEW_2p0deg_dat$X2050, 
+                                                    t_2070 = Ras18_SEW_2p0deg_dat$X2070, t_2100 = Ras18_SEW_2p0deg_dat$X2100))
+
+Ras18_SEW_2p5deg_dat = read.csv("../Data/LSLproj_MC_Ras18_SEW_299_2p5degree.csv") 
+Ras18_SEW_2p5deg = convert_cm_to_ft(data.frame(t_2030 = Ras18_SEW_2p5deg_dat$X2030, t_2050 = Ras18_SEW_2p5deg_dat$X2050, 
+                                                    t_2070 = Ras18_SEW_2p5deg_dat$X2070, t_2100 = Ras18_SEW_2p5deg_dat$X2100))
+Ras18_SEW_years = seq(2010, 2300, 10)
+
+##=========================== READ SWEET ET AL. 2017 DATA ===================================
+# # Data is mm above 2000, so 0mm is 2000. Data is projected with RCP26, 45, 60, and 85.
+values = rep(NA, length(seq(2000,2200,10)))
+values[1] = 0
+
+# Run a forward euler to estimate sea-level over time
+for(i in 2:length(values)){
+  values[i] = values[i-1] + 0.00810*10
+}
+
+sweet17_03dat = read.csv("../Data/sweet_etal_2017_SEW_0_3.csv", header=TRUE)
+sweet17_03 = convert_mm_to_ft(sweet17_03dat)
+
+sweet17_05dat = read.csv("../Data/sweet_etal_2017_SEW_0_5.csv", header=TRUE)
+sweet17_05 = convert_mm_to_ft(sweet17_05dat)
+
+sweet17_10dat = read.csv("../Data/sweet_etal_2017_SEW_1_0.csv", header=TRUE)
+sweet17_10 = convert_mm_to_ft(sweet17_10dat)
+
+sweet17_15dat = read.csv("../Data/sweet_etal_2017_SEW_1_5.csv", header=TRUE)
+sweet17_15 = convert_mm_to_ft(sweet17_15dat)
+
+sweet17_20dat = read.csv("../Data/sweet_etal_2017_SEW_2_0.csv", header=TRUE)
+sweet17_20 = convert_mm_to_ft(sweet17_20dat)
+
+sweet17_25dat = read.csv("../Data/sweet_etal_2017_SEW_2_5.csv", header=TRUE)
+sweet17_25 = convert_mm_to_ft(sweet17_25dat)
+
 ##=========================== READ WONG & KELLER 2017 DATA ===================================
 # Wong and Keller 2017 Local sea-level rise data with Fast dynamics at Sewells point tide gauge
 # Data is m above 2000, so 0 m is 2000. Data is projected with RCP26, 45, 60, and 85.
@@ -107,12 +152,16 @@ nc_close(fid1)
 states_w = dim(lsl_fdyn_rcp26)[2]
 BKkopp_subsid = data.frame(t_2030 = 1:states_w, t_2050 = 1:states_w, t_2070 = 1:states_w, t_2100 = 1:states_w)
 for(i in 1:4){
-  BKkopp_subsid[ ,i] = rlnorm(states_w, meanlog=mean(log(kopp14_subsid[ ,i])), sdlog=sd(log(kopp14_subsid[ ,i])))
+  meanlog <- log(mean(kopp14_subsid[ ,i])) - 0.5 * log(1 + (sd(kopp14_subsid[ ,i])^2)/(mean(kopp14_subsid[ ,i])^2))
+  sdlog <- sqrt(log(1 + (sd(kopp14_subsid[ ,i])^2)/(mean(kopp14_subsid[ ,i])^2)))
+  BKkopp_subsid[ ,i] = rlnorm(states_w, meanlog=meanlog, sdlog=sdlog)
 }
 
 BKkopp_subsid_dat = mat.or.vec(states_w, length(k14_years))
 for(i in 1:length(k14_years)){
-  BKkopp_subsid_dat[ ,i] = convert_cm_to_ft(rlnorm(states_w, meanlog=mean(log(kopp14_subsid_dat[ ,i])), sdlog=sd(log(kopp14_subsid_dat[ ,i]))))
+  meanlog <- log(mean(kopp14_subsid_dat[ ,i])) - 0.5 * log(1 + (sd(kopp14_subsid_dat[ ,i])^2)/(mean(kopp14_subsid_dat[ ,i])^2))
+  sdlog <- sqrt(log(1 + (sd(kopp14_subsid_dat[ ,i])^2)/(mean(kopp14_subsid_dat[ ,i])^2)))
+  BKkopp_subsid_dat[ ,i] = convert_cm_to_ft(rlnorm(states_w, meanlog=meanlog, sdlog=sdlog))
 }
 
 # Linear regression of subsidence to add to BRICK data
@@ -282,17 +331,17 @@ subbrick_stat = burn_stationary[sample(nrow(burn_stationary), size=subbrick_leng
 stationary_brick = convert_mm_to_ft(revd(nrow(subbrick_stat), loc = subbrick_stat[,1], scale = subbrick_stat[,2], 
                       shape = subbrick_stat[,3], type='GEV'))
 
-# Generate storm surge GEV distribution with an ensemble size matching Kopp et al. 2014
+# Generate storm surge GEV distribution with an ensemble size matching Kopp et al. 2014, Kopp et al. 2017, and Rasmussen et al. 2018
 subkopp_length = length(kopp14_rcp26$t_2030)
 subkopp_stat = burn_stationary[sample(nrow(burn_stationary), size=subkopp_length, replace=FALSE), ]
 stationary_kopp = convert_mm_to_ft(revd(nrow(subkopp_stat), loc = subkopp_stat[,1], scale = subkopp_stat[,2], 
                       shape = subkopp_stat[,3], type='GEV'))
 
-# Generate storm surge GEV distribution with an ensemble size matching Kopp et al. 2017
-subkopp17_DP16_SEW_length = length(kopp17_DP16_SEW_rcp26$t_2030)
-subkopp17_DP16_SEW_stat = burn_stationary[sample(nrow(burn_stationary), size=subkopp17_DP16_SEW_length, replace=FALSE), ]
-stationary_kopp17_DP16_SEW = convert_mm_to_ft(revd(nrow(subkopp17_DP16_SEW_stat), loc = subkopp17_DP16_SEW_stat[,1], 
-                                                   scale = subkopp17_DP16_SEW_stat[,2], shape = subkopp17_DP16_SEW_stat[,3], type='GEV'))
+# Generate storm surge GEV distribution with an ensemble size matching Sweet et al. 2017
+subsweet17_SEW_length = length(sweet17_03$X2030)
+subsweet17_SEW_stat = burn_stationary[sample(nrow(burn_stationary), size=subsweet17_SEW_length, replace=FALSE), ]
+stationary_sweet17_SEW = convert_mm_to_ft(revd(nrow(subsweet17_SEW_stat), loc = subsweet17_SEW_stat[,1], 
+                                                   scale = subsweet17_SEW_stat[,2], shape = subsweet17_SEW_stat[,3], type='GEV'))
 
 #--------------------------- Add distribution of storm surge data to SLR data --------------------------
 # Add stationary storm surge to Kopp et al. 2014
@@ -302,10 +351,23 @@ k14_r60_SS = kopp14_rcp60 + stationary_kopp
 k14_r85_SS = kopp14_rcp85 + stationary_kopp
 
 # Add stationary storm surge to Kopp et al. 2017
-k17_DP16_SEW_r26_SS = kopp17_DP16_SEW_rcp26 + stationary_kopp17_DP16_SEW
-k17_DP16_SEW_r45_SS = kopp17_DP16_SEW_rcp45 + stationary_kopp17_DP16_SEW
-k17_DP16_SEW_r60_SS = kopp17_DP16_SEW_rcp60 + stationary_kopp17_DP16_SEW
-k17_DP16_SEW_r85_SS = kopp17_DP16_SEW_rcp85 + stationary_kopp17_DP16_SEW
+k17_DP16_SEW_r26_SS = kopp17_DP16_SEW_rcp26 + stationary_kopp
+k17_DP16_SEW_r45_SS = kopp17_DP16_SEW_rcp45 + stationary_kopp
+k17_DP16_SEW_r60_SS = kopp17_DP16_SEW_rcp60 + stationary_kopp
+k17_DP16_SEW_r85_SS = kopp17_DP16_SEW_rcp85 + stationary_kopp
+
+# Add stationary storm surge to Rasmussen et al. 2018
+Ras18_SEW_1p5deg_SS = Ras18_SEW_1p5deg + stationary_kopp
+Ras18_SEW_2p0deg_SS = Ras18_SEW_2p0deg + stationary_kopp
+Ras18_SEW_2p5deg_SS = Ras18_SEW_2p5deg + stationary_kopp
+
+# Add stationary storm surge to Sweet et al. 2017
+sweet17_03_SS = sweet17_03 + stationary_sweet17_SEW
+sweet17_05_SS = sweet17_05 + stationary_sweet17_SEW
+sweet17_10_SS = sweet17_10 + stationary_sweet17_SEW
+sweet17_15_SS = sweet17_15 + stationary_sweet17_SEW
+sweet17_20_SS = sweet17_20 + stationary_sweet17_SEW
+sweet17_25_SS = sweet17_25 + stationary_sweet17_SEW
 
 # Add stationary storm surge to Wong and Keller 2017 fast dynamics
 bfd_r26_SS = brickfd_rcp26 + stationary_brick
