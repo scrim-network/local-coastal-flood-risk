@@ -43,7 +43,7 @@ convert_m_to_ft = function(m){
   m * 3.28084
 }
 
-# Conversion of water level datums
+# Conversion of water level datums (in ft)
 # At Sewells Point Tide gauge (Norfolk, VA)
 convert_mhw_to_msl = function(mhw_levels){
   MHW = 6.94
@@ -55,5 +55,11 @@ convert_mhhw_to_msl = function(mhhw_levels){
   MHHW = 7.14
   MSL = 5.74
   mhhw_levels + (MHHW - MSL)
+}
+
+convert_navd88_to_msl = function(navd88_levels){
+  NAVD88 = 5.99
+  MSL = 5.74
+  navd88_levels + (NAVD88 - MSL)
 }
 #   -----------------------------------------------------------------------
