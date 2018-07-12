@@ -20,7 +20,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this file.  If not, see <http://www.gnu.org/licenses/>.
 ##==============================================================================
-# setwd('/Users/klr324/Documents/Data_LSL')
+# setwd('/Users/klr324/Documents/Data_LSL/local-costal-flood-risk/R')
 
 library(ncdf4)
 library(extRemes)
