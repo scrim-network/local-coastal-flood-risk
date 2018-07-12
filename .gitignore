@@ -2,6 +2,12 @@
 .Rhistory
 .Rapp.history
 
+# .nc Data files, which tend to be large in size
+Data/*.nc
+
+# Generated Figures 
+Figures/*
+
 # Session Data files
 .RData
 
