@@ -331,36 +331,71 @@ sweet17_20_95 = percentile_projection_col(sweet17_10[1,], sweet17_20, 0.95)
 sweet17_25_95 = percentile_projection_col(sweet17_10[1,], sweet17_25, 0.95)
 
 #   -----------------------------------------------------------------------
-pdf(file="../Figures/CI_stormsurge_slr.pdf", family="Times", width=full_page_width, height=single_panel_height*2, pointsize=12)
-par(mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
+pdf(file="../Figures/CI_slr.pdf", family="Times", width=text_column_width, height=single_panel_height, pointsize=12)
+par(mfrow=c(1, 1), mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
 
 # a) Sea-level rise projections
 plot(0, type="n",xlab="Year", ylab="Projected sea level (ft)", ylim=c(0,13), xlim=c(2010, 2098), xaxt="n")
-title(main="a.", adj=0)
+# title(main="a.", adj=0)
 axis(1, lwd = 1, at=seq(2010,2100, 10), label=seq(2010,2100, 10))
 
-# Only plot RCP 8.5
-polygon(y = c(sweet17_25_5, rev(sweet17_25_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = trans_sweet17_col[1], border = NA)
-polygon(y = c(sweet17_20_5, rev(sweet17_20_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = trans_sweet17_col[2], border = NA)
-polygon(y = c(k14_85_5, rev(k14_85_95)), x = c(k14_years, rev(k14_years)), col = trans_kopp14_col[1], border = NA)
-polygon(y = c(k17_DP16_SEW_85_5, rev(k17_DP16_SEW_85_95)), x = c(k17_DP16_SEW_years, rev(k17_DP16_SEW_years)), col = trans_kopp17_DP16_col[1], border = NA)
-polygon(y = c(Ras18_SEW_2p5deg_5, rev(Ras18_SEW_2p5deg_95)), x = c(Ras18_SEW_years, rev(Ras18_SEW_years)), col = trans_Ras18_col[1], border = NA)
-polygon(y = c(lsl_fdyn_85_5, rev(lsl_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_brickfd_col[1], border = NA)
-polygon(y = c(NO_fdyn_85_5, rev(NO_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_NO_fd_col[1], border = NA)
+# Only plot RCP 8.5; those with Fast dynamic plot solid with border
+polygon(y = c(sweet17_25_5, rev(sweet17_25_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = sweet17_col[1], border = "black", lty=2, lwd=2)
+polygon(y = c(sweet17_20_5, rev(sweet17_20_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = trans_sweet17_col[5], border = NA)
+polygon(y = c(k17_DP16_SEW_85_5, rev(k17_DP16_SEW_85_95)), x = c(k17_DP16_SEW_years, rev(k17_DP16_SEW_years)), col = kopp17_DP16_col[1], border = "black", lty=2, lwd=2)
 
-legend("topleft", legend = c("Sweet et al. 2.0 90% CI", "Sweet et al. 2.5 90% CI", "Kopp et al. 2014 RCP85 90% CI", 
-                           "Kopp et al. 2017 RCP85 90% CI", "Rasmussen et al. 2018 2.5 90% CI", 
-                           "Wong & Keller 2017 FD RCP85 90% CI", "Wong & Keller 2017 no FD RCP85 90% CI"), pch = 22, 
-       bty='n', pt.bg = c(trans_sweet17_col[1], trans_sweet17_col[2], trans_kopp14_col[1], trans_kopp17_DP16_col[1], 
-                          trans_Ras18_col[1], trans_brickfd_col[1], trans_NO_fd_col[1]), pt.cex = 2)
+polygon(y = c(k14_85_5, rev(k14_85_95)), x = c(k14_years, rev(k14_years)), col = trans_kopp14_col[3], border = NA)
+polygon(y = c(Ras18_SEW_2p5deg_5, rev(Ras18_SEW_2p5deg_95)), x = c(Ras18_SEW_years, rev(Ras18_SEW_years)), col = trans_Ras18_col[3], border = NA)
+polygon(y = c(lsl_fdyn_85_5, rev(lsl_fdyn_85_95)), x = c(t.time, rev(t.time)), col = brickfd_col[1], border = "black", lty=2, lwd=2)
+polygon(y = c(NO_fdyn_85_5, rev(NO_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_NO_fd_col[3], border = NA)
+
+# polygon(y = c(sweet17_25_5, rev(sweet17_25_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = trans_sweet17_col[1], border = NA)
+# polygon(y = c(k17_DP16_SEW_85_5, rev(k17_DP16_SEW_85_95)), x = c(k17_DP16_SEW_years, rev(k17_DP16_SEW_years)), col = trans_kopp17_DP16_col[1], border = NA)
+# 
+# polygon(y = c(k14_85_5, rev(k14_85_95)), x = c(k14_years, rev(k14_years)), col = trans_kopp14_col[1], border = NA)
+# polygon(y = c(Ras18_SEW_2p5deg_5, rev(Ras18_SEW_2p5deg_95)), x = c(Ras18_SEW_years, rev(Ras18_SEW_years)), col = trans_Ras18_col[1], border = NA)
+# polygon(y = c(NO_fdyn_85_5, rev(NO_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_NO_fd_col[1], border = NA)
+# polygon(y = c(sweet17_20_5, rev(sweet17_20_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = trans_sweet17_col2[1], border = NA)
+# 
+# polygon(y = c(lsl_fdyn_85_5, rev(lsl_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_brickfd_col[1], border = NA)
+# 
+# # Only plot RCP 8.5
+# polygon(y = c(sweet17_25_5, rev(sweet17_25_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = trans_sweet17_col[1], border = NA)
+# polygon(y = c(sweet17_20_5, rev(sweet17_20_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = trans_sweet17_col[1], border = NA)
+# polygon(y = c(k14_85_5, rev(k14_85_95)), x = c(k14_years, rev(k14_years)), col = trans_kopp14_col[1], border = NA)
+# polygon(y = c(k17_DP16_SEW_85_5, rev(k17_DP16_SEW_85_95)), x = c(k17_DP16_SEW_years, rev(k17_DP16_SEW_years)), col = trans_kopp17_DP16_col[1], border = NA)
+# polygon(y = c(Ras18_SEW_2p5deg_5, rev(Ras18_SEW_2p5deg_95)), x = c(Ras18_SEW_years, rev(Ras18_SEW_years)), col = trans_Ras18_col[1], border = NA)
+# polygon(y = c(lsl_fdyn_85_5, rev(lsl_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_brickfd_col[1], border = NA)
+# polygon(y = c(NO_fdyn_85_5, rev(NO_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_NO_fd_col[1], border = NA)
+
+# legend("topleft", legend = c("Sweet et al. 2.0 90% CI", "Sweet et al. 2.5 90% CI", "Kopp et al. 2014 RCP85 90% CI", 
+#                            "Kopp et al. 2017 RCP85 90% CI", "Rasmussen et al. 2018 2.5 90% CI", 
+#                            "Wong & Keller 2017 FD RCP85 90% CI", "Wong & Keller 2017 no FD RCP85 90% CI"), pch = 22, 
+#        bty='n', pt.bg = c(sweet17_col[1], trans_sweet17_col[5], trans_kopp14_col[3], kopp17_DP16_col[1], 
+#                           trans_Ras18_col[3], brickfd_col[1], trans_NO_fd_col[3]), pt.cex = 2)
+
+legend("topleft", legend = c("Incorporates ice sheet feedback proccesses", 
+                             "Wong & Keller 2017 no FD RCP85 90% CI", "Wong & Keller 2017 FD RCP85 90% CI", 
+                             "Rasmussen et al. 2018 2.5 90% CI", "Kopp et al. 2017 RCP85 90% CI", 
+                             "Kopp et al. 2014 RCP85 90% CI", "Sweet et al. 2.5 90% CI", 
+                             "Sweet et al. 2.0 90% CI"), pch = c(NA, rep(22, 7)), 
+       bty='n', pt.bg = c(NA, trans_NO_fd_col[3], brickfd_col[1], trans_Ras18_col[3], kopp17_DP16_col[1], trans_kopp14_col[3], 
+                          sweet17_col[1], trans_sweet17_col[5]), pt.cex = 2, lty=c(2, rep(0, 7)), lwd=c(1.5, rep(1, 7)))
 #   -----------------------------------------------------------------------
+dev.off()
+#   -----------------------------------------------------------------------
+
+#   -----------------------------------------------------------------------
+pdf(file="../Figures/CI_stormsurge.pdf", family="Times", width=text_column_width, height=single_panel_height, pointsize=12)
+par(mfrow=c(1, 1), mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
+
 # b) Storm surge return period 
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
      ylim = c(2.85, 18), 
-     xaxt = 'n', cex=1, bty="l",
+     xaxt = 'n', cex=1, #bty="l",
      xlab = "Return period (years)", 
      ylab = "Storm surge (ft MSL)")
-title(main="b.", adj=0)
+# title(main="b.", adj=0)
 axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 
 SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
