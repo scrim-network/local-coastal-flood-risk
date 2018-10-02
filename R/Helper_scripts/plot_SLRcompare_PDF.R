@@ -66,10 +66,10 @@ plot_SLRcompare_PDF = function(  year = 2070,
   } else {
     xl = c(-0.5,2); yl = c(0, 6.75); ypol = c(yl[2]-1.75, yl[2]-2.25); dif = 0.5*2
   }
-  
+  xl = c(-0.5,15)
   # Create a density plot  
-  plot(density(c(1,1)), type = "n", xlab= paste("Projected sea level in ", year, " (ft)", sep=""), 
-       ylab="Probability density", yaxt="n", main="", xlim=xl, ylim=yl, bty="l")
+  plot(density(c(1,1)), type = "n", xlab= as.character(year), ylab="", cex.lab=1.25,
+       yaxt="n", main="", xlim=xl, ylim=yl, bty="l")
   title(main=panel, adj=0)
 
   # Plot the projections based on the scenario and projection year from the function input

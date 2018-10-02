@@ -38,8 +38,20 @@
 ## along with this file.  If not, see <http://www.gnu.org/licenses/>.
 ##==============================================================================
 
-plot_SLRandStormSurge_SF = function(  year = 2070, 
-                            panel = "a."){
+plot_SLRandStormSurge_SF_scen = function(  year = 2070, 
+                                      scen = "rcp85",
+                                      deg = "2p5deg",
+                                      sweet.scen = c("25", "20"),
+                                      panel = "a."){
+  
+  # Set up data.frames to call the plotting color based on the study and projection scenario
+  s.col = data.frame(col = 1:3, name = c("rcp85", "rcp45", "rcp26"))
+  d.col = data.frame(col = 1:3, name = c("2p5deg", "2p0deg", "1p5deg"))
+  sweet.col = data.frame(col = 1:6, name = c("25", "20", "15", "10", "05", "03"))
+  
+  s.col = s.col$col[which(s.col$name == scen)]
+  d.col = d.col$col[which(d.col$name == deg)]
+  sweet.col = sweet.col$col[which(sweet.col$name == sweet.scen)]
   
   # Create a combined sea level and storm surge return period plot
   plot(0, log = "x", type = "n", xlim = c(1, 500),
@@ -50,37 +62,40 @@ plot_SLRandStormSurge_SF = function(  year = 2070,
   title(main=panel, adj=0)
   axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 
+
   # Plot return periods based on projection year from the function input 
+  if(scen=="rcp26"){
   #   RCP2.6-----------------------------------------------------------------------
   coln_year = which(colnames(k14_r26_SS) == paste("t_", year, sep=""))
   SF_k14_r26_SS = plot.sf(k14_r26_SS[ ,coln_year], make.plot=FALSE)
-  lines(1/SF_k14_r26_SS$sf, SF_k14_r26_SS$sf.num, col=kopp14_col[3], lwd=1.5)
+  lines(1/SF_k14_r26_SS$sf, SF_k14_r26_SS$sf.num, col=kopp14_col[s.col], lwd=1.5)
   
   coln_year = which(colnames(k17_DP16_SEW_r26_SS) == paste("t_", year, sep=""))
   SF_k17_DP16_SEW_r26_SS = plot.sf(k17_DP16_SEW_r26_SS[ ,coln_year], make.plot=FALSE)
-  lines(1/SF_k17_DP16_SEW_r26_SS$sf, SF_k17_DP16_SEW_r26_SS$sf.num, col=kopp17_DP16_col[3], lwd=1.5)
+  lines(1/SF_k17_DP16_SEW_r26_SS$sf, SF_k17_DP16_SEW_r26_SS$sf.num, col=kopp17_DP16_col[s.col], lwd=1.5)
   
   coln_year = which(colnames(bfd_r26_SS) == paste("t_", year, sep=""))
   SF_bfd_r26_SS = plot.sf(bfd_r26_SS[ ,coln_year], make.plot=FALSE)
-  lines(1/SF_bfd_r26_SS$sf, SF_bfd_r26_SS$sf.num, col=brickfd_col[3], lwd=1.5)
+  lines(1/SF_bfd_r26_SS$sf, SF_bfd_r26_SS$sf.num, col=brickfd_col[s.col], lwd=1.5)
   
   coln_year = which(colnames(NOfd_r26_SS) == paste("t_", year, sep=""))
   SF_NOfd_r26_SS = plot.sf(NOfd_r26_SS[ ,coln_year], make.plot=FALSE)
-  lines(1/SF_NOfd_r26_SS$sf, SF_NOfd_r26_SS$sf.num, col=NO_fd_col[3], lwd=1.5)
+  lines(1/SF_NOfd_r26_SS$sf, SF_NOfd_r26_SS$sf.num, col=NO_fd_col[s.col], lwd=1.5)
   
   # Similar to 2.6
   coln_year = which(colnames(Ras18_SEW_1p5deg_SS) == paste("t_", year, sep=""))
   SF_Ras18_SEW_1p5deg_SS = plot.sf(Ras18_SEW_1p5deg_SS[ ,coln_year], make.plot=FALSE)
-  lines(1/SF_Ras18_SEW_1p5deg_SS$sf, SF_Ras18_SEW_1p5deg_SS$sf.num, col=Ras18_col[3], lwd=1.5)
+  lines(1/SF_Ras18_SEW_1p5deg_SS$sf, SF_Ras18_SEW_1p5deg_SS$sf.num, col=Ras18_col[d.col], lwd=1.5)
   
   coln_year = which(colnames(sweet17_03_SS) == paste("X", year, sep=""))
   SF_sweet17_03_SS = plot.sf(sweet17_03_SS[ ,coln_year], make.plot=FALSE)
-  lines(1/SF_sweet17_03_SS$sf, SF_sweet17_03_SS$sf.num, col=sweet17_col[6], lwd=1.5)
+  lines(1/SF_sweet17_03_SS$sf, SF_sweet17_03_SS$sf.num, col=sweet17_col[sweet.col], lwd=1.5)
   
   coln_year = which(colnames(sweet17_05_SS) == paste("X", year, sep=""))
   SF_sweet17_05_SS = plot.sf(sweet17_05_SS[ ,coln_year], make.plot=FALSE)
-  lines(1/SF_sweet17_05_SS$sf, SF_sweet17_05_SS$sf.num, col=sweet17_col[5], lwd=1.5)
-  
+  lines(1/SF_sweet17_05_SS$sf, SF_sweet17_05_SS$sf.num, col=sweet17_col[sweet.col], lwd=1.5)
+  } else if(scen=="rcp45"){
+
   #   RCP4.5-----------------------------------------------------------------------  
   coln_year = which(colnames(k14_r45_SS) == paste("t_", year, sep=""))
   SF_k14_r45_SS = plot.sf(k14_r45_SS[ ,coln_year], make.plot=FALSE)
@@ -112,6 +127,8 @@ plot_SLRandStormSurge_SF = function(  year = 2070,
   SF_sweet17_15_SS = plot.sf(rm_na, make.plot=FALSE)
   lines(1/SF_sweet17_15_SS$sf, SF_sweet17_15_SS$sf.num, col=sweet17_col[3], lwd=1.5)
   
+  } else if(scen=="rcp85"){
+
   #   RCP8.5-----------------------------------------------------------------------  
   coln_year = which(colnames(k14_r85_SS) == paste("t_", year, sep=""))
   SF_k14_r85_SS = plot.sf(k14_r85_SS[ ,coln_year], make.plot=FALSE)
@@ -144,6 +161,9 @@ plot_SLRandStormSurge_SF = function(  year = 2070,
   SF_sweet17_25_SS = plot.sf(rm_na, make.plot=FALSE)
   lines(1/SF_sweet17_25_SS$sf, SF_sweet17_25_SS$sf.num, col=sweet17_col[1], lwd=1.5)
   
+  } else {
+    stop("Unknown scenario")
+    }
 }
 ##==============================================================================
 ## End
