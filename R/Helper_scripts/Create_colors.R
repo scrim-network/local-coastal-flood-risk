@@ -1,6 +1,6 @@
 #######################################################################
 #
-# create_colors.R    18 April 2017
+# create_colors.R    18 April 2018
 #
 # Author: Kelsey Ruckert (klr324@psu.edu)
 #
