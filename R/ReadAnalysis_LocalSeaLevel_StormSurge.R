@@ -292,6 +292,27 @@ tebaldi12[,c(2,4,5)] = convert_mhw_to_msl(convert_m_to_ft(tebaldi12[,c(2,4,5)]))
 NOAA_methodGEV = read.csv("../Data/NOAA_method_stormsurge_sewellspoint.csv")
 NOAA_methodGEV[,c(3,4,5,6,9)] = convert_m_to_ft(NOAA_methodGEV[,c(3,4,5,6,9)])
 
+# Read in a function that returns a vector of the median return periods for an input vector of block maxima observations
+source("Helper_scripts/Empirical_probability_calculator.R")
+
+# Snag the annual block maxima observations and remove the NAs from the vector
+blockMax = as.numeric(na.omit(NOAA_methodGEV$obs))
+
+# Run the numerical median probability return period formula
+rp_ABM = median.rt(blockMax)
+
+# Approximate the return period for the Norfolk-Long Island Hurricane of 1821, which has a return period far exceeding the historical 
+# record. The storm surge of of 1821 may have been exceeded by a storm in 1825 or storms prior to 1806, so use those values to 
+# estimate an uncertainty bar.
+NLIH_1821 = 10 # 10 feet of surge in some areas of VA
+returnperiod_l = 2018 - 1825 # low bound
+returnperiod_m = 2018 - 1821
+returnperiod_h = 2018 - 1806 # upper bound
+
+rp_l = max(median.rt(vector(mode = 'numeric', length = returnperiod_l)))
+rp_h = max(median.rt(vector(mode = 'numeric', length = returnperiod_h)))
+rp_m = max(median.rt(vector(mode = 'numeric', length = returnperiod_m)))
+
 ##=========================== READ ZERVAS 2013 (NOAA) DATA ===================================
 # NOAA MLE (Zervas data just with more points) from the USACE Sea level calculator for Sewells Point: 
 # http://www.corpsclimate.us/ccaceslcurves.cfm. Feet above MSL;

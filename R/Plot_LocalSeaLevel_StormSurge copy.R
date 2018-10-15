@@ -570,7 +570,8 @@ polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)),
 
 polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])), 
         x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_zervas13_col[2], border = NA)
-points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19, col=obs_col)
+# points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19, col=obs_col)
+points(rp_ABM, blockMax, pch = 19, col=obs_col)
 
 SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
 lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=srikrishnan_col[2], lwd=2)
@@ -579,12 +580,16 @@ lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=zervas13_col[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi12_col[2])
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 19, col=usace14_col[2])
 
-returnperiod_l = 2017 - 1825
-returnperiod_h = 2017 - 1806
+# returnperiod_l = 2017 - 1825
+# returnperiod_h = 2017 - 1806
+# 
+# points(c(returnperiod_h, returnperiod_l), rep(10, 2), pch="|", col=burntorange[1])
+# lines(c(returnperiod_h, returnperiod_l), rep(10, 2), lty=2, col=burntorange[1])
+# points(mean(c(returnperiod_h, returnperiod_l)), 10, pch=19, col=burntorange[1])
 
-points(c(returnperiod_h, returnperiod_l), rep(10, 2), pch="|", col=burntorange[1])
-lines(c(returnperiod_h, returnperiod_l), rep(10, 2), lty=2, col=burntorange[1])
-points(mean(c(returnperiod_h, returnperiod_l)), 10, pch=19, col=burntorange[1])
+points(c(rp_h, rp_l), rep(NLIH_1821, 2), pch="|", col=burntorange[1])
+lines(c(rp_h, rp_l), rep(NLIH_1821, 2), lty=2, col=burntorange[1])
+points(rp_m, NLIH_1821, pch=19, col=burntorange[1])
 
 legend("topleft", legend=c("Our model 95% CI", "Our model MLE",
                            "Tebaldi et al. 2012 95% CI", "Tebaldi et al. 2012 MLE",
