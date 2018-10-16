@@ -255,27 +255,6 @@ hall_etal_2016 = data.frame(t_2030 = c(SL_calculator_ref2000[match_SLC[1], 9:13]
                         t_2070 = c(SL_calculator_ref2000[match_SLC[3], 9:13]), 
                         t_2100 = c(SL_calculator_ref2000[match_SLC[4], 9:13]), row.names = NULL)
 
-##=========================== READ SWEET ET AL 2017 DATA ===================================
-# Read in data from the USACE Sea level calculator for Sewells Point: http://www.corpsclimate.us/ccaceslcurves.cfm
-# Data is ft above 1992, so 0 ft is 1992
-sweet_etal_2017 = read.csv("../Data/Sweet_etal_2017_SewellsPoint.csv", skip=1, header=TRUE) 
-sweet_etal_2017 = as.matrix(sweet_etal_2017)
-
-#----------------------------- Convert baseline to 2000 -------------------------------------
-sweet_etal_2017_ref2000 = sweet_etal_2017
-for(i in 2:22){
-  sweet_etal_2017_ref2000[,i] = sweet_etal_2017[,i] - sweet_etal_2017[match(2000, sweet_etal_2017[,1]),i]
-}
-
-#--------------------------- Extract specific years --------------------------
-match_sweet17 = match(c(2030,2050,2070,2100), sweet_etal_2017[,1])
-
-# Medians are in columns 6,9,12,15,18, and 21; hence sequence from 6 to 21 by 3.
-sweet2017 = data.frame(t_2030 = c(sweet_etal_2017_ref2000[match_sweet17[1], seq(6,21,3)]), 
-                      t_2050 = c(sweet_etal_2017_ref2000[match_sweet17[2], seq(6,21,3)]),
-                      t_2070 = c(sweet_etal_2017_ref2000[match_sweet17[3], seq(6,21,3)]), 
-                      t_2100 = c(sweet_etal_2017_ref2000[match_sweet17[4], seq(6,21,3)]), row.names = NULL)
-
 ################################### STORM SURGE DATA ##################################
 ##=========================== READ USACE 2014 EXTREME WATER LEVEL DATA ===================================
 # Data is presented in feet and meters above mean sea level
