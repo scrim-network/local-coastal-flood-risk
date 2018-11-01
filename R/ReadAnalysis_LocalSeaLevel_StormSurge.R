@@ -305,81 +305,445 @@ zervas_2013[,7:9] = convert_mhhw_to_msl(convert_m_to_ft(zervas_2013[,7:9]))
 ##=========================== READ SRIKRISHNAN ET AL. IN PREP. DATA ===================================
 # Millimeters above mean sea level
 stationary = readRDS("../Data/Srikrishnan_norfolk_MCMC-stationary.rds")
-# processed_data = readRDS("../Data/Srikrishnan_processed_norfolk_data.rds")
 
-#------------------- Remove a burnin and extraxt the 95% parameter estimates ------------------- 
+#------------------- Remove a burnin and extract the 95% parameter estimates ------------------- 
 burnin = 1:50000
 burn_stationary = stationary[[1]]$samples[-burnin, ]
-post_stat_25 = rep(NA,3)
-post_stat_975 = rep(NA,3)
-for(i in 1:3){
-  post_stat_25[i] = quantile(burn_stationary[ ,i],0.025) 
-  post_stat_975[i] = quantile(burn_stationary[ ,i],0.975) 
+# post_stat_025 = rep(NA,3)
+# post_stat_50 = rep(NA,3)
+# post_stat_975 = rep(NA,3)
+# for(i in 1:3){
+#   post_stat_025[i] = quantile(burn_stationary[ ,i],0.025) 
+#   post_stat_50[i] = quantile(burn_stationary[ ,i],0.5)
+#   post_stat_975[i] = quantile(burn_stationary[ ,i],0.975) 
+# }
+
+# Generate GEV functions for each state of the world via the parameter distributions
+# Figure 3 plots just past the 500-yr return period so the 750-yr return period is sufficient to reduce compute time
+probs = seq(0 + 1/750, 1 - 1/750, length.out = 750)
+stat_sotw = mat.or.vec(length(probs), nrow(burn_stationary))
+for(i in 1:nrow(burn_stationary)){
+stat_sotw[ ,i] = qevd(probs, loc = burn_stationary[i,1], scale = burn_stationary[i,2], shape = burn_stationary[i,3], type='GEV')
 }
+# Estimate the 97.5 and 2.5% confidence intervals 
+gev_stat_025 = gev_stat_50 = gev_stat_975 = vector(mode = "numeric", length = nrow(stat_sotw))
+for(i in 1:nrow(stat_sotw)){
+  gev_stat_025[i] = quantile(stat_sotw[i, ],0.025)
+  gev_stat_50[i] = quantile(stat_sotw[i, ],0.5)
+  gev_stat_975[i] = quantile(stat_sotw[i, ],0.975)
+}
+# Convert values to feet
+gev_stat_025 = convert_mm_to_ft(gev_stat_025)
+gev_stat_50 = convert_mm_to_ft(gev_stat_50)
+gev_stat_975 = convert_mm_to_ft(gev_stat_975)
 
 #------------------------- Generate MLE and 95% GEV distribution -----------------------
-stat_gev = convert_mm_to_ft(revd(nrow(burn_stationary), loc = burn_stationary[,1], scale = burn_stationary[,2], 
-                shape = burn_stationary[,3], type='GEV'))
-stat_gev25 = convert_mm_to_ft(revd(1e5, loc = post_stat_25[1], scale = post_stat_25[2], shape = post_stat_25[3], type='GEV'))
-stat_gev975 = convert_mm_to_ft(revd(1e5, loc = post_stat_975[1], scale = post_stat_975[2], shape = post_stat_975[3], type='GEV'))
+
+# ADD description of revd
+# stat_gev = revd(nrow(burn_stationary), loc = burn_stationary[,1], scale = burn_stationary[,2], 
+#                 shape = burn_stationary[,3], type='GEV')
+# stat_gev = convert_mm_to_ft(stat_gev)
+
+# stat_gev025 = revd(1e5, loc = post_stat_025[1], scale = post_stat_025[2], shape = post_stat_025[3], type='GEV')
+# stat_gev025 = convert_mm_to_ft(stat_gev025)
+# 
+# stat_gev50 = revd(1e5, loc = post_stat_50[1], scale = post_stat_50[2], shape = post_stat_50[3], type='GEV')
+# stat_gev50 = convert_mm_to_ft(stat_gev50)
+# 
+# stat_gev975 = revd(1e5, loc = post_stat_975[1], scale = post_stat_975[2], shape = post_stat_975[3], type='GEV')
+# stat_gev975 = convert_mm_to_ft(stat_gev975)
 
 ################################### COMBINED SLR and STORM SURGE DATA ##################################
+# ADD description of revd
 #------------------- Generate GEV distribution using Srikrishnan et al. in prep. -----------------
-# Generate storm surge GEV distribution with an ensemble size matching Wong and Keller 2017
+# Determine Wong and Keller 2017 ensemble size
 subbrick_length = length(brickfd_rcp26$t_2030)
-subbrick_stat = burn_stationary[sample(nrow(burn_stationary), size=subbrick_length, replace=FALSE), ]
-stationary_brick = convert_mm_to_ft(revd(nrow(subbrick_stat), loc = subbrick_stat[,1], scale = subbrick_stat[,2], 
-                      shape = subbrick_stat[,3], type='GEV'))
+# Generate a subset of GEV parameter sets matching the ensemble size of Wong and Keller 2017.
+
+subbrick_stat2 = stat_sotw[ , sample(ncol(stat_sotw), size=subbrick_length, replace=FALSE)]
+stationary_brick = convert_mm_to_ft(subbrick_stat2)
+
+# subbrick_stat = burn_stationary[sample(nrow(burn_stationary), size=subbrick_length, replace=FALSE), ]
+# # Generate a distribution of storm surge values of the Wong and Keller 2017 ensemble size by randomly sampling the GEV parameters.
+# stationary_brick = revd(nrow(subbrick_stat), loc = subbrick_stat[,1], scale = subbrick_stat[,2], shape = subbrick_stat[,3], type='GEV')
+# stationary_brick = convert_mm_to_ft(stationary_brick)
 
 # Generate storm surge GEV distribution with an ensemble size matching Kopp et al. 2014, Kopp et al. 2017, and Rasmussen et al. 2018
 subkopp_length = length(kopp14_rcp26$t_2030)
-subkopp_stat = burn_stationary[sample(nrow(burn_stationary), size=subkopp_length, replace=FALSE), ]
-stationary_kopp = convert_mm_to_ft(revd(nrow(subkopp_stat), loc = subkopp_stat[,1], scale = subkopp_stat[,2], 
-                      shape = subkopp_stat[,3], type='GEV'))
+# Generate a subset of GEV parameter sets
+subkopp_stat2 = stat_sotw[ , sample(ncol(stat_sotw), size=subkopp_length, replace=FALSE)]
+stationary_kopp = convert_mm_to_ft(subkopp_stat2)
 
+# subkopp_stat = burn_stationary[sample(nrow(burn_stationary), size=subkopp_length, replace=FALSE), ]
+# # Generate a distribution of storm surge values of the SLR ensemble size by randomly sampling the GEV parameters.
+# stationary_kopp = revd(nrow(subkopp_stat), loc = subkopp_stat[,1], scale = subkopp_stat[,2], shape = subkopp_stat[,3], type='GEV')
+# stationary_kopp = convert_mm_to_ft(stationary_kopp)
+  # SLR + qevd()
+# estimate the credible interval from the SLR + gev distribution and plot the polygon.
 # Generate storm surge GEV distribution with an ensemble size matching Sweet et al. 2017
 subsweet17_SEW_length = length(sweet17_03$X2030)
-subsweet17_SEW_stat = burn_stationary[sample(nrow(burn_stationary), size=subsweet17_SEW_length, replace=FALSE), ]
-stationary_sweet17_SEW = convert_mm_to_ft(revd(nrow(subsweet17_SEW_stat), loc = subsweet17_SEW_stat[,1], 
-                                                   scale = subsweet17_SEW_stat[,2], shape = subsweet17_SEW_stat[,3], type='GEV'))
+# Generate a subset of GEV parameter sets
+subsweet17_SEW_stat2 = stat_sotw[ , sample(ncol(stat_sotw), size=subsweet17_SEW_length, replace=FALSE)]
+stationary_sweet17_SEW = convert_mm_to_ft(subsweet17_SEW_stat2)
 
+# subsweet17_SEW_stat = burn_stationary[sample(nrow(burn_stationary), size=subsweet17_SEW_length, replace=FALSE), ]
+# # Generate a distribution of storm surge values of the SLR ensemble size by randomly sampling the GEV parameters.
+# stationary_sweet17_SEW = revd(nrow(subsweet17_SEW_stat), loc = subsweet17_SEW_stat[,1], scale = subsweet17_SEW_stat[,2], 
+#                               shape = subsweet17_SEW_stat[,3], type='GEV')
+# stationary_sweet17_SEW = convert_mm_to_ft(stationary_sweet17_SEW)
+  
 #--------------------------- Add distribution of storm surge data to SLR data --------------------------
-# Add stationary storm surge to Kopp et al. 2014
-k14_r26_SS = kopp14_rcp26 + stationary_kopp
-k14_r45_SS = kopp14_rcp45 + stationary_kopp
-k14_r60_SS = kopp14_rcp60 + stationary_kopp
-k14_r85_SS = kopp14_rcp85 + stationary_kopp
+# Add stationary storm surge to Kopp et al. 2014; 2017 and Rasmussen et al. 2018
+k14_r26_SS_t_2030 = k14_r26_SS_t_2050 = k14_r26_SS_t_2070 = k14_r26_SS_t_2100 = 
+  k14_r45_SS_t_2030 = k14_r45_SS_t_2050 = k14_r45_SS_t_2070 = k14_r45_SS_t_2100 = 
+  k14_r85_SS_t_2030 = k14_r85_SS_t_2050 = k14_r85_SS_t_2070 = k14_r85_SS_t_2100 = 
+  k17_DP16_SEW_r26_SS_t_2030 = k17_DP16_SEW_r26_SS_t_2050 = k17_DP16_SEW_r26_SS_t_2070 = k17_DP16_SEW_r26_SS_t_2100 = 
+  k17_DP16_SEW_r45_SS_t_2030 = k17_DP16_SEW_r45_SS_t_2050 = k17_DP16_SEW_r45_SS_t_2070 = k17_DP16_SEW_r45_SS_t_2100 =   
+  k17_DP16_SEW_r85_SS_t_2030 = k17_DP16_SEW_r85_SS_t_2050 = k17_DP16_SEW_r85_SS_t_2070 = k17_DP16_SEW_r85_SS_t_2100 = 
+  Ras18_SEW_1p5deg_SS_t_2030 = Ras18_SEW_1p5deg_SS_t_2050 = Ras18_SEW_1p5deg_SS_t_2070 = Ras18_SEW_1p5deg_SS_t_2100 = 
+  Ras18_SEW_2p0deg_SS_t_2030 = Ras18_SEW_2p0deg_SS_t_2050 = Ras18_SEW_2p0deg_SS_t_2070 = Ras18_SEW_2p0deg_SS_t_2100 = 
+  Ras18_SEW_2p5deg_SS_t_2030 = Ras18_SEW_2p5deg_SS_t_2050 = Ras18_SEW_2p5deg_SS_t_2070 = Ras18_SEW_2p5deg_SS_t_2100 = mat.or.vec(nrow(stationary_kopp), ncol(stationary_kopp))
+for(i in 1:ncol(stationary_kopp)){
+  # Add stationary storm surge to Kopp et al. 2014
+  k14_r26_SS_t_2030[ ,i] = kopp14_rcp26$t_2030[i] + stationary_kopp[ ,i]
+  k14_r26_SS_t_2050[ ,i] = kopp14_rcp26$t_2050[i] + stationary_kopp[ ,i]
+  k14_r26_SS_t_2070[ ,i] = kopp14_rcp26$t_2070[i] + stationary_kopp[ ,i]
+  k14_r26_SS_t_2100[ ,i] = kopp14_rcp26$t_2100[i] + stationary_kopp[ ,i]
+  k14_r45_SS_t_2030[ ,i] = kopp14_rcp45$t_2030[i] + stationary_kopp[ ,i]
+  k14_r45_SS_t_2050[ ,i] = kopp14_rcp45$t_2050[i] + stationary_kopp[ ,i]
+  k14_r45_SS_t_2070[ ,i] = kopp14_rcp45$t_2070[i] + stationary_kopp[ ,i]
+  k14_r45_SS_t_2100[ ,i] = kopp14_rcp45$t_2100[i] + stationary_kopp[ ,i]
+  k14_r85_SS_t_2030[ ,i] = kopp14_rcp85$t_2030[i] + stationary_kopp[ ,i]
+  k14_r85_SS_t_2050[ ,i] = kopp14_rcp85$t_2050[i] + stationary_kopp[ ,i]
+  k14_r85_SS_t_2070[ ,i] = kopp14_rcp85$t_2070[i] + stationary_kopp[ ,i]
+  k14_r85_SS_t_2100[ ,i] = kopp14_rcp85$t_2100[i] + stationary_kopp[ ,i]
+  # Add stationary storm surge to Kopp et al. 2017
+  k17_DP16_SEW_r26_SS_t_2030[ ,i] = kopp17_DP16_SEW_rcp26$t_2030[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r26_SS_t_2050[ ,i] = kopp17_DP16_SEW_rcp26$t_2050[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r26_SS_t_2070[ ,i] = kopp17_DP16_SEW_rcp26$t_2070[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r26_SS_t_2100[ ,i] = kopp17_DP16_SEW_rcp26$t_2100[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r45_SS_t_2030[ ,i] = kopp17_DP16_SEW_rcp45$t_2030[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r45_SS_t_2050[ ,i] = kopp17_DP16_SEW_rcp45$t_2050[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r45_SS_t_2070[ ,i] = kopp17_DP16_SEW_rcp45$t_2070[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r45_SS_t_2100[ ,i] = kopp17_DP16_SEW_rcp45$t_2100[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r85_SS_t_2030[ ,i] = kopp17_DP16_SEW_rcp85$t_2030[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r85_SS_t_2050[ ,i] = kopp17_DP16_SEW_rcp85$t_2050[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r85_SS_t_2070[ ,i] = kopp17_DP16_SEW_rcp85$t_2070[i] + stationary_kopp[ ,i]
+  k17_DP16_SEW_r85_SS_t_2100[ ,i] = kopp17_DP16_SEW_rcp85$t_2100[i] + stationary_kopp[ ,i]
+  # Add stationary storm surge to Rasmussen et al. 2018
+  Ras18_SEW_1p5deg_SS_t_2030[ ,i] = Ras18_SEW_1p5deg$t_2030[i] + stationary_kopp[ ,i]
+  Ras18_SEW_1p5deg_SS_t_2050[ ,i] = Ras18_SEW_1p5deg$t_2050[i] + stationary_kopp[ ,i]
+  Ras18_SEW_1p5deg_SS_t_2070[ ,i] = Ras18_SEW_1p5deg$t_2070[i] + stationary_kopp[ ,i]
+  Ras18_SEW_1p5deg_SS_t_2100[ ,i] = Ras18_SEW_1p5deg$t_2100[i] + stationary_kopp[ ,i]
+  Ras18_SEW_2p0deg_SS_t_2030[ ,i] = Ras18_SEW_2p0deg$t_2030[i] + stationary_kopp[ ,i]
+  Ras18_SEW_2p0deg_SS_t_2050[ ,i] = Ras18_SEW_2p0deg$t_2050[i] + stationary_kopp[ ,i]
+  Ras18_SEW_2p0deg_SS_t_2070[ ,i] = Ras18_SEW_2p0deg$t_2070[i] + stationary_kopp[ ,i]
+  Ras18_SEW_2p0deg_SS_t_2100[ ,i] = Ras18_SEW_2p0deg$t_2100[i] + stationary_kopp[ ,i]
+  Ras18_SEW_2p5deg_SS_t_2030[ ,i] = Ras18_SEW_2p5deg$t_2030[i] + stationary_kopp[ ,i]
+  Ras18_SEW_2p5deg_SS_t_2050[ ,i] = Ras18_SEW_2p5deg$t_2050[i] + stationary_kopp[ ,i]
+  Ras18_SEW_2p5deg_SS_t_2070[ ,i] = Ras18_SEW_2p5deg$t_2070[i] + stationary_kopp[ ,i]
+  Ras18_SEW_2p5deg_SS_t_2100[ ,i] = Ras18_SEW_2p5deg$t_2100[i] + stationary_kopp[ ,i]
+}
+
+k14_r26_SS_025 = k14_r26_SS_975 = k14_r45_SS_025 = k14_r45_SS_975 = k14_r85_SS_025 = k14_r85_SS_975 = 
+  k17_DP16_SEW_r26_SS_025 = k17_DP16_SEW_r26_SS_975 = k17_DP16_SEW_r45_SS_025 = k17_DP16_SEW_r45_SS_975 = k17_DP16_SEW_r85_SS_025 = k17_DP16_SEW_r85_SS_975 = 
+  Ras18_SEW_1p5deg_SS_025 = Ras18_SEW_1p5deg_SS_975 = Ras18_SEW_2p0deg_SS_025 = Ras18_SEW_2p0deg_SS_975 = Ras18_SEW_2p5deg_SS_025 = Ras18_SEW_2p5deg_SS_975 =
+  data.frame(t_2030 = 1:nrow(k14_r26_SS_t_2030), t_2050 = 1:nrow(k14_r26_SS_t_2030), t_2070 = 1:nrow(k14_r26_SS_t_2030), t_2100 = 1:nrow(k14_r26_SS_t_2030))
+
+# Estimate the 97.5 and 2.5% confidence intervals 
+for(i in 1:nrow(k14_r26_SS_t_2030)){
+  # Kopp et al. 2014
+  k14_r26_SS_025$t_2030[i] = quantile(k14_r26_SS_t_2030[i, ],0.025)
+  k14_r26_SS_025$t_2050[i] = quantile(k14_r26_SS_t_2050[i, ],0.025)
+  k14_r26_SS_025$t_2070[i] = quantile(k14_r26_SS_t_2070[i, ],0.025)
+  k14_r26_SS_025$t_2100[i] = quantile(k14_r26_SS_t_2100[i, ],0.025)
+  k14_r26_SS_975$t_2030[i] = quantile(k14_r26_SS_t_2030[i, ],0.975)
+  k14_r26_SS_975$t_2050[i] = quantile(k14_r26_SS_t_2050[i, ],0.975)
+  k14_r26_SS_975$t_2070[i] = quantile(k14_r26_SS_t_2070[i, ],0.975)
+  k14_r26_SS_975$t_2100[i] = quantile(k14_r26_SS_t_2100[i, ],0.975)
+  k14_r45_SS_025$t_2030[i] = quantile(k14_r45_SS_t_2030[i, ],0.025)
+  k14_r45_SS_025$t_2050[i] = quantile(k14_r45_SS_t_2050[i, ],0.025)
+  k14_r45_SS_025$t_2070[i] = quantile(k14_r45_SS_t_2070[i, ],0.025)
+  k14_r45_SS_025$t_2100[i] = quantile(k14_r45_SS_t_2100[i, ],0.025)
+  k14_r45_SS_975$t_2030[i] = quantile(k14_r45_SS_t_2030[i, ],0.975)
+  k14_r45_SS_975$t_2050[i] = quantile(k14_r45_SS_t_2050[i, ],0.975)
+  k14_r45_SS_975$t_2070[i] = quantile(k14_r45_SS_t_2070[i, ],0.975)
+  k14_r45_SS_975$t_2100[i] = quantile(k14_r45_SS_t_2100[i, ],0.975)
+  k14_r85_SS_025$t_2030[i] = quantile(k14_r85_SS_t_2030[i, ],0.025)
+  k14_r85_SS_025$t_2050[i] = quantile(k14_r85_SS_t_2050[i, ],0.025)
+  k14_r85_SS_025$t_2070[i] = quantile(k14_r85_SS_t_2070[i, ],0.025)
+  k14_r85_SS_025$t_2100[i] = quantile(k14_r85_SS_t_2100[i, ],0.025)
+  k14_r85_SS_975$t_2030[i] = quantile(k14_r85_SS_t_2030[i, ],0.975)
+  k14_r85_SS_975$t_2050[i] = quantile(k14_r85_SS_t_2050[i, ],0.975)
+  k14_r85_SS_975$t_2070[i] = quantile(k14_r85_SS_t_2070[i, ],0.975)
+  k14_r85_SS_975$t_2100[i] = quantile(k14_r85_SS_t_2100[i, ],0.975)
+  # Kopp et al. 2017
+  k17_DP16_SEW_r26_SS_025$t_2030[i] = quantile(k17_DP16_SEW_r26_SS_t_2030[i, ],0.025)
+  k17_DP16_SEW_r26_SS_025$t_2050[i] = quantile(k17_DP16_SEW_r26_SS_t_2050[i, ],0.025)
+  k17_DP16_SEW_r26_SS_025$t_2070[i] = quantile(k17_DP16_SEW_r26_SS_t_2070[i, ],0.025)
+  k17_DP16_SEW_r26_SS_025$t_2100[i] = quantile(k17_DP16_SEW_r26_SS_t_2100[i, ],0.025)
+  k17_DP16_SEW_r26_SS_975$t_2030[i] = quantile(k17_DP16_SEW_r26_SS_t_2030[i, ],0.975)
+  k17_DP16_SEW_r26_SS_975$t_2050[i] = quantile(k17_DP16_SEW_r26_SS_t_2050[i, ],0.975)
+  k17_DP16_SEW_r26_SS_975$t_2070[i] = quantile(k17_DP16_SEW_r26_SS_t_2070[i, ],0.975)
+  k17_DP16_SEW_r26_SS_975$t_2100[i] = quantile(k17_DP16_SEW_r26_SS_t_2100[i, ],0.975)
+  k17_DP16_SEW_r45_SS_025$t_2030[i] = quantile(k17_DP16_SEW_r45_SS_t_2030[i, ],0.025)
+  k17_DP16_SEW_r45_SS_025$t_2050[i] = quantile(k17_DP16_SEW_r45_SS_t_2050[i, ],0.025)
+  k17_DP16_SEW_r45_SS_025$t_2070[i] = quantile(k17_DP16_SEW_r45_SS_t_2070[i, ],0.025)
+  k17_DP16_SEW_r45_SS_025$t_2100[i] = quantile(k17_DP16_SEW_r45_SS_t_2100[i, ],0.025)
+  k17_DP16_SEW_r45_SS_975$t_2030[i] = quantile(k17_DP16_SEW_r45_SS_t_2030[i, ],0.975)
+  k17_DP16_SEW_r45_SS_975$t_2050[i] = quantile(k17_DP16_SEW_r45_SS_t_2050[i, ],0.975)
+  k17_DP16_SEW_r45_SS_975$t_2070[i] = quantile(k17_DP16_SEW_r45_SS_t_2070[i, ],0.975)
+  k17_DP16_SEW_r45_SS_975$t_2100[i] = quantile(k17_DP16_SEW_r45_SS_t_2100[i, ],0.975)
+  k17_DP16_SEW_r85_SS_025$t_2030[i] = quantile(k17_DP16_SEW_r85_SS_t_2030[i, ],0.025)
+  k17_DP16_SEW_r85_SS_025$t_2050[i] = quantile(k17_DP16_SEW_r85_SS_t_2050[i, ],0.025)
+  k17_DP16_SEW_r85_SS_025$t_2070[i] = quantile(k17_DP16_SEW_r85_SS_t_2070[i, ],0.025)
+  k17_DP16_SEW_r85_SS_025$t_2100[i] = quantile(k17_DP16_SEW_r85_SS_t_2100[i, ],0.025)
+  k17_DP16_SEW_r85_SS_975$t_2030[i] = quantile(k17_DP16_SEW_r85_SS_t_2030[i, ],0.975)
+  k17_DP16_SEW_r85_SS_975$t_2050[i] = quantile(k17_DP16_SEW_r85_SS_t_2050[i, ],0.975)
+  k17_DP16_SEW_r85_SS_975$t_2070[i] = quantile(k17_DP16_SEW_r85_SS_t_2070[i, ],0.975)
+  k17_DP16_SEW_r85_SS_975$t_2100[i] = quantile(k17_DP16_SEW_r85_SS_t_2100[i, ],0.975)
+  # Rasmussen et al. 2018
+  Ras18_SEW_1p5deg_SS_025$t_2030[i] = quantile(Ras18_SEW_1p5deg_SS_t_2030[i, ],0.025)
+  Ras18_SEW_1p5deg_SS_025$t_2050[i] = quantile(Ras18_SEW_1p5deg_SS_t_2050[i, ],0.025)
+  Ras18_SEW_1p5deg_SS_025$t_2070[i] = quantile(Ras18_SEW_1p5deg_SS_t_2070[i, ],0.025)
+  Ras18_SEW_1p5deg_SS_025$t_2100[i] = quantile(Ras18_SEW_1p5deg_SS_t_2100[i, ],0.025)
+  Ras18_SEW_1p5deg_SS_975$t_2030[i] = quantile(Ras18_SEW_1p5deg_SS_t_2030[i, ],0.975)
+  Ras18_SEW_1p5deg_SS_975$t_2050[i] = quantile(Ras18_SEW_1p5deg_SS_t_2050[i, ],0.975)
+  Ras18_SEW_1p5deg_SS_975$t_2070[i] = quantile(Ras18_SEW_1p5deg_SS_t_2070[i, ],0.975)
+  Ras18_SEW_1p5deg_SS_975$t_2100[i] = quantile(Ras18_SEW_1p5deg_SS_t_2100[i, ],0.975)
+  Ras18_SEW_2p0deg_SS_025$t_2030[i] = quantile(Ras18_SEW_2p0deg_SS_t_2030[i, ],0.025)
+  Ras18_SEW_2p0deg_SS_025$t_2050[i] = quantile(Ras18_SEW_2p0deg_SS_t_2050[i, ],0.025)
+  Ras18_SEW_2p0deg_SS_025$t_2070[i] = quantile(Ras18_SEW_2p0deg_SS_t_2070[i, ],0.025)
+  Ras18_SEW_2p0deg_SS_025$t_2100[i] = quantile(Ras18_SEW_2p0deg_SS_t_2100[i, ],0.025)
+  Ras18_SEW_2p0deg_SS_975$t_2030[i] = quantile(Ras18_SEW_2p0deg_SS_t_2030[i, ],0.975)
+  Ras18_SEW_2p0deg_SS_975$t_2050[i] = quantile(Ras18_SEW_2p0deg_SS_t_2050[i, ],0.975)
+  Ras18_SEW_2p0deg_SS_975$t_2070[i] = quantile(Ras18_SEW_2p0deg_SS_t_2070[i, ],0.975)
+  Ras18_SEW_2p0deg_SS_975$t_2100[i] = quantile(Ras18_SEW_2p0deg_SS_t_2100[i, ],0.975)
+  Ras18_SEW_2p5deg_SS_025$t_2030[i] = quantile(Ras18_SEW_2p5deg_SS_t_2030[i, ],0.025)
+  Ras18_SEW_2p5deg_SS_025$t_2050[i] = quantile(Ras18_SEW_2p5deg_SS_t_2050[i, ],0.025)
+  Ras18_SEW_2p5deg_SS_025$t_2070[i] = quantile(Ras18_SEW_2p5deg_SS_t_2070[i, ],0.025)
+  Ras18_SEW_2p5deg_SS_025$t_2100[i] = quantile(Ras18_SEW_2p5deg_SS_t_2100[i, ],0.025)
+  Ras18_SEW_2p5deg_SS_975$t_2030[i] = quantile(Ras18_SEW_2p5deg_SS_t_2030[i, ],0.975)
+  Ras18_SEW_2p5deg_SS_975$t_2050[i] = quantile(Ras18_SEW_2p5deg_SS_t_2050[i, ],0.975)
+  Ras18_SEW_2p5deg_SS_975$t_2070[i] = quantile(Ras18_SEW_2p5deg_SS_t_2070[i, ],0.975)
+  Ras18_SEW_2p5deg_SS_975$t_2100[i] = quantile(Ras18_SEW_2p5deg_SS_t_2100[i, ],0.975)
+}
+
+# k14_r26_SS[ ,i] = kopp14_rcp26[i] + stationary_kopp[ ,i]
+# k14_r45_SS[ ,i] = kopp14_rcp45[i] + stationary_kopp[ ,i]
+# k14_r60_SS[ ,i] = kopp14_rcp60[i] + stationary_kopp[ ,i]
+# k14_r85_SS[ ,i] = kopp14_rcp85[i] + stationary_kopp[ ,i]
 
 # Add stationary storm surge to Kopp et al. 2017
-k17_DP16_SEW_r26_SS = kopp17_DP16_SEW_rcp26 + stationary_kopp
-k17_DP16_SEW_r45_SS = kopp17_DP16_SEW_rcp45 + stationary_kopp
-k17_DP16_SEW_r60_SS = kopp17_DP16_SEW_rcp60 + stationary_kopp
-k17_DP16_SEW_r85_SS = kopp17_DP16_SEW_rcp85 + stationary_kopp
-
-# Add stationary storm surge to Rasmussen et al. 2018
-Ras18_SEW_1p5deg_SS = Ras18_SEW_1p5deg + stationary_kopp
-Ras18_SEW_2p0deg_SS = Ras18_SEW_2p0deg + stationary_kopp
-Ras18_SEW_2p5deg_SS = Ras18_SEW_2p5deg + stationary_kopp
+# k17_DP16_SEW_r26_SS = kopp17_DP16_SEW_rcp26 + stationary_kopp
+# k17_DP16_SEW_r45_SS = kopp17_DP16_SEW_rcp45 + stationary_kopp
+# k17_DP16_SEW_r60_SS = kopp17_DP16_SEW_rcp60 + stationary_kopp
+# k17_DP16_SEW_r85_SS = kopp17_DP16_SEW_rcp85 + stationary_kopp
+# 
+# # Add stationary storm surge to Rasmussen et al. 2018
+# Ras18_SEW_1p5deg_SS = Ras18_SEW_1p5deg + stationary_kopp
+# Ras18_SEW_2p0deg_SS = Ras18_SEW_2p0deg + stationary_kopp
+# Ras18_SEW_2p5deg_SS = Ras18_SEW_2p5deg + stationary_kopp
 
 # Add stationary storm surge to Sweet et al. 2017
-sweet17_03_SS = sweet17_03 + stationary_sweet17_SEW
-sweet17_05_SS = sweet17_05 + stationary_sweet17_SEW
-sweet17_10_SS = sweet17_10 + stationary_sweet17_SEW
-sweet17_15_SS = sweet17_15 + stationary_sweet17_SEW
-sweet17_20_SS = sweet17_20 + stationary_sweet17_SEW
-sweet17_25_SS = sweet17_25 + stationary_sweet17_SEW
+sweet17_03_SS_X2030 = sweet17_03_SS_X2050 = sweet17_03_SS_X2070 = sweet17_03_SS_X2100 = 
+  sweet17_05_SS_X2030 = sweet17_05_SS_X2050 = sweet17_05_SS_X2070 = sweet17_05_SS_X2100 =
+  sweet17_10_SS_X2030 = sweet17_10_SS_X2050 = sweet17_10_SS_X2070 = sweet17_10_SS_X2100 =
+  sweet17_15_SS_X2030 = sweet17_15_SS_X2050 = sweet17_15_SS_X2070 = sweet17_15_SS_X2100 =
+  sweet17_20_SS_X2030 = sweet17_20_SS_X2050 = sweet17_20_SS_X2070 = sweet17_20_SS_X2100 =
+  sweet17_25_SS_X2030 = sweet17_25_SS_X2050 = sweet17_25_SS_X2070 = sweet17_25_SS_X2100 = mat.or.vec(nrow(stationary_sweet17_SEW), ncol(stationary_sweet17_SEW))
+for(i in 1:ncol(stationary_sweet17_SEW)){
+  sweet17_03_SS_X2030[ ,i] = sweet17_03$X2030[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_03_SS_X2050[ ,i] = sweet17_03$X2050[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_03_SS_X2070[ ,i] = sweet17_03$X2070[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_03_SS_X2100[ ,i] = sweet17_03$X2100[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_05_SS_X2030[ ,i] = sweet17_05$X2030[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_05_SS_X2050[ ,i] = sweet17_05$X2050[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_05_SS_X2070[ ,i] = sweet17_05$X2070[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_05_SS_X2100[ ,i] = sweet17_05$X2100[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_10_SS_X2030[ ,i] = sweet17_10$X2030[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_10_SS_X2050[ ,i] = sweet17_10$X2050[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_10_SS_X2070[ ,i] = sweet17_10$X2070[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_10_SS_X2100[ ,i] = sweet17_10$X2100[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_15_SS_X2030[ ,i] = sweet17_15$X2030[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_15_SS_X2050[ ,i] = sweet17_15$X2050[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_15_SS_X2070[ ,i] = sweet17_15$X2070[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_15_SS_X2100[ ,i] = sweet17_15$X2100[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_20_SS_X2030[ ,i] = sweet17_20$X2030[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_20_SS_X2050[ ,i] = sweet17_20$X2050[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_20_SS_X2070[ ,i] = sweet17_20$X2070[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_20_SS_X2100[ ,i] = sweet17_20$X2100[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_25_SS_X2030[ ,i] = sweet17_25$X2030[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_25_SS_X2050[ ,i] = sweet17_25$X2050[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_25_SS_X2070[ ,i] = sweet17_25$X2070[i] + stationary_sweet17_SEW[ ,i]
+  sweet17_25_SS_X2100[ ,i] = sweet17_25$X2100[i] + stationary_sweet17_SEW[ ,i]
+}
 
-# Add stationary storm surge to Wong and Keller 2017 fast dynamics
-bfd_r26_SS = brickfd_rcp26 + stationary_brick
-bfd_r45_SS = brickfd_rcp45 + stationary_brick
-bfd_r60_SS = brickfd_rcp60 + stationary_brick
-bfd_r85_SS = brickfd_rcp85 + stationary_brick
+sweet17_03_SS_025 = sweet17_03_SS_975 = sweet17_05_SS_025 = sweet17_05_SS_975 = sweet17_10_SS_025 = sweet17_10_SS_975 = 
+  sweet17_15_SS_025 = sweet17_15_SS_975 = sweet17_20_SS_025 = sweet17_20_SS_975 = sweet17_25_SS_025 = sweet17_25_SS_975 =
+  data.frame(X2030 = 1:nrow(sweet17_25_SS_X2100), X2050 = 1:nrow(sweet17_25_SS_X2100), X2070 = 1:nrow(sweet17_25_SS_X2100), X2100 = 1:nrow(sweet17_25_SS_X2100))
+# Estimate the 97.5 and 2.5% confidence intervals 
+for(i in 1:nrow(sweet17_25_SS_X2100)){
+  sweet17_03_SS_025$X2030[i] = quantile(sweet17_03_SS_X2030[i, ],0.025, na.rm = TRUE)
+  sweet17_03_SS_025$X2050[i] = quantile(sweet17_03_SS_X2050[i, ],0.025, na.rm = TRUE)
+  sweet17_03_SS_025$X2070[i] = quantile(sweet17_03_SS_X2070[i, ],0.025, na.rm = TRUE)
+  sweet17_03_SS_025$X2100[i] = quantile(sweet17_03_SS_X2100[i, ],0.025, na.rm = TRUE)
+  sweet17_03_SS_975$X2030[i] = quantile(sweet17_03_SS_X2030[i, ],0.975, na.rm = TRUE)
+  sweet17_03_SS_975$X2050[i] = quantile(sweet17_03_SS_X2050[i, ],0.975, na.rm = TRUE)
+  sweet17_03_SS_975$X2070[i] = quantile(sweet17_03_SS_X2070[i, ],0.975, na.rm = TRUE)
+  sweet17_03_SS_975$X2100[i] = quantile(sweet17_03_SS_X2100[i, ],0.975, na.rm = TRUE)
+  sweet17_05_SS_025$X2030[i] = quantile(sweet17_05_SS_X2030[i, ],0.025, na.rm = TRUE)
+  sweet17_05_SS_025$X2050[i] = quantile(sweet17_05_SS_X2050[i, ],0.025, na.rm = TRUE)
+  sweet17_05_SS_025$X2070[i] = quantile(sweet17_05_SS_X2070[i, ],0.025, na.rm = TRUE)
+  sweet17_05_SS_025$X2100[i] = quantile(sweet17_05_SS_X2100[i, ],0.025, na.rm = TRUE)
+  sweet17_05_SS_975$X2030[i] = quantile(sweet17_05_SS_X2030[i, ],0.975, na.rm = TRUE)
+  sweet17_05_SS_975$X2050[i] = quantile(sweet17_05_SS_X2050[i, ],0.975, na.rm = TRUE)
+  sweet17_05_SS_975$X2070[i] = quantile(sweet17_05_SS_X2070[i, ],0.975, na.rm = TRUE)
+  sweet17_05_SS_975$X2100[i] = quantile(sweet17_05_SS_X2100[i, ],0.975, na.rm = TRUE)
+  sweet17_10_SS_025$X2030[i] = quantile(sweet17_10_SS_X2030[i, ],0.025, na.rm = TRUE)
+  sweet17_10_SS_025$X2050[i] = quantile(sweet17_10_SS_X2050[i, ],0.025, na.rm = TRUE)
+  sweet17_10_SS_025$X2070[i] = quantile(sweet17_10_SS_X2070[i, ],0.025, na.rm = TRUE)
+  sweet17_10_SS_025$X2100[i] = quantile(sweet17_10_SS_X2100[i, ],0.025, na.rm = TRUE)
+  sweet17_10_SS_975$X2030[i] = quantile(sweet17_10_SS_X2030[i, ],0.975, na.rm = TRUE)
+  sweet17_10_SS_975$X2050[i] = quantile(sweet17_10_SS_X2050[i, ],0.975, na.rm = TRUE)
+  sweet17_10_SS_975$X2070[i] = quantile(sweet17_10_SS_X2070[i, ],0.975, na.rm = TRUE)
+  sweet17_10_SS_975$X2100[i] = quantile(sweet17_10_SS_X2100[i, ],0.975, na.rm = TRUE)
+  sweet17_15_SS_025$X2030[i] = quantile(sweet17_15_SS_X2030[i, ],0.025, na.rm = TRUE)
+  sweet17_15_SS_025$X2050[i] = quantile(sweet17_15_SS_X2050[i, ],0.025, na.rm = TRUE)
+  sweet17_15_SS_025$X2070[i] = quantile(sweet17_15_SS_X2070[i, ],0.025, na.rm = TRUE)
+  sweet17_15_SS_025$X2100[i] = quantile(sweet17_15_SS_X2100[i, ],0.025, na.rm = TRUE)
+  sweet17_15_SS_975$X2030[i] = quantile(sweet17_15_SS_X2030[i, ],0.975, na.rm = TRUE)
+  sweet17_15_SS_975$X2050[i] = quantile(sweet17_15_SS_X2050[i, ],0.975, na.rm = TRUE)
+  sweet17_15_SS_975$X2070[i] = quantile(sweet17_15_SS_X2070[i, ],0.975, na.rm = TRUE)
+  sweet17_15_SS_975$X2100[i] = quantile(sweet17_15_SS_X2100[i, ],0.975, na.rm = TRUE)
+  sweet17_20_SS_025$X2030[i] = quantile(sweet17_20_SS_X2030[i, ],0.025, na.rm = TRUE)
+  sweet17_20_SS_025$X2050[i] = quantile(sweet17_20_SS_X2050[i, ],0.025, na.rm = TRUE)
+  sweet17_20_SS_025$X2070[i] = quantile(sweet17_20_SS_X2070[i, ],0.025, na.rm = TRUE)
+  sweet17_20_SS_025$X2100[i] = quantile(sweet17_20_SS_X2100[i, ],0.025, na.rm = TRUE)
+  sweet17_20_SS_975$X2030[i] = quantile(sweet17_20_SS_X2030[i, ],0.975, na.rm = TRUE)
+  sweet17_20_SS_975$X2050[i] = quantile(sweet17_20_SS_X2050[i, ],0.975, na.rm = TRUE)
+  sweet17_20_SS_975$X2070[i] = quantile(sweet17_20_SS_X2070[i, ],0.975, na.rm = TRUE)
+  sweet17_20_SS_975$X2100[i] = quantile(sweet17_20_SS_X2100[i, ],0.975, na.rm = TRUE)
+  sweet17_25_SS_025$X2030[i] = quantile(sweet17_25_SS_X2030[i, ],0.025, na.rm = TRUE)
+  sweet17_25_SS_025$X2050[i] = quantile(sweet17_25_SS_X2050[i, ],0.025, na.rm = TRUE)
+  sweet17_25_SS_025$X2070[i] = quantile(sweet17_25_SS_X2070[i, ],0.025, na.rm = TRUE)
+  sweet17_25_SS_025$X2100[i] = quantile(sweet17_25_SS_X2100[i, ],0.025, na.rm = TRUE)
+  sweet17_25_SS_975$X2030[i] = quantile(sweet17_25_SS_X2030[i, ],0.975, na.rm = TRUE)
+  sweet17_25_SS_975$X2050[i] = quantile(sweet17_25_SS_X2050[i, ],0.975, na.rm = TRUE)
+  sweet17_25_SS_975$X2070[i] = quantile(sweet17_25_SS_X2070[i, ],0.975, na.rm = TRUE)
+  sweet17_25_SS_975$X2100[i] = quantile(sweet17_25_SS_X2100[i, ],0.975, na.rm = TRUE)
+}
+# # Add stationary storm surge to Sweet et al. 2017 X2030
+# sweet17_03_SS = sweet17_03 + stationary_sweet17_SEW
+# sweet17_05_SS = sweet17_05 + stationary_sweet17_SEW
+# sweet17_10_SS = sweet17_10 + stationary_sweet17_SEW
+# sweet17_15_SS = sweet17_15 + stationary_sweet17_SEW
+# sweet17_20_SS = sweet17_20 + stationary_sweet17_SEW
+# sweet17_25_SS = sweet17_25 + stationary_sweet17_SEW
+
+# Add stationary storm surge to Wong and Keller 2017
+bfd_r26_SS_t_2030 = bfd_r26_SS_t_2050 = bfd_r26_SS_t_2070 = bfd_r26_SS_t_2100 = 
+  bfd_r45_SS_t_2030 = bfd_r45_SS_t_2050 = bfd_r45_SS_t_2070 = bfd_r45_SS_t_2100 = 
+  bfd_r85_SS_t_2030 = bfd_r85_SS_t_2050 = bfd_r85_SS_t_2070 = bfd_r85_SS_t_2100 = 
+  NOfd_r26_SS_t_2030 = NOfd_r26_SS_t_2050 = NOfd_r26_SS_t_2070 = NOfd_r26_SS_t_2100 = 
+  NOfd_r45_SS_t_2030 = NOfd_r45_SS_t_2050 = NOfd_r45_SS_t_2070 = NOfd_r45_SS_t_2100 = 
+  NOfd_r85_SS_t_2030 = NOfd_r85_SS_t_2050 = NOfd_r85_SS_t_2070 = NOfd_r85_SS_t_2100 = mat.or.vec(nrow(stationary_brick), ncol(stationary_brick))
+for(i in 1:ncol(stationary_brick)){
+  # Add stationary storm surge to Wong and Keller 2017 fast dynamics
+  bfd_r26_SS_t_2030[ ,i] = brickfd_rcp26$t_2030[i] + stationary_brick[ ,i]
+  bfd_r26_SS_t_2050[ ,i] = brickfd_rcp26$t_2050[i] + stationary_brick[ ,i]
+  bfd_r26_SS_t_2070[ ,i] = brickfd_rcp26$t_2070[i] + stationary_brick[ ,i]
+  bfd_r26_SS_t_2100[ ,i] = brickfd_rcp26$t_2100[i] + stationary_brick[ ,i]
+  bfd_r45_SS_t_2030[ ,i] = brickfd_rcp45$t_2030[i] + stationary_brick[ ,i]
+  bfd_r45_SS_t_2050[ ,i] = brickfd_rcp45$t_2050[i] + stationary_brick[ ,i]
+  bfd_r45_SS_t_2070[ ,i] = brickfd_rcp45$t_2070[i] + stationary_brick[ ,i]
+  bfd_r45_SS_t_2100[ ,i] = brickfd_rcp45$t_2100[i] + stationary_brick[ ,i]
+  bfd_r85_SS_t_2030[ ,i] = brickfd_rcp85$t_2030[i] + stationary_brick[ ,i]
+  bfd_r85_SS_t_2050[ ,i] = brickfd_rcp85$t_2050[i] + stationary_brick[ ,i]
+  bfd_r85_SS_t_2070[ ,i] = brickfd_rcp85$t_2070[i] + stationary_brick[ ,i]
+  bfd_r85_SS_t_2100[ ,i] = brickfd_rcp85$t_2100[i] + stationary_brick[ ,i]
+  # Add stationary storm surge to Wong and Keller 2017 NO fast dynamics
+  NOfd_r26_SS_t_2030[ ,i] = NO_fdft_rcp26$t_2030[i] + stationary_brick[ ,i]
+  NOfd_r26_SS_t_2050[ ,i] = NO_fdft_rcp26$t_2050[i] + stationary_brick[ ,i]
+  NOfd_r26_SS_t_2070[ ,i] = NO_fdft_rcp26$t_2070[i] + stationary_brick[ ,i]
+  NOfd_r26_SS_t_2100[ ,i] = NO_fdft_rcp26$t_2100[i] + stationary_brick[ ,i]
+  NOfd_r45_SS_t_2030[ ,i] = NO_fdft_rcp45$t_2030[i] + stationary_brick[ ,i]
+  NOfd_r45_SS_t_2050[ ,i] = NO_fdft_rcp45$t_2050[i] + stationary_brick[ ,i]
+  NOfd_r45_SS_t_2070[ ,i] = NO_fdft_rcp45$t_2070[i] + stationary_brick[ ,i]
+  NOfd_r45_SS_t_2100[ ,i] = NO_fdft_rcp45$t_2100[i] + stationary_brick[ ,i]
+  NOfd_r85_SS_t_2030[ ,i] = NO_fdft_rcp85$t_2030[i] + stationary_brick[ ,i]
+  NOfd_r85_SS_t_2050[ ,i] = NO_fdft_rcp85$t_2050[i] + stationary_brick[ ,i]
+  NOfd_r85_SS_t_2070[ ,i] = NO_fdft_rcp85$t_2070[i] + stationary_brick[ ,i]
+  NOfd_r85_SS_t_2100[ ,i] = NO_fdft_rcp85$t_2100[i] + stationary_brick[ ,i]
+}
+
+bfd_r26_SS_025 = bfd_r26_SS_975 = bfd_r45_SS_025 = bfd_r45_SS_975 = bfd_r85_SS_025 = bfd_r85_SS_975 = 
+  NOfd_r26_SS_025 = NOfd_r26_SS_975 = NOfd_r45_SS_025 = NOfd_r45_SS_975 = NOfd_r85_SS_025 = NOfd_r85_SS_975 =
+  data.frame(t_2030 = 1:nrow(bfd_r26_SS_t_2030), t_2050 = 1:nrow(bfd_r26_SS_t_2030), t_2070 = 1:nrow(bfd_r26_SS_t_2030), t_2100 = 1:nrow(bfd_r26_SS_t_2030))
+# Estimate the 97.5 and 2.5% confidence intervals 
+for(i in 1:nrow(bfd_r26_SS_t_2030)){
+  # Wong and Keller 2017 fast dynamics
+  bfd_r26_SS_025$t_2030[i] = quantile(bfd_r26_SS_t_2030[i, ],0.025)
+  bfd_r26_SS_025$t_2050[i] = quantile(bfd_r26_SS_t_2050[i, ],0.025)
+  bfd_r26_SS_025$t_2070[i] = quantile(bfd_r26_SS_t_2070[i, ],0.025)
+  bfd_r26_SS_025$t_2100[i] = quantile(bfd_r26_SS_t_2100[i, ],0.025)
+  bfd_r26_SS_975$t_2030[i] = quantile(bfd_r26_SS_t_2030[i, ],0.975)
+  bfd_r26_SS_975$t_2050[i] = quantile(bfd_r26_SS_t_2050[i, ],0.975)
+  bfd_r26_SS_975$t_2070[i] = quantile(bfd_r26_SS_t_2070[i, ],0.975)
+  bfd_r26_SS_975$t_2100[i] = quantile(bfd_r26_SS_t_2100[i, ],0.975)
+  bfd_r45_SS_025$t_2030[i] = quantile(bfd_r45_SS_t_2030[i, ],0.025)
+  bfd_r45_SS_025$t_2050[i] = quantile(bfd_r45_SS_t_2050[i, ],0.025)
+  bfd_r45_SS_025$t_2070[i] = quantile(bfd_r45_SS_t_2070[i, ],0.025)
+  bfd_r45_SS_025$t_2100[i] = quantile(bfd_r45_SS_t_2100[i, ],0.025)
+  bfd_r45_SS_975$t_2030[i] = quantile(bfd_r45_SS_t_2030[i, ],0.975)
+  bfd_r45_SS_975$t_2050[i] = quantile(bfd_r45_SS_t_2050[i, ],0.975)
+  bfd_r45_SS_975$t_2070[i] = quantile(bfd_r45_SS_t_2070[i, ],0.975)
+  bfd_r45_SS_975$t_2100[i] = quantile(bfd_r45_SS_t_2100[i, ],0.975)
+  bfd_r85_SS_025$t_2030[i] = quantile(bfd_r85_SS_t_2030[i, ],0.025)
+  bfd_r85_SS_025$t_2050[i] = quantile(bfd_r85_SS_t_2050[i, ],0.025)
+  bfd_r85_SS_025$t_2070[i] = quantile(bfd_r85_SS_t_2070[i, ],0.025)
+  bfd_r85_SS_025$t_2100[i] = quantile(bfd_r85_SS_t_2100[i, ],0.025)
+  bfd_r85_SS_975$t_2030[i] = quantile(bfd_r85_SS_t_2030[i, ],0.975)
+  bfd_r85_SS_975$t_2050[i] = quantile(bfd_r85_SS_t_2050[i, ],0.975)
+  bfd_r85_SS_975$t_2070[i] = quantile(bfd_r85_SS_t_2070[i, ],0.975)
+  bfd_r85_SS_975$t_2100[i] = quantile(bfd_r85_SS_t_2100[i, ],0.975)
+  # Wong and Keller 2017 NO fast dynamics
+  NOfd_r26_SS_025$t_2030[i] = quantile(NOfd_r26_SS_t_2030[i, ],0.025)
+  NOfd_r26_SS_025$t_2050[i] = quantile(NOfd_r26_SS_t_2050[i, ],0.025)
+  NOfd_r26_SS_025$t_2070[i] = quantile(NOfd_r26_SS_t_2070[i, ],0.025)
+  NOfd_r26_SS_025$t_2100[i] = quantile(NOfd_r26_SS_t_2100[i, ],0.025)
+  NOfd_r26_SS_975$t_2030[i] = quantile(NOfd_r26_SS_t_2030[i, ],0.975)
+  NOfd_r26_SS_975$t_2050[i] = quantile(NOfd_r26_SS_t_2050[i, ],0.975)
+  NOfd_r26_SS_975$t_2070[i] = quantile(NOfd_r26_SS_t_2070[i, ],0.975)
+  NOfd_r26_SS_975$t_2100[i] = quantile(NOfd_r26_SS_t_2100[i, ],0.975)
+  NOfd_r45_SS_025$t_2030[i] = quantile(NOfd_r45_SS_t_2030[i, ],0.025)
+  NOfd_r45_SS_025$t_2050[i] = quantile(NOfd_r45_SS_t_2050[i, ],0.025)
+  NOfd_r45_SS_025$t_2070[i] = quantile(NOfd_r45_SS_t_2070[i, ],0.025)
+  NOfd_r45_SS_025$t_2100[i] = quantile(NOfd_r45_SS_t_2100[i, ],0.025)
+  NOfd_r45_SS_975$t_2030[i] = quantile(NOfd_r45_SS_t_2030[i, ],0.975)
+  NOfd_r45_SS_975$t_2050[i] = quantile(NOfd_r45_SS_t_2050[i, ],0.975)
+  NOfd_r45_SS_975$t_2070[i] = quantile(NOfd_r45_SS_t_2070[i, ],0.975)
+  NOfd_r45_SS_975$t_2100[i] = quantile(NOfd_r45_SS_t_2100[i, ],0.975)
+  NOfd_r85_SS_025$t_2030[i] = quantile(NOfd_r85_SS_t_2030[i, ],0.025)
+  NOfd_r85_SS_025$t_2050[i] = quantile(NOfd_r85_SS_t_2050[i, ],0.025)
+  NOfd_r85_SS_025$t_2070[i] = quantile(NOfd_r85_SS_t_2070[i, ],0.025)
+  NOfd_r85_SS_025$t_2100[i] = quantile(NOfd_r85_SS_t_2100[i, ],0.025)
+  NOfd_r85_SS_975$t_2030[i] = quantile(NOfd_r85_SS_t_2030[i, ],0.975)
+  NOfd_r85_SS_975$t_2050[i] = quantile(NOfd_r85_SS_t_2050[i, ],0.975)
+  NOfd_r85_SS_975$t_2070[i] = quantile(NOfd_r85_SS_t_2070[i, ],0.975)
+  NOfd_r85_SS_975$t_2100[i] = quantile(NOfd_r85_SS_t_2100[i, ],0.975)
+}
+# Add stationary storm surge to Wong and Keller 2017 fast dynamics $t_2030
+# bfd_r26_SS = brickfd_rcp26 + stationary_brick
+# bfd_r45_SS = brickfd_rcp45 + stationary_brick
+# bfd_r60_SS = brickfd_rcp60 + stationary_brick
+# bfd_r85_SS = brickfd_rcp85 + stationary_brick
 
 # Add stationary storm surge to Wong and Keller 2017 NO fast dynamics
-NOfd_r26_SS = NO_fdft_rcp26 + stationary_brick
-NOfd_r45_SS = NO_fdft_rcp45 + stationary_brick
-NOfd_r60_SS = NO_fdft_rcp60 + stationary_brick
-NOfd_r85_SS = NO_fdft_rcp85 + stationary_brick
+# NOfd_r26_SS = NO_fdft_rcp26 + stationary_brick
+# NOfd_r45_SS = NO_fdft_rcp45 + stationary_brick
+# NOfd_r60_SS = NO_fdft_rcp60 + stationary_brick
+# NOfd_r85_SS = NO_fdft_rcp85 + stationary_brick
 ##==============================================================================
 ## End
 ##==============================================================================
