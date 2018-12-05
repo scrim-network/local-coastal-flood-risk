@@ -469,18 +469,18 @@ NO_fdyn_26_95 = percentile_projection_row(t.time, NO_fdyn_rcp26_sub, 0.95)
 NO_fdyn_45_95 = percentile_projection_row(t.time, NO_fdyn_rcp45_sub, 0.95)
 NO_fdyn_85_95 = percentile_projection_row(t.time, NO_fdyn_rcp85_sub, 0.95)
 
-GSIC_rcp26_5 = percentile_projection_row(ice_proj, GSIC_rcp26, 0.05)
-GIS_rcp26_5 = percentile_projection_row(ice_proj, GIS_rcp26, 0.05)
-GSIC_rcp45_5 = percentile_projection_row(ice_proj, GSIC_rcp45, 0.05)
-GIS_rcp45_5 = percentile_projection_row(ice_proj, GIS_rcp45, 0.05)
-GSIC_rcp85_5 = percentile_projection_row(ice_proj, GSIC_rcp85, 0.05)
-GIS_rcp85_5 = percentile_projection_row(ice_proj, GIS_rcp85, 0.05)
-GSIC_rcp26_95 = percentile_projection_row(ice_proj, GSIC_rcp26, 0.95)
-GIS_rcp26_95 = percentile_projection_row(ice_proj, GIS_rcp26, 0.95)
-GSIC_rcp45_95 = percentile_projection_row(ice_proj, GSIC_rcp45, 0.95)
-GIS_rcp45_95 = percentile_projection_row(ice_proj, GIS_rcp45, 0.95)
-GSIC_rcp85_95 = percentile_projection_row(ice_proj, GSIC_rcp85, 0.95)
-GIS_rcp85_95 = percentile_projection_row(ice_proj, GIS_rcp85, 0.95)
+GSIC_rcp26_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp26), 0.05)
+GIS_rcp26_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp26), 0.05)
+GSIC_rcp45_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp45), 0.05)
+GIS_rcp45_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp45), 0.05)
+GSIC_rcp85_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp85), 0.05)
+GIS_rcp85_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp85), 0.05)
+GSIC_rcp26_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp26), 0.95)
+GIS_rcp26_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp26), 0.95)
+GSIC_rcp45_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp45), 0.95)
+GIS_rcp45_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp45), 0.95)
+GSIC_rcp85_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp85), 0.95)
+GIS_rcp85_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp85), 0.95)
 
 Ras18_SEW_2p5deg_5 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_2p5deg_dat), 0.05)
 Ras18_SEW_2p0deg_5 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_2p0deg_dat), 0.05)
@@ -700,25 +700,40 @@ dev.off()
 
 
 ##=========================== RETURN PERIOD PLOTS OF COMBINED STORM SURGE AND SLR ===================================
+# Median and 90% credible intervals for initial ice mass volume from the BRICK model 
+# using the gamma priors for the fast dynamics. 
+# See: https://static-content.springer.com/esm/art%3A10.1007%2Fs10584-017-2039-4/MediaObjects/10584_2017_2039_MOESM2_ESM.pdf
+median.gsic = convert_m_to_ft(0.3958)
+lower.5.gsic = convert_m_to_ft(0.3097)
+upper.95.gsic = convert_m_to_ft(0.4908)
+
+median.gis = convert_m_to_ft(7.352)
+lower.5.gis = convert_m_to_ft(7.177)
+upper.95.gis = convert_m_to_ft(7.539)
+
 pdf(file="../Figures/2018-sf01.pdf", family="Times", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
 
 par(oma=c(0,0,0,0), mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,1.5))
-plot(0, type="n",xlab="Year", ylab="Projected GSIC melt (ft SLE)", ylim=c(0,0.5), xlim=c(2010, 2193), xaxt="n")
+plot(0, type="n",xlab="Year", ylab="Projected GSIC melt (ft SLE)", ylim=c(0,1.7), xlim=c(2010, 2193), xaxt="n")
 axis(1, lwd = 1, at=seq(2010,2200, 10), label=seq(2010,2200, 10))
 polygon(y = c(GSIC_rcp85_5, rev(GSIC_rcp85_95)), x = c(ice_proj, rev(ice_proj)), col = trans_Ras18_col[1], border = NA)
 polygon(y = c(GSIC_rcp45_5, rev(GSIC_rcp45_95)), x = c(ice_proj, rev(ice_proj)), col = trans_brickfd_col[1], border = NA)
 polygon(y = c(GSIC_rcp26_5, rev(GSIC_rcp26_95)), x = c(ice_proj, rev(ice_proj)), col = trans_kopp17_DP16_col[1], border = NA)
 
-legend("topleft", legend = c("RCP85 90% CI", "RCP45 90% CI", 
-                             "RCP26 90% CI"), pch = rep(22, 3), 
-       bty='n', pt.bg = c(trans_Ras18_col[1], trans_brickfd_col[1], trans_kopp17_DP16_col[1]), 
-       pt.cex = 2)
+abline(h=c(bound.lower.gsic, bound.upper.gsic), lty=3)
 
-plot(0, type="n",xlab="Year", ylab="Projected GIS melt (ft SLE)", ylim=c(0,5.5), xlim=c(2010, 2193), xaxt="n")
+plot(0, type="n",xlab="Year", ylab="Projected GIS melt (ft SLE)", ylim=c(0,25), xlim=c(2010, 2193), xaxt="n")
 axis(1, lwd = 1, at=seq(2010,2200, 10), label=seq(2010,2200, 10))
 polygon(y = c(GIS_rcp26_5, rev(GIS_rcp26_95)), x = c(ice_proj, rev(ice_proj)), col = trans_kopp17_DP16_col[1], border = NA)
 polygon(y = c(GIS_rcp45_5, rev(GIS_rcp45_95)), x = c(ice_proj, rev(ice_proj)), col = trans_brickfd_col[1], border = NA)
 polygon(y = c(GIS_rcp85_5, rev(GIS_rcp85_95)), x = c(ice_proj, rev(ice_proj)), col = trans_Ras18_col[1], border = NA)
+
+abline(h=c(bound.lower.gis, bound.upper.gis), lty=3)
+
+legend("left", legend = c("RCP85 90% CI", "RCP45 90% CI", 
+                             "RCP26 90% CI", "Initial ice mass\nvolume 90% CI"), pch = c(rep(22, 3), NA), 
+       bty='n', pt.bg = c(trans_Ras18_col[1], trans_brickfd_col[1], trans_kopp17_DP16_col[1], NA), lty = c(NA,NA,NA,3),
+       pt.cex = 2)
 
 dev.off()
 
