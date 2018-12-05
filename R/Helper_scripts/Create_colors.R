@@ -29,7 +29,6 @@ library(RColorBrewer)
 ##=========================== CREATE COLORS ===================================
 # Transparent Color Function 
 makeTransparent<- function(someColor, alpha=100){
-  #someColor = someColor
   newColor<-col2rgb(someColor)
   apply(newColor,2 ,
         function(curcoldata)

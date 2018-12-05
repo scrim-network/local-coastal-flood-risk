@@ -182,7 +182,7 @@ single_panel_height = 4
 # -----------------------------
 
 # Plot current storm surge frequency with observations
-pdf(file="SewellsPoint_Survival.pdf", family="Times", width=text_column_width, height=single_panel_height, pointsize=11)
+pdf(file="../Figures/SewellsPoint_Survival.pdf", family="Times", width=text_column_width, height=single_panel_height, pointsize=11)
 par(mfrow=c(1,1), mgp=c(1.5,.5,0),mar=c(4, 3, 1, 2))
 plot.sf(coredata(year.res.max)/100, pch = 21, bg = "black",
         ylab = "Survival function [1 - cdf]",
@@ -203,7 +203,7 @@ legend("topright",
        inset = c(0.01, -0.01))
 dev.off()
 
-pdf(file="SewellsPoint_StormSurge.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=11)
+pdf(file="../Figures/SewellsPoint_StormSurge.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=11)
 par(mfrow=c(2,1), mgp=c(1.5,.5,0),mar=c(4, 3, 1, 2))
 plot(index(year.res.max), coredata(year.res.max)/100, pch=20, type = "b", col = "black",#, xaxs = 'i',
      ylab = "Annual block maxima (m)", xlab = "Year", lwd=1.5)

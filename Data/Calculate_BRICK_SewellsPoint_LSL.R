@@ -35,7 +35,7 @@
 # Clone the BRICK repository
 # git clone https://github.com/scrim-network/BRICK.git
 # cd BRICK
-# Make sure to snag the file: 
+# Make sure to snag the file: (Projections only to 2100)
 # https://download.scrim.psu.edu/Wong_etal_BRICK/NOLA_Wong_etal_2017/output_model/BRICK_physical_fd-gamma_08May2017.nc
 
 library(ncdf4)
@@ -51,7 +51,9 @@ use_fastdynamics <- TRUE     # Set to FALSE to get the data without fast dynamic
 
 # BRICK output file
 # Which BRICK output file would you like? (Defaults to Wong and Keller (2017)) This path is assumed relative to the BRICK home directory.
-filename.brick <- 'output_model/BRICK_physical_fd-gamma_08May2017.nc'
+# The Nov. 20th analysis is from rerunning the Wong and Keller 2017 analysis extending projections to 2200.
+# filename.brick <- 'output_model/BRICK_physical_fd-gamma_08May2017.nc'
+filename.brick <- 'output_model/BRICK_physical_fd-gamma_20Nov2018.nc'
 
 # Do a check to see if the requested file is local. If not, fetch from download server.
 # If this doesn't work, then you make need to either (1) try different method for the download.file, or (2) just navigate to 
@@ -59,10 +61,10 @@ filename.brick <- 'output_model/BRICK_physical_fd-gamma_08May2017.nc'
 files <- list.files(recursive=TRUE)
 ifile <- which(files==filename.brick)
 
-if(length(ifile)==0) {
-  download.file(paste('https://download.scrim.psu.edu/Wong_etal_BRICK/NOLA_Wong_etal_2017/',filename.brick, sep=''),
-                filename.brick, method='curl')
-}
+# if(length(ifile)==0) {
+#   download.file(paste('https://download.scrim.psu.edu/Wong_etal_BRICK/NOLA_Wong_etal_2017/',filename.brick, sep=''),
+#                 filename.brick, method='curl')
+# }
 
 # Read the results file
 # Edit here the rcps variable if you only want a particular subset of the RCP scenarios.
@@ -172,10 +174,16 @@ for (rcp in rcps) {
 
 # Write output file.
 # Set to output name based on whether the model incorporates fast dynamics.
+# if(!use_fastdynamics) {
+#   filename.output <- './output_model/BRICK_NOfastDynamics_SP_08May2017.nc'
+# } else{
+#   filename.output <- './output_model/BRICK_SewellsPoint_FastDynamics_08May2017.nc'
+# }
+
 if(!use_fastdynamics) {
-  filename.output <- './output_model/BRICK_NOfastDynamics_SP_08May2017.nc'
+  filename.output <- './output_model/BRICK_NOfastDynamics_SP_20Nov2018.nc'
 } else{
-  filename.output <- './output_model/BRICK_SewellsPoint_FastDynamics_08May2017.nc'
+  filename.output <- './output_model/BRICK_SewellsPoint_FastDynamics_20Nov2018.nc'
 }
 
 # Now create the actual file:

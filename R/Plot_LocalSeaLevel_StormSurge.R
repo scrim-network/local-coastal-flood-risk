@@ -20,7 +20,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this file.  If not, see <http://www.gnu.org/licenses/>.
 ##==============================================================================
-# setwd('/Users/klr324/Documents/Data_LSL/local-costal-flood-risk/R')
+# setwd('/Users/klr324/Documents/GitHub/local-coastal-flood-risk/R')
 
 library(ncdf4)
 library(extRemes)
@@ -29,11 +29,11 @@ library(plotrix)
 library(ash)
 library(fields)
 library(diagram)
+library(DEoptim)
 
 # Source survival function, function.
-source("Helper_scripts/plot_sf.r")
 source("Helper_scripts/plot_SLRcompare_PDF.R")
-source("Helper_scripts/plot_SLRandStormSurge_SF_scen.R")
+source("Helper_scripts/plot_SLRandStormSurge_CI.R")
 
 # Source Conversion functions.
 source("Helper_scripts/conversion_functions.R")
@@ -81,7 +81,16 @@ trans_srikrishnan_col = makeTransparent(srikrishnan_col, 150)
 trans_zervas13_col = makeTransparent(zervas13_col, 150)
 
 ##=========================== PUBLICATION FIGURE SIZES ===================================
+# Figures should be sized between:
+# 1/4 page figure = 95 mm x 115 mm (3.74016 x 4.52756 in)
+# Full page = 190 mm x 230 mm (7.48031 x 9.05512 in)
 inches_to_dpi = function(inch){ inch * 300 }
+mm_to_inches = function(mm){ mm * 0.0393701 }
+
+quart_width = mm_to_inches(95)
+quart_height = mm_to_inches(115)
+full_width = mm_to_inches(190)
+full_height = mm_to_inches(230)
 
 text_column_width   = 5.2
 minimum_width       = 2.63
@@ -181,14 +190,14 @@ fromto_split <- matrix(ncol = 3, byrow = TRUE, data = c(17, 12, 24,
                                                         88, 77, 101))
 # Create label vectors for circle and rectangle boxes
 lab_circ = c("Choice\nof sea-\nlevel\ndata",
-             "Kopp et\nal.\n(2017)",
-             "Wong\nand\nKeller\n(2017)",
-             "Rasmu-\nssen et\nal.\n(2018)",
-             "Kopp et\nal.\n(2014)",
-             "Sweet\net al.\n(2017)",
-             "Hall et\nal.\n(2016)",
-             "Parris\net al.\n(2012)",
-             "USACE\n(2011,\n2013,\n2014)")
+             "Kopp et\nal.\n[2017]",
+             "Wong\nand\nKeller\n[2017]",
+             "Rasmu-\nssen et\nal.\n[2018]",
+             "Kopp et\nal.\n[2014]",
+             "Sweet\net al.\n[2017]",
+             "Hall et\nal.\n[2016]",
+             "Parris\net al.\n[2012]",
+             "USACE\n[2011,\n2013,\n2014]")
 lab_rect = c("Accounts\nfor ice\nsheet\nfeedback\nprocesses",
              "Based on\nRCP\nscenarios",
              "Probabil-\nistic",
@@ -206,7 +215,7 @@ lab_rect = c("Accounts\nfor ice\nsheet\nfeedback\nprocesses",
              "4\nscenarios",
              "3\nscenarios")
 
-pdf(file="../Figures/Fig1.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
+pdf(file="../Figures/2018-f01.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
 par(mar = c(0, 0, 0, 0))
 openplotmat()
 
@@ -254,7 +263,7 @@ dev.off()
 
 ##=========================== SLR PDF PLOTS ===================================
 #---------------------------- 2030 -----------------------------------
-pdf(file="../Figures/Fig2.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=12)
+pdf(file="../Figures/2018-f02.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
@@ -269,8 +278,8 @@ layout(matrix(c(1,1,1,
 par(oma=c(1.5,1.5,0,0), mgp=c(1.5,.5,0), mar=c(0,2,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 
-legend("topleft", legend=c("Wong & Keller 2017 FD", "Wong & Keller 2017 no FD", "Kopp et al. 2014", "Kopp et al. 2017", "Sweet et al. 2017",
-                           "Rasmussen et al. 2018", "Parris et al. 2012", "USACE 2014", "Hall et al. 2016"),
+legend("topleft", legend=c("Wong & Keller [2017] FD", "Wong & Keller [2017] no FD", "Kopp et al. [2014]", "Kopp et al. [2017]", "Sweet et al. [2017]",
+                           "Rasmussen et al. [2018]", "Parris et al. [2012]", "USACE [2014]", "Hall et al. [2016]"),
        lty=c(1,1,1,1,NA,1,NA,NA,NA), lwd=c(2,2,2,2,NA,2,NA,NA,NA), pch=c(NA,NA,NA,NA,15,NA,19,19,19),
        pt.cex=c(NA,NA,NA,NA,2,NA,1,1,1), bty='n', ncol=3, 
        col=c(brickfd_col[1], NO_fd_col[1], kopp14_col[1], kopp17_DP16_col[1], sweet17_col[1],
@@ -460,6 +469,19 @@ NO_fdyn_26_95 = percentile_projection_row(t.time, NO_fdyn_rcp26_sub, 0.95)
 NO_fdyn_45_95 = percentile_projection_row(t.time, NO_fdyn_rcp45_sub, 0.95)
 NO_fdyn_85_95 = percentile_projection_row(t.time, NO_fdyn_rcp85_sub, 0.95)
 
+GSIC_rcp26_5 = percentile_projection_row(ice_proj, GSIC_rcp26, 0.05)
+GIS_rcp26_5 = percentile_projection_row(ice_proj, GIS_rcp26, 0.05)
+GSIC_rcp45_5 = percentile_projection_row(ice_proj, GSIC_rcp45, 0.05)
+GIS_rcp45_5 = percentile_projection_row(ice_proj, GIS_rcp45, 0.05)
+GSIC_rcp85_5 = percentile_projection_row(ice_proj, GSIC_rcp85, 0.05)
+GIS_rcp85_5 = percentile_projection_row(ice_proj, GIS_rcp85, 0.05)
+GSIC_rcp26_95 = percentile_projection_row(ice_proj, GSIC_rcp26, 0.95)
+GIS_rcp26_95 = percentile_projection_row(ice_proj, GIS_rcp26, 0.95)
+GSIC_rcp45_95 = percentile_projection_row(ice_proj, GSIC_rcp45, 0.95)
+GIS_rcp45_95 = percentile_projection_row(ice_proj, GIS_rcp45, 0.95)
+GSIC_rcp85_95 = percentile_projection_row(ice_proj, GSIC_rcp85, 0.95)
+GIS_rcp85_95 = percentile_projection_row(ice_proj, GIS_rcp85, 0.95)
+
 Ras18_SEW_2p5deg_5 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_2p5deg_dat), 0.05)
 Ras18_SEW_2p0deg_5 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_2p0deg_dat), 0.05)
 Ras18_SEW_1p5deg_5 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_1p5deg_dat), 0.05)
@@ -481,7 +503,7 @@ sweet17_20_95 = percentile_projection_col(sweet17_10[1,], sweet17_20, 0.95)
 sweet17_25_95 = percentile_projection_col(sweet17_10[1,], sweet17_25, 0.95)
 
 #   -----------------------------------------------------------------------
-pdf(file="../Figures/Fig3.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=12)
+pdf(file="../Figures/2018-f03.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
 par(oma=c(0,0,0,0), mfrow=c(3, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,1.5))
 
 # a) Sea-level rise projections
@@ -498,17 +520,17 @@ polygon(y = c(k14_85_5, rev(k14_85_95)), x = c(k14_years, rev(k14_years)), col =
 polygon(y = c(lsl_fdyn_85_5, rev(lsl_fdyn_85_95)), x = c(t.time, rev(t.time)), col = brickfd_col[1], border = "black", lty=2, lwd=2)
 polygon(y = c(NO_fdyn_85_5, rev(NO_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_NO_fd_col[3], border = NA)
 
-arrows(2103, sweet17_20_95[11]+0.3, 2103, sweet17_25_95[11]+0.5, xpd = TRUE, lwd=1.5, length = 0.05, col = sweet17_col[1])
-arrows(2103, k14_85_95[which(k14_years==2100)], 2103, k17_DP16_SEW_85_95[which(k14_years==2100)]+0.25, xpd = TRUE, lwd=1.5, 
+arrows(2102.5, sweet17_20_95[11]+0.3, 2102.5, sweet17_25_95[11]+0.5, xpd = TRUE, lwd=1.5, length = 0.05, col = sweet17_col[1])
+arrows(2102.5, k14_85_95[which(k14_years==2100)], 2102.5, k17_DP16_SEW_85_95[which(k14_years==2100)]+0.25, xpd = TRUE, lwd=1.5, 
        length = 0.05, col = kopp17_DP16_col[1])
-arrows(2104.5, NO_fdyn_85_95[which(t.time == 2100)], 2104.5, lsl_fdyn_85_95[which(t.time == 2100)], xpd = TRUE, lwd=1.5, length = 0.05, col = brickfd_col[1])
+arrows(2103, NO_fdyn_85_95[which(t.time == 2100)], 2103, lsl_fdyn_85_95[which(t.time == 2100)], xpd = TRUE, lwd=1.5, length = 0.05, col = brickfd_col[1])
 
 legend("topleft", legend = c("Incorporates ice sheet feedback proccesses", 
-                             "Wong & Keller 2017 no FD RCP85 90% CI", "Wong & Keller 2017 FD RCP85 90% CI", 
-                             #"Rasmussen et al. 2018 2.5 90% CI", 
-                             "Kopp et al. 2017 RCP85 90% CI", 
-                             "Kopp et al. 2014 RCP85 90% CI", "Sweet et al. 2017 2.5 90% CI", 
-                             "Sweet et al. 2017 2.0 90% CI"), pch = c(NA, rep(22, 7)), 
+                             "Wong & Keller [2017] no FD RCP85 90% CI", "Wong & Keller [2017] FD RCP85 90% CI", 
+                             #"Rasmussen et al. [2018] 2.5 90% CI", 
+                             "Kopp et al. [2017] RCP85 90% CI", 
+                             "Kopp et al. [2014] RCP85 90% CI", "Sweet et al. [2017] 2.5 90% CI", 
+                             "Sweet et al. [2017] 2.0 90% CI"), pch = c(NA, rep(22, 7)), 
        bty='n', pt.bg = c(NA, trans_NO_fd_col[3], brickfd_col[1], 
                           #trans_Ras18_col[3], 
                           kopp17_DP16_col[1], trans_kopp14_col[3], 
@@ -544,14 +566,13 @@ rect(project_years$parris12[1], 6.75, project_years$parris12[2], 7.25, col=parri
 rect(project_years$hall16[1], 7.75, project_years$hall16[2], 8.25, col=hall16_col[2], border=NA)
 rect(project_years$sweet17[1], 8.75, project_years$sweet17[2], 9.25, col=sweet17_col[2], border=NA)
 
-axis(2, lwd = 1, at=1:9, label=c("Kopp et al. 2014", "Kopp et al. 2017", "Wong & Keller\n2017 no FD", 
-                                 "Wong & Keller 2017 FD", "Rasmussen et al.\n2018", "USACE 2014", 
-                                 "Parris et al. 2012", "Hall et al. 2016", "Sweet et al. 2017"), las=1)
+axis(2, lwd = 1, at=1:9, label=c("Kopp et al. [2014]", "Kopp et al. [2017]", "Wong & Keller\n[2017] no FD", 
+                                 "Wong & Keller [2017] FD", "Rasmussen et al.\n[2018]", "USACE [2014]", 
+                                 "Parris et al. [2012]", "Hall et al. [2016]", "Sweet et al. [2017]"), las=1)
 
 box()
 #   -----------------------------------------------------------------------
 # c) Storm surge return period 
-# pdf(file="../Figures/Figtest.pdf", family="Times", width=text_column_width, height=single_panel_height, pointsize=12)
 par(mgp=c(1.5,.5,0), mar=c(3,3,0.5,0.5))
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
      ylim = c(2.85, 17), 
@@ -561,10 +582,6 @@ plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", x
 axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
 fig_label("c.", region="figure", pos="topleft", cex=1.5)
 
-# SF_Srikrishnan_stationary025 = plot.sf(stat_gev025, make.plot=FALSE)
-# SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
-# polygon(y = c(SF_Srikrishnan_stationary025$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
-#         x = c(1/SF_Srikrishnan_stationary025$sf, rev(1/SF_Srikrishnan_stationary975$sf)), col = trans_srikrishnan_col[5], border = NA)
 polygon(y = c(gev_stat_025, rev(gev_stat_975)), 
         x = c(1/probs[order(1/probs)], 1/probs), col = trans_srikrishnan_col[5], border = NA)
 
@@ -573,13 +590,6 @@ polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)),
 
 polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])), 
         x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_zervas13_col[2], border = NA)
-# points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19, col=obs_col)
-
-# SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
-# lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=srikrishnan_col[2], lwd=2)
-
-# SF_Srikrishnan_stationary50 = plot.sf(stat_gev50, make.plot=FALSE)
-# lines(1/SF_Srikrishnan_stationary50$sf, SF_Srikrishnan_stationary50$sf.num, col="blue", lwd=2)
 
 lines(1/probs[order(1/probs)], gev_stat_50, col=srikrishnan_col[2], lwd=2)
 lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=zervas13_col[2])
@@ -587,21 +597,14 @@ lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi12_col[2])
 points(rp_ABM, blockMax, pch = 19, col=obs_col)
 points(USACE_rp, USACE_EWL$feet[8:14], pch = 19, col=usace14_col[2])
 
-# returnperiod_l = 2017 - 1825
-# returnperiod_h = 2017 - 1806
-# 
-# points(c(returnperiod_h, returnperiod_l), rep(10, 2), pch="|", col=burntorange[1])
-# lines(c(returnperiod_h, returnperiod_l), rep(10, 2), lty=2, col=burntorange[1])
-# points(mean(c(returnperiod_h, returnperiod_l)), 10, pch=19, col=burntorange[1])
-
 points(c(rp_h, rp_l), rep(NLIH_1821, 2), pch="|", col=burntorange[1])
 lines(c(rp_h, rp_l), rep(NLIH_1821, 2), lty=2, col=burntorange[1])
 points(rp_m, NLIH_1821, pch=19, col=burntorange[1])
 
 legend("topleft", legend=c("Our model 95% CI", "Our model MLE",
-                           "Tebaldi et al. 2012 95% CI", "Tebaldi et al. 2012 MLE",
-                           "Zervas 2013 95% CI", "Zervas 2013 MLE", 
-                           "USACE 2014", "Observations", "1821 Norfolk-Long Island Hurricane"),
+                           "Tebaldi et al. [2012] 95% CI", "Tebaldi et al. [2012] MLE",
+                           "Zervas [2013] 95% CI", "Zervas [2013] MLE", 
+                           "USACE [2014]", "Observations", "1821 Norfolk-Long Island Hurricane"),
        lty=c(NA,1,NA,1,NA,1,NA,NA,NA), lwd=c(NA,2,NA,2,NA,2,NA,NA,NA), pch=c(22,NA,22,NA,22,NA,19,19,19), 
        col=c("black", srikrishnan_col[2], "black", tebaldi12_col[2], "black", zervas13_col[2], usace14_col[2], obs_col, burntorange[1]),
        bty='n', pt.bg=c(trans_srikrishnan_col[5],NA,trans_tebaldi12_col[2],NA,trans_zervas13_col[2],NA,NA,NA,NA), pt.cex = c(2,NA,2,NA,2,NA,1,1,1))
@@ -610,8 +613,7 @@ dev.off()
 #   -----------------------------------------------------------------------
 
 ##=========================== RETURN PERIOD PLOTS OF COMBINED STORM SURGE AND SLR ===================================
-# pdf(file="../Figures/Fig4.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=12)
-pdf(file="../Figures/Fig4CI.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=12)
+pdf(file="../Figures/2018-f04.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
@@ -625,89 +627,69 @@ layout(matrix(c(1,1,1,
 par(oma=c(1.5,1.5,0,0), mgp=c(1.5,.5,0), mar=c(0,3,1,1))
 plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 
-# legend("topleft", legend=c("Wong & Keller 2017 no FD","Wong & Keller 2017 FD", 
-#                            "Kopp et al. 2017", "Kopp et al. 2014", "Rasmussen et al. 2018", "Sweet et al. 2017"), ncol=2, 
-#        lty=1, lwd=2, col=c(NO_fd_col[2], brickfd_col[2], kopp17_DP16_col[2], kopp14_col[2], Ras18_col[2], sweet17_col[3]), bty='n')
-
-legend("topleft", legend=c("95% CI Wong & Keller 2017 no FD","95% CI Wong & Keller 2017 FD", 
-                           "95% CI Kopp et al. 2017", "95% CI Kopp et al. 2014", "95% CI Rasmussen et al. 2018", "95% CI Sweet et al. 2017"), ncol=2, 
+legend("topleft", legend=c("95% CI Wong & Keller [2017] no FD","95% CI Wong & Keller [2017] FD", 
+                           "95% CI Kopp et al. [2017]", "95% CI Kopp et al. [2014]", "95% CI Rasmussen et al. [2018]", "95% CI Sweet et al. [2017]"), ncol=2, 
        pch=15, pt.cex = 2, col=c(NO_fd_col[2], brickfd_col[2], kopp17_DP16_col[2], kopp14_col[2], Ras18_col[2], sweet17_col[3]), bty='n')
 
 gradient.rect(8.35,7.5,10.1,9, col=col_grad, gradient="x")
 arrows(9.95, 6.3, 10.2, 6.3, length=0.075)
 text(9.1,6.3, "Higher scenario")
 
-# gradient.rect(7.35,7.5,9.1,9, col=col_grad, gradient="x")
-# arrows(8.95, 6.3, 9.2, 6.3, length=0.075)
-# text(8.1,6.3, "Higher scenario")
-
 #   -----------------------------------------------------------------------
 # a) low scenarios
 par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
 plot_SLRandStormSurge_CI(year = 2030, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "a.")
-# plot_SLRandStormSurge_SF_scen(year = 2030, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), panel = "a.")
 
 #   -----------------------------------------------------------------------
 # b) medium scenarios
 plot_SLRandStormSurge_CI(year = 2030, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "b.")
-# plot_SLRandStormSurge_SF_scen(year = 2030, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), panel = "b.")
 
 #   -----------------------------------------------------------------------
 # c) high scenarios
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
 plot_SLRandStormSurge_CI(year = 2030, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "c.")
-# plot_SLRandStormSurge_SF_scen(year = 2030, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), panel = "c.")
 
 #---------------------------- 2050 -----------------------------------
 # d) low scenarios
 par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
 plot_SLRandStormSurge_CI(year = 2050, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "d.")
-# plot_SLRandStormSurge_SF_scen(year = 2050, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), panel = "d.")
 
 #   -----------------------------------------------------------------------
 # e) medium scenarios
 plot_SLRandStormSurge_CI(year = 2050, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "e.")
-# plot_SLRandStormSurge_SF_scen(year = 2050, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), panel = "e.")
 
 #   -----------------------------------------------------------------------
 # f) high scenarios
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
 plot_SLRandStormSurge_CI(year = 2050, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "f.")
-# plot_SLRandStormSurge_SF_scen(year = 2050, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), panel = "f.")
 
 #---------------------------- 2070 -----------------------------------
 # g) low scenarios
 par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
 plot_SLRandStormSurge_CI(year = 2070, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "g.")
-# plot_SLRandStormSurge_SF_scen(year = 2070, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), panel = "g.")
 
 #   -----------------------------------------------------------------------
 # h) medium scenarios
 plot_SLRandStormSurge_CI(year = 2070, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "h.")
-# plot_SLRandStormSurge_SF_scen(year = 2070, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), panel = "h.")
 
 #   -----------------------------------------------------------------------
 # i) high scenarios
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
 plot_SLRandStormSurge_CI(year = 2070, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "i.")
-# plot_SLRandStormSurge_SF_scen(year = 2070, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), panel = "i.")
 
 #---------------------------- 2100 -----------------------------------
 # j) low scenarios
 par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
 plot_SLRandStormSurge_CI(year = 2100, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "j.")
-# plot_SLRandStormSurge_SF_scen(year = 2100, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), panel = "j.")
 
 #   -----------------------------------------------------------------------
 # k) medium scenarios
 plot_SLRandStormSurge_CI(year = 2100, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "k.")
-# plot_SLRandStormSurge_SF_scen(year = 2100, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), panel = "k.")
 
 #   -----------------------------------------------------------------------
 # l) high scenarios
 par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
 plot_SLRandStormSurge_CI(year = 2100, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "l.")
-# plot_SLRandStormSurge_SF_scen(year = 2100, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), panel = "l.")
 
 #   -----------------------------------------------------------------------
 mtext(text="Projected sea+surge level (ft MSL)",side=2,line=0,outer=TRUE)
@@ -715,6 +697,30 @@ mtext(text="Return period (years)",side=1,line=0,outer=TRUE)
 
 dev.off()
 #   -----------------------------------------------------------------------
+
+
+##=========================== RETURN PERIOD PLOTS OF COMBINED STORM SURGE AND SLR ===================================
+pdf(file="../Figures/2018-sf01.pdf", family="Times", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+
+par(oma=c(0,0,0,0), mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,1.5))
+plot(0, type="n",xlab="Year", ylab="Projected GSIC melt (ft SLE)", ylim=c(0,0.5), xlim=c(2010, 2193), xaxt="n")
+axis(1, lwd = 1, at=seq(2010,2200, 10), label=seq(2010,2200, 10))
+polygon(y = c(GSIC_rcp85_5, rev(GSIC_rcp85_95)), x = c(ice_proj, rev(ice_proj)), col = trans_Ras18_col[1], border = NA)
+polygon(y = c(GSIC_rcp45_5, rev(GSIC_rcp45_95)), x = c(ice_proj, rev(ice_proj)), col = trans_brickfd_col[1], border = NA)
+polygon(y = c(GSIC_rcp26_5, rev(GSIC_rcp26_95)), x = c(ice_proj, rev(ice_proj)), col = trans_kopp17_DP16_col[1], border = NA)
+
+legend("topleft", legend = c("RCP85 90% CI", "RCP45 90% CI", 
+                             "RCP26 90% CI"), pch = rep(22, 3), 
+       bty='n', pt.bg = c(trans_Ras18_col[1], trans_brickfd_col[1], trans_kopp17_DP16_col[1]), 
+       pt.cex = 2)
+
+plot(0, type="n",xlab="Year", ylab="Projected GIS melt (ft SLE)", ylim=c(0,5.5), xlim=c(2010, 2193), xaxt="n")
+axis(1, lwd = 1, at=seq(2010,2200, 10), label=seq(2010,2200, 10))
+polygon(y = c(GIS_rcp26_5, rev(GIS_rcp26_95)), x = c(ice_proj, rev(ice_proj)), col = trans_kopp17_DP16_col[1], border = NA)
+polygon(y = c(GIS_rcp45_5, rev(GIS_rcp45_95)), x = c(ice_proj, rev(ice_proj)), col = trans_brickfd_col[1], border = NA)
+polygon(y = c(GIS_rcp85_5, rev(GIS_rcp85_95)), x = c(ice_proj, rev(ice_proj)), col = trans_Ras18_col[1], border = NA)
+
+dev.off()
 
 ##==============================================================================
 ## End

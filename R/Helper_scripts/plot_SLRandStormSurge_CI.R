@@ -114,22 +114,6 @@ plot_SLRandStormSurge_CI = function(  year = 2070,
     coln_year = which(colnames(NOfd_r45_SS_025) == paste("t_", year, sep=""))
     polygon(y = c(NOfd_r45_SS_025[ ,coln_year], rev(NOfd_r45_SS_975[ ,coln_year])), 
             x = c(1/probs[order(1/probs)], 1/probs), col = trans_NO_fd_col[s.col], border = NA)    
-    
-  # coln_year = which(colnames(k14_r45_SS) == paste("t_", year, sep=""))
-  # SF_k14_r45_SS = plot.sf(k14_r45_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_k14_r45_SS$sf, SF_k14_r45_SS$sf.num, col=kopp14_col[2], lwd=1.5)
-  # 
-  # coln_year = which(colnames(k17_DP16_SEW_r45_SS) == paste("t_", year, sep=""))
-  # SF_k17_DP16_SEW_r45_SS = plot.sf(k17_DP16_SEW_r45_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_k17_DP16_SEW_r45_SS$sf, SF_k17_DP16_SEW_r45_SS$sf.num, col=kopp17_DP16_col[2], lwd=1.5)
-  # 
-  # coln_year = which(colnames(bfd_r45_SS) == paste("t_", year, sep=""))
-  # SF_bfd_r45_SS = plot.sf(bfd_r45_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_bfd_r45_SS$sf, SF_bfd_r45_SS$sf.num, col=brickfd_col[2], lwd=1.5)
-  # 
-  # coln_year = which(colnames(NOfd_r45_SS) == paste("t_", year, sep=""))
-  # SF_NOfd_r45_SS = plot.sf(NOfd_r45_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_NOfd_r45_SS$sf, SF_NOfd_r45_SS$sf.num, col=NO_fd_col[2], lwd=1.5)
   
   # Similar to 4.5
     coln_year = which(colnames(Ras18_SEW_1p5deg_SS_025) == paste("t_", year, sep=""))
@@ -143,19 +127,6 @@ plot_SLRandStormSurge_CI = function(  year = 2070,
     coln_year = which(colnames(sweet17_05_SS_025) == paste("X", year, sep=""))
     polygon(y = c(sweet17_05_SS_025[ ,coln_year], rev(sweet17_05_SS_975[ ,coln_year])), 
             x = c(1/probs[order(1/probs)], 1/probs), col = trans_sweet17_col[sweet.col[1]], border = NA)
-    
-  # coln_year = which(colnames(Ras18_SEW_2p0deg_SS) == paste("t_", year, sep=""))
-  # SF_Ras18_SEW_2p0deg_SS = plot.sf(Ras18_SEW_2p0deg_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_Ras18_SEW_2p0deg_SS$sf, SF_Ras18_SEW_2p0deg_SS$sf.num, col=Ras18_col[2], lwd=1.5)
-  # 
-  # coln_year = which(colnames(sweet17_10_SS) == paste("X", year, sep=""))
-  # SF_sweet17_10_SS = plot.sf(sweet17_10_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_sweet17_10_SS$sf, SF_sweet17_10_SS$sf.num, col=sweet17_col[4], lwd=1.5)
-  # 
-  # coln_year = which(colnames(sweet17_15_SS) == paste("X", year, sep=""))
-  # rm_na = sweet17_15_SS[!is.na(sweet17_15_SS[ ,coln_year]), coln_year] # remove NAs
-  # SF_sweet17_15_SS = plot.sf(rm_na, make.plot=FALSE)
-  # lines(1/SF_sweet17_15_SS$sf, SF_sweet17_15_SS$sf.num, col=sweet17_col[3], lwd=1.5)
   
   } else if(scen=="rcp85"){
 
@@ -175,23 +146,6 @@ plot_SLRandStormSurge_CI = function(  year = 2070,
     coln_year = which(colnames(NOfd_r85_SS_025) == paste("t_", year, sep=""))
     polygon(y = c(NOfd_r85_SS_025[ ,coln_year], rev(NOfd_r85_SS_975[ ,coln_year])), 
             x = c(1/probs[order(1/probs)], 1/probs), col = trans_NO_fd_col[s.col], border = NA)    
-  #   
-  #   
-  # coln_year = which(colnames(k14_r85_SS) == paste("t_", year, sep=""))
-  # SF_k14_r85_SS = plot.sf(k14_r85_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_k14_r85_SS$sf, SF_k14_r85_SS$sf.num, col=kopp14_col[1], lwd=1.5)
-  # 
-  # coln_year = which(colnames(k17_DP16_SEW_r85_SS) == paste("t_", year, sep=""))
-  # SF_k17_DP16_SEW_r85_SS = plot.sf(k17_DP16_SEW_r85_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_k17_DP16_SEW_r85_SS$sf, SF_k17_DP16_SEW_r85_SS$sf.num, col=kopp17_DP16_col[1], lwd=1.5)
-  # 
-  # coln_year = which(colnames(bfd_r85_SS) == paste("t_", year, sep=""))
-  # SF_bfd_r85_SS = plot.sf(bfd_r85_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_bfd_r85_SS$sf, SF_bfd_r85_SS$sf.num, col=brickfd_col[1], lwd=1.5)
-  # 
-  # coln_year = which(colnames(NOfd_r85_SS) == paste("t_", year, sep=""))
-  # SF_NOfd_r85_SS = plot.sf(NOfd_r85_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_NOfd_r85_SS$sf, SF_NOfd_r85_SS$sf.num, col=NO_fd_col[1], lwd=1.5)  
   
   # Similar to 8.5
     coln_year = which(colnames(Ras18_SEW_2p5deg_SS_025) == paste("t_", year, sep=""))
@@ -205,20 +159,6 @@ plot_SLRandStormSurge_CI = function(  year = 2070,
     coln_year = which(colnames(sweet17_05_SS_025) == paste("X", year, sep=""))
     polygon(y = c(sweet17_25_SS_025[ ,coln_year], rev(sweet17_25_SS_975[ ,coln_year])), 
             x = c(1/probs[order(1/probs)], 1/probs), col = trans_sweet17_col[sweet.col[1]], border = NA)
-    
-  # coln_year = which(colnames(Ras18_SEW_2p5deg_SS) == paste("t_", year, sep=""))
-  # SF_Ras18_SEW_2p5deg_SS = plot.sf(Ras18_SEW_2p5deg_SS[ ,coln_year], make.plot=FALSE)
-  # lines(1/SF_Ras18_SEW_2p5deg_SS$sf, SF_Ras18_SEW_2p5deg_SS$sf.num, col=Ras18_col[1], lwd=1.5)
-  # 
-  # coln_year = which(colnames(sweet17_20_SS) == paste("X", year, sep=""))
-  # rm_na = sweet17_20_SS[!is.na(sweet17_20_SS[ ,coln_year]), coln_year] # remove NAs
-  # SF_sweet17_20_SS = plot.sf(rm_na, make.plot=FALSE)
-  # lines(1/SF_sweet17_20_SS$sf, SF_sweet17_20_SS$sf.num, col=sweet17_col[2], lwd=1.5)
-  # 
-  # coln_year = which(colnames(sweet17_25_SS) == paste("X", year, sep=""))
-  # rm_na = sweet17_25_SS[!is.na(sweet17_25_SS[ ,coln_year]), coln_year] # remove NAs
-  # SF_sweet17_25_SS = plot.sf(rm_na, make.plot=FALSE)
-  # lines(1/SF_sweet17_25_SS$sf, SF_sweet17_25_SS$sf.num, col=sweet17_col[1], lwd=1.5)
   
   } else {
     stop("Unknown scenario")
