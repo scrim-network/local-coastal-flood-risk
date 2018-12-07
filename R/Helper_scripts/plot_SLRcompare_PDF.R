@@ -68,7 +68,7 @@ plot_SLRcompare_PDF = function(  year = 2070,
   }
   xl = c(-0.5,15)
   # Create a density plot  
-  plot(density(c(1,1)), type = "n", xlab= as.character(year), ylab="", cex.lab=1.25,
+  plot(density(c(1,1)), type = "n", xlab= as.character(year), ylab="", cex.lab=1,
        yaxt="n", main="", xlim=xl, ylim=yl, bty="l")
   title(main=panel, adj=0)
 
@@ -96,7 +96,6 @@ plot_SLRcompare_PDF = function(  year = 2070,
   # Plot the Sweet et al. 2017 as multiple polygons to resemble box and wisker like plots
   var = paste('sweet17_', sweet.scen[1], sep="")
   coln_year = which(colnames(get(var)) == paste("X", year, sep=""))
-  #lines(density(get(var)[ ,coln_year], na.rm=TRUE), col=sweet17_col[sweet.col[1]], lwd=2)
   # add the lighter 5-95% range polygon
   polygon(x = c(quantile(get(var)[ ,coln_year], 0.05, na.rm=TRUE), 
                 quantile(get(var)[ ,coln_year], 0.05, na.rm=TRUE),
@@ -114,7 +113,6 @@ plot_SLRcompare_PDF = function(  year = 2070,
 
   var = paste('sweet17_', sweet.scen[2], sep="")
   coln_year = which(colnames(get(var)) == paste("X", year, sep=""))
-  #lines(density(get(var)[ ,coln_year], na.rm=TRUE), col=sweet17_col[sweet.col[2]], lwd=2)
   # add the lighter 5-95% range polygon
   polygon(x = c(quantile(get(var)[ ,coln_year], 0.05, na.rm=TRUE), 
                 quantile(get(var)[ ,coln_year], 0.05, na.rm=TRUE),

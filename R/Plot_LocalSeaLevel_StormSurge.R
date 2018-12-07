@@ -20,7 +20,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this file.  If not, see <http://www.gnu.org/licenses/>.
 ##==============================================================================
-# setwd('/Users/klr324/Documents/Data_LSL')
+# setwd('/Users/klr324/Documents/GitHub/local-coastal-flood-risk/R')
 
 library(ncdf4)
 library(extRemes)
@@ -28,9 +28,12 @@ library(RColorBrewer)
 library(plotrix)
 library(ash)
 library(fields)
+library(diagram)
+library(DEoptim)
 
 # Source survival function, function.
-source("Helper_scripts/plot_sf.r")
+source("Helper_scripts/plot_SLRcompare_PDF.R")
+source("Helper_scripts/plot_SLRandStormSurge_CI.R")
 
 # Source Conversion functions.
 source("Helper_scripts/conversion_functions.R")
@@ -39,43 +42,6 @@ source("Helper_scripts/conversion_functions.R")
 source("ReadAnalysis_LocalSeaLevel_StormSurge.R")
 
 ##=========================== CREATE COLORS ===================================
-# # Transparent Color Function 
-# makeTransparent<- function(someColor, alpha=100){
-#   #someColor = someColor
-#   newColor<-col2rgb(someColor)
-#   apply(newColor,2 ,
-#         function(curcoldata)
-#         {rgb(red=curcoldata[1],
-#              green=curcoldata[2],
-#              blue=curcoldata[3], alpha=alpha,
-#              maxColorValue=255)})
-# }
-# # Create sequence with black and white function.
-# seq_color = function(num, maincol){
-#   col_fun <- colorRampPalette(c("white", maincol, "black"))
-#   col_fun(num)
-# }
-# 
-# RdGy = brewer.pal(11, "RdGy")
-# BrBG = brewer.pal(11, "BrBG")
-# RdBu = brewer.pal(11, "RdBu")
-# PRGn = brewer.pal(11, "PRGn")
-# PiYG = brewer.pal(11, "PiYG")
-# Greens = brewer.pal(9, "Greens")
-# tebaldi_gold = c("#f0cf0c", "#fcf5ce")
-# 
-# sweet_cols = seq_color(9, PiYG[1:5])
-# col_grad = seq_color(150, RdGy[7:11])
-# 
-# trans_RdGy = makeTransparent(RdGy, 100)
-# trans_BrBG = makeTransparent(BrBG, 100)
-# trans_RdBu = makeTransparent(RdBu, 100)
-# trans_PRGn = makeTransparent(PRGn, 100)
-# trans_PiYG = makeTransparent(PiYG, 100)
-# trans_Greens = makeTransparent(Greens, 100)
-# trans_sweet_cols = makeTransparent(sweet_cols, 100)
-# trans_tebaldi_gold = makeTransparent(tebaldi_gold, 200)
-
 source("Helper_scripts/Create_colors.R")
 
 kopp14_col = skyblue
@@ -94,6 +60,10 @@ srikrishnan_col = greys
 zervas13_col = paleyellow
 obs_col = "black"
 
+# Flow chart colors
+Lmoss_green = "#C5E0B4" 
+pale_yellow = "#FFF2CC"
+
 # Transparent colors with transparent color function
 trans_kopp14_col = makeTransparent(kopp14_col, 150)
 trans_kopp17_DP16_col = makeTransparent(kopp17_DP16_col, 150)
@@ -111,7 +81,16 @@ trans_srikrishnan_col = makeTransparent(srikrishnan_col, 150)
 trans_zervas13_col = makeTransparent(zervas13_col, 150)
 
 ##=========================== PUBLICATION FIGURE SIZES ===================================
+# Figures should be sized between:
+# 1/4 page figure = 95 mm x 115 mm (3.74016 x 4.52756 in)
+# Full page = 190 mm x 230 mm (7.48031 x 9.05512 in)
 inches_to_dpi = function(inch){ inch * 300 }
+mm_to_inches = function(mm){ mm * 0.0393701 }
+
+quart_width = mm_to_inches(95)
+quart_height = mm_to_inches(115)
+full_width = mm_to_inches(190)
+full_height = mm_to_inches(230)
 
 text_column_width   = 5.2
 minimum_width       = 2.63
@@ -119,946 +98,646 @@ full_page_width     = 7.5
 full_page_height    = 8.75
 single_panel_height = 4
 
-##=========================== SLR / STORM SURGE / COMBINED PLOTS ===================================
-#---------------------------- 2030 -----------------------------------
-pdf(file="../Figures/SLR_2030a.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=14)
-# layout(matrix(c(1,1,1,
-#                 2,3,4,
-#                 2,3,4,
-#                 2,3,4), 4, 3, byrow = TRUE))
-layout(matrix(c(1,1,1,
-                2,3,4,
-                2,3,4), 3, 3, byrow = TRUE))
-# Add legend
-par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
-plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
-legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
-                           "Wong & Keller\n2017 no FD", "Tebaldi et al. 2012\nexpected value", "Sweet et al. 2017", 
-                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
-                           "Zervas 2013\n 95% CI", "Observations"),
-       lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
-       col=c(brickfd_col[2], kopp14_col[2], NO_fd_col[2], tebaldi12_col[2], sweet17_col[2], parris12_col[2], "black", usace14_col[2], "black", zervas13_col[2], hall16_col[3], srikrishnan_col[2], "black", obs_col),
-       bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,trans_tebaldi12_col[2],NA,trans_srikrishnan_col[5],NA,NA,NA, trans_zervas13_col[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
-gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
-arrows(8.75, 1.5, 9, 1.5, length=0.075)
-text(8,1.5, "Higher scenario")
+##=========================== FIGURE LABELING ===================================
+# https://www.r-bloggers.com/adding-figure-labels-a-b-c-in-the-top-left-corner-of-the-plotting-region/
+fig_label <- function(text, region="figure", pos="topleft", cex=NULL, ...) {
+  
+  region <- match.arg(region, c("figure", "plot", "device"))
+  pos <- match.arg(pos, c("topleft", "top", "topright", 
+                          "left", "center", "right", 
+                          "bottomleft", "bottom", "bottomright"))
+  
+  if(region %in% c("figure", "device")) {
+    ds <- dev.size("in")
+    # xy coordinates of device corners in user coordinates
+    x <- grconvertX(c(0, ds[1]), from="in", to="user")
+    y <- grconvertY(c(0, ds[2]), from="in", to="user")
+    
+    # fragment of the device we use to plot
+    if(region == "figure") {
+      # account for the fragment of the device that 
+      # the figure is using
+      fig <- par("fig")
+      dx <- (x[2] - x[1])
+      dy <- (y[2] - y[1])
+      x <- x[1] + dx * fig[1:2]
+      y <- y[1] + dy * fig[3:4]
+    } 
+  }
+  
+  # much simpler if in plotting region
+  if(region == "plot") {
+    u <- par("usr")
+    x <- u[1:2]
+    y <- u[3:4]
+  }
+  
+  sw <- strwidth(text, cex=cex) * 60/100
+  sh <- strheight(text, cex=cex) * 60/100
+  
+  x1 <- switch(pos,
+               topleft     =x[1] + sw, 
+               left        =x[1] + sw,
+               bottomleft  =x[1] + sw,
+               top         =(x[1] + x[2])/2,
+               center      =(x[1] + x[2])/2,
+               bottom      =(x[1] + x[2])/2,
+               topright    =x[2] - sw,
+               right       =x[2] - sw,
+               bottomright =x[2] - sw)
+  
+  y1 <- switch(pos,
+               topleft     =y[2] - sh,
+               top         =y[2] - sh,
+               topright    =y[2] - sh,
+               left        =(y[1] + y[2])/2,
+               center      =(y[1] + y[2])/2,
+               right       =(y[1] + y[2])/2,
+               bottomleft  =y[1] + sh,
+               bottom      =y[1] + sh,
+               bottomright =y[1] + sh)
+  
+  old.par <- par(xpd=NA)
+  on.exit(par(old.par))
+  
+  text(x1, y1, text, cex=cex, ...)
+  return(invisible(c(x,y)))
+}
 
-#   -----------------------------------------------------------------------
-# a) Sea-level rise probability density function
-par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
-plot(density(kopp14_rcp85$t_2030), xlab="Projected sea level in 2030 (ft)", ylab="Probability density", yaxt="n", 
-     main="",col=kopp14_col[1], lwd=2, xlim=c(-0.3,2), ylim = c(0, 6.75), bty="l")
-title(main="a.", adj=0)
-# lines(density(kopp14_rcp60$t_2030), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45$t_2030), col=kopp14_col[2], lwd=2)
-lines(density(kopp14_rcp26$t_2030), col=kopp14_col[3], lwd=2)
+##=========================== FLOW DIAGRAM ===================================
+# Designate coordinates for box midpoints
+elpos  <- coordinates (rep(6,18))
 
-lines(density(kopp17_DP16_SEW_rcp85$t_2030), col=kopp17_DP16_col[1], lwd=2)
-# lines(density(kopp17_DP16_SEW_rcp60$t_2030), col=Greens[6], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp45$t_2030), col=kopp17_DP16_col[2], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp26$t_2030), col=kopp17_DP16_col[3], lwd=2)
+# Create matrix for straight arrows
+fromto_straight <- matrix(ncol = 2, byrow = TRUE, data = c(16, 17, 
+                                                           26, 27, 
+                                                           35, 36, 
+                                                           47, 48, 
+                                                           63, 64,
+                                                           64, 65, 
+                                                           65, 66,
+                                                           77, 78, 
+                                                           87, 88,
+                                                           88, 89,
+                                                           89, 90,
+                                                           101, 102))
+# Create matrix for arrows that split
+fromto_split <- matrix(ncol = 3, byrow = TRUE, data = c(17, 12, 24, 
+                                                        27, 16, 40,
+                                                        40, 35, 47,
+                                                        49, 26, 74,
+                                                        74, 63, 87, 
+                                                        88, 77, 101))
+# Create label vectors for circle and rectangle boxes
+lab_circ = c("Choice\nof sea-\nlevel\ndata",
+             "Kopp et\nal.\n[2017]",
+             "Wong\nand\nKeller\n[2017]",
+             "Rasmu-\nssen et\nal.\n[2018]",
+             "Kopp et\nal.\n[2014]",
+             "Sweet\net al.\n[2017]",
+             "Hall et\nal.\n[2016]",
+             "Parris\net al.\n[2012]",
+             "USACE\n[2011,\n2013,\n2014]")
+lab_rect = c("Accounts\nfor ice\nsheet\nfeedback\nprocesses",
+             "Based on\nRCP\nscenarios",
+             "Probabil-\nistic",
+             "Projected\nindividual\ncomp-\nonents",
+             "Based on\nstabilizat-\nion target\nscenarios",
+             "Neglects\nice sheet\nfeedback\nprocesses",
+             "Based on\nRCP\nscenarios",
+             "Late 20th-\n21st\ncentury\nhistorical\nlinear\ntrend",
+             "Accounts\nfor ice\nsheet\nfeedback\nprocesses",
+             "6\nscenarios",
+             "Plausible\nrange",
+             "5\nscenarios",
+             "20th\ncentury\nhistorical\nlinear\ntrend",
+             "Neglects\nice sheet\nfeedback\nprocesses",
+             "4\nscenarios",
+             "3\nscenarios")
 
-lines(density(brickfd_rcp85$t_2030), col=brickfd_col[1], lwd=2)
-# lines(density(brickfd_rcp60$t_2030), col=RdBu[10], lwd=2)
-lines(density(brickfd_rcp45$t_2030), col=brickfd_col[2], lwd=2)
-lines(density(brickfd_rcp26$t_2030), col=brickfd_col[3], lwd=2)
+pdf(file="../Figures/2018-f01.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
+par(mar = c(0, 0, 0, 0))
+openplotmat()
 
-lines(density(NO_fdft_rcp85$t_2030), col=NO_fd_col[1], lwd=2)
-# lines(density(NO_fdft_rcp60$t_2030), col=PRGn[3], lwd=2)
-lines(density(NO_fdft_rcp45$t_2030), col=NO_fd_col[2], lwd=2)
-lines(density(NO_fdft_rcp26$t_2030), col=NO_fd_col[3], lwd=2)
-
-lines(density(Ras18_SEW_2p5deg$t_2030), col=Ras18_col[1], lwd=2)
-lines(density(Ras18_SEW_2p0deg$t_2030), col=Ras18_col[2], lwd=2)
-lines(density(Ras18_SEW_1p5deg$t_2030), col=Ras18_col[3], lwd=2)
-
-lines(density(sweet17_03$X2030), col=sweet17_col[6], lwd=2)
-lines(density(sweet17_05$X2030), col=sweet17_col[5], lwd=2)
-lines(density(sweet17_10$X2030), col=sweet17_col[4], lwd=2)
-lines(density(sweet17_15$X2030, na.rm=TRUE), col=sweet17_col[3], lwd=2)
-lines(density(sweet17_20$X2030, na.rm=TRUE), col=sweet17_col[2], lwd=2)
-lines(density(sweet17_25$X2030, na.rm=TRUE), col=sweet17_col[1], lwd=2)
-
-lines(parris_etal_2012$t_2030, rep(6.5, 4), col=parris12_col[4:1], lwd=1.5, lty=3)
-lines(usace2014$t_2030, rep(6, 3), col=usace14_col[3:1], lwd=1.5, lty=3)
-lines(hall_etal_2016$t_2030, rep(5.5, 5), col=hall16_col[5:1], lwd=1.5, lty=3)
-lines(sweet2017$t_2030, rep(5, length(sweet2017$t_2030)), col=sweet17_col[6:1], lwd=1.5, lty=3)
-
-points(parris_etal_2012$t_2030, rep(6.5, 4), col=parris12_col[4:1], pch=19)
-points(usace2014$t_2030, rep(6, 3), col=usace14_col[3:1], pch=19)
-points(hall_etal_2016$t_2030, rep(5.5, 5), col=hall16_col[5:1], pch=19)
-points(sweet2017$t_2030, rep(5, length(sweet2017$t_2030)), col=sweet17_col[6:1], pch=19)
-
-#   -----------------------------------------------------------------------
-# b) Storm surge return period 
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
-     ylim = c(2.85, 18), 
-     xaxt = 'n', cex=1, bty="l",
-     xlab = "Return period (years)", 
-     ylab = "Storm surge (ft MSL)")
-title(main="b.", adj=0)
-axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
-
-SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
-SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
-polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
-        x = c(1/SF_Srikrishnan_stationary25$sf, rev(1/SF_Srikrishnan_stationary975$sf)), col = trans_srikrishnan_col[5], border = NA)
-
-polygon(y = c(Ras18_CBBT_SS_q025$height, rev(Ras18_CBBT_SS_q975$height)), 
-        x = c(1/Ras18_CBBT_SS_q025$freq, rev(1/Ras18_CBBT_SS_q975$freq)), col = trans_Ras18_col[2], border = NA)
-
-polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
-        x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi12_col[2], border = NA)
-
-polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])), 
-        x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_zervas13_col[2], border = NA)
-points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19, col=obs_col)
-
-SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
-lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=srikrishnan_col[2], lwd=2)
-
-lines(1/Ras18_CBBT_SS_q50$freq, Ras18_CBBT_SS_q50$height, lwd=2, col=Ras18_col[2])
-lines(1/Ras18_CBBT_SS_parun$freq, Ras18_CBBT_SS_parun$height, lwd=2, col=Ras18_col[1])
-
-lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=zervas13_col[2])
-lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi12_col[2])
-points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=usace14_col[2])
-
-#   -----------------------------------------------------------------------
-# c) Combined sea level and storm surge return period 
-par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
-     ylim = c(2.85, 18), 
-     xaxt = 'n', cex=1, bty="l",
-     xlab = "Return period (years)", 
-     ylab = "Projected sea+surge level (ft MSL)")
-title(main="c.", adj=0)
-axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
-
-SF_k14_r85_2030_SS = plot.sf(k14_r85_SS$t_2030, make.plot=FALSE)
-# SF_k14_r60_2030_SS = plot.sf(k14_r60_SS$t_2030, make.plot=FALSE)
-SF_k14_r45_2030_SS = plot.sf(k14_r45_SS$t_2030, make.plot=FALSE)
-SF_k14_r26_2030_SS = plot.sf(k14_r26_SS$t_2030, make.plot=FALSE)
-lines(1/SF_k14_r85_2030_SS$sf, SF_k14_r85_2030_SS$sf.num, col=kopp14_col[1], lwd=1.5)
-# lines(1/SF_k14_r60_2030_SS$sf, SF_k14_r60_2030_SS$sf.num, col=RdGy[2], lwd=1.5)
-lines(1/SF_k14_r45_2030_SS$sf, SF_k14_r45_2030_SS$sf.num, col=kopp14_col[2], lwd=1.5)
-lines(1/SF_k14_r26_2030_SS$sf, SF_k14_r26_2030_SS$sf.num, col=kopp14_col[3], lwd=1.5)
-
-SF_k17_DP16_SEW_r85_2030_SS = plot.sf(k17_DP16_SEW_r85_SS$t_2030, make.plot=FALSE)
-# SF_k17_DP16_SEW_r60_2030_SS = plot.sf(k17_DP16_SEW_r60_SS$t_2030, make.plot=FALSE)
-SF_k17_DP16_SEW_r45_2030_SS = plot.sf(k17_DP16_SEW_r45_SS$t_2030, make.plot=FALSE)
-SF_k17_DP16_SEW_r26_2030_SS = plot.sf(k17_DP16_SEW_r26_SS$t_2030, make.plot=FALSE)
-lines(1/SF_k17_DP16_SEW_r85_2030_SS$sf, SF_k17_DP16_SEW_r85_2030_SS$sf.num, col=kopp17_DP16_col[1], lwd=1.5)
-# lines(1/SF_k17_DP16_SEW_r60_2030_SS$sf, SF_k17_DP16_SEW_r60_2030_SS$sf.num, col=Greens[6], lwd=1.5)
-lines(1/SF_k17_DP16_SEW_r45_2030_SS$sf, SF_k17_DP16_SEW_r45_2030_SS$sf.num, col=kopp17_DP16_col[2], lwd=1.5)
-lines(1/SF_k17_DP16_SEW_r26_2030_SS$sf, SF_k17_DP16_SEW_r26_2030_SS$sf.num, col=kopp17_DP16_col[3], lwd=1.5)
-
-SF_bfd_r85_2030_SS = plot.sf(bfd_r85_SS$t_2030, make.plot=FALSE)
-# SF_bfd_r60_2030_SS = plot.sf(bfd_r60_SS$t_2030, make.plot=FALSE)
-SF_bfd_r45_2030_SS = plot.sf(bfd_r45_SS$t_2030, make.plot=FALSE)
-SF_bfd_r26_2030_SS = plot.sf(bfd_r26_SS$t_2030, make.plot=FALSE)
-lines(1/SF_bfd_r85_2030_SS$sf, SF_bfd_r85_2030_SS$sf.num, col=brickfd_col[1], lwd=1.5)
-# lines(1/SF_bfd_r60_2030_SS$sf, SF_bfd_r60_2030_SS$sf.num, col=RdBu[10], lwd=1.5)
-lines(1/SF_bfd_r45_2030_SS$sf, SF_bfd_r45_2030_SS$sf.num, col=brickfd_col[2], lwd=1.5)
-lines(1/SF_bfd_r26_2030_SS$sf, SF_bfd_r26_2030_SS$sf.num, col=brickfd_col[3], lwd=1.5)
-
-SF_NOfd_r85_2030_SS = plot.sf(NOfd_r85_SS$t_2030, make.plot=FALSE)
-# SF_NOfd_r60_2030_SS = plot.sf(NOfd_r60_SS$t_2030, make.plot=FALSE)
-SF_NOfd_r45_2030_SS = plot.sf(NOfd_r45_SS$t_2030, make.plot=FALSE)
-SF_NOfd_r26_2030_SS = plot.sf(NOfd_r26_SS$t_2030, make.plot=FALSE)
-lines(1/SF_NOfd_r85_2030_SS$sf, SF_NOfd_r85_2030_SS$sf.num, col=NO_fd_col[1], lwd=1.5)
-# lines(1/SF_NOfd_r60_2030_SS$sf, SF_NOfd_r60_2030_SS$sf.num, col=PRGn[3], lwd=1.5)
-lines(1/SF_NOfd_r45_2030_SS$sf, SF_NOfd_r45_2030_SS$sf.num, col=NO_fd_col[2], lwd=1.5)
-lines(1/SF_NOfd_r26_2030_SS$sf, SF_NOfd_r26_2030_SS$sf.num, col=NO_fd_col[3], lwd=1.5)
+# Plot arrows
+for(i in 1:nrow(fromto_straight)){
+  straightarrow(to = elpos[fromto_straight[i, 2], ],
+                from = elpos[fromto_straight[i, 1], ], lwd = 1, arr.type="triangle", arr.length = 0.2)
+}
+splitarrow(from = elpos[fromto_split[1, 1], ], to = elpos[fromto_split[1, 2:3], ], lwd = 1, arr.type="triangle", arr.length = 0.2, arr.pos = 0.3)
+splitarrow(from = elpos[fromto_split[2, 1], ], to = elpos[fromto_split[2, 2:3], ], lwd = 1, arr.type="triangle", arr.length = 0.2, arr.pos = 0.45)
+splitarrow(from = elpos[fromto_split[3, 1], ], to = elpos[fromto_split[3, 2:3], ], lwd = 1, arr.type="triangle", arr.length = 0.2, arr.pos = 0.15)
+splitarrow(from = elpos[fromto_split[4, 1], ], to = elpos[fromto_split[4, 2:3], ], lwd = 1, arr.type="triangle", arr.length = 0.2, arr.pos = 0.775)
+splitarrow(from = elpos[fromto_split[5, 1], ], to = elpos[fromto_split[5, 2:3], ], lwd = 1, arr.type="triangle", arr.length = 0.2, arr.pos = 0.35)
+splitarrow(from = elpos[fromto_split[6, 1], ], to = elpos[fromto_split[6, 2:3], ], lwd = 1, arr.type="triangle", arr.length = 0.2, arr.pos = 0.575)
+                      
+# Add boxes to diagram plot
+textellipse(elpos[49,], 0.075, 0.05, lab = lab_circ[1], box.col = Lmoss_green, shadow.col = NA)
+textellipse(elpos[12,], 0.075, 0.05, lab = lab_circ[2], box.col = pale_yellow, shadow.col = NA)
+textellipse(elpos[24,], 0.075, 0.05, lab = lab_circ[3], box.col = pale_yellow, shadow.col = NA)
+textellipse(elpos[36,], 0.075, 0.05, lab = lab_circ[4], box.col = pale_yellow, shadow.col = NA)
+textellipse(elpos[48,], 0.075, 0.05, lab = lab_circ[5], box.col = pale_yellow, shadow.col = NA)
+textellipse(elpos[66,], 0.075, 0.05, lab = lab_circ[6], box.col = pale_yellow, shadow.col = NA)
+textellipse(elpos[78,], 0.075, 0.05, lab = lab_circ[7], box.col = pale_yellow, shadow.col = NA)
+textellipse(elpos[90,], 0.075, 0.05, lab = lab_circ[8], box.col = pale_yellow, shadow.col = NA)
+textellipse(elpos[102,], 0.075, 0.05, lab = lab_circ[9], box.col = pale_yellow, shadow.col = NA)
+textrect(elpos[16,], 0.065, 0.055, lab = lab_rect[1], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
+textrect(elpos[17,], 0.065, 0.045, lab = lab_rect[2], box.col = Lmoss_green, shadow.col = NA, lcol=Lmoss_green)
+textrect(elpos[26,], 0.065, 0.042, lab = lab_rect[3], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
+textrect(elpos[27,], 0.065, 0.05, lab = lab_rect[4], box.col = Lmoss_green, shadow.col = NA, lcol=Lmoss_green)
+textrect(elpos[35,], 0.065, 0.055, lab = lab_rect[5], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
+textrect(elpos[40,], 0.065, 0.05, lab = lab_rect[6], box.col = Lmoss_green, shadow.col = NA, lcol=Lmoss_green)
+textrect(elpos[47,], 0.065, 0.045, lab = lab_rect[7], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
+textrect(elpos[63,], 0.065, 0.065, lab = lab_rect[8], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
+textrect(elpos[64,], 0.065, 0.065, lab = lab_rect[9], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
+textrect(elpos[65,], 0.065, 0.04, lab = lab_rect[10], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
+textrect(elpos[74,], 0.065, 0.04, lab = lab_rect[11], box.col = Lmoss_green, shadow.col = NA, lcol=Lmoss_green)
+textrect(elpos[77,], 0.065, 0.04, lab = lab_rect[12], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
+textrect(elpos[87,], 0.065, 0.065, lab = lab_rect[13], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
+textrect(elpos[88,], 0.065, 0.05, lab = lab_rect[14], box.col = Lmoss_green, shadow.col = NA, lcol=Lmoss_green)
+textrect(elpos[89,], 0.065, 0.04, lab = lab_rect[15], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
+textrect(elpos[101,], 0.065, 0.04, lab = lab_rect[16], box.col = pale_yellow, shadow.col = NA, lcol=pale_yellow)
 
 dev.off()
+#   -----------------------------------------------------------------------
+
+##=========================== SLR PDF PLOTS ===================================
+#---------------------------- 2030 -----------------------------------
+pdf(file="../Figures/2018-f02.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
+layout(matrix(c(1,1,1,
+                2,3,4,
+                2,3,4,
+                5,6,7,
+                5,6,7,
+                8,9,10,
+                8,9,10,
+                11,12,13,
+                11,12,13), 9, 3, byrow = TRUE))
+
+# Add legend
+par(oma=c(1.5,1.5,0,0), mgp=c(1.5,.5,0), mar=c(0,2,1,1))
+plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
+
+legend("topleft", legend=c("Wong & Keller [2017] FD", "Wong & Keller [2017] no FD", "Kopp et al. [2014]", "Kopp et al. [2017]", "Sweet et al. [2017]",
+                           "Rasmussen et al. [2018]", "Parris et al. [2012]", "USACE [2014]", "Hall et al. [2016]"),
+       lty=c(1,1,1,1,NA,1,NA,NA,NA), lwd=c(2,2,2,2,NA,2,NA,NA,NA), pch=c(NA,NA,NA,NA,15,NA,19,19,19),
+       pt.cex=c(NA,NA,NA,NA,2,NA,1,1,1), bty='n', ncol=3, 
+       col=c(brickfd_col[1], NO_fd_col[1], kopp14_col[1], kopp17_DP16_col[1], sweet17_col[1],
+             Ras18_col[1], parris12_col[2], usace14_col[1], hall16_col[1]))
+
+gradient.rect(7.35,1.5,9.1,3, col=col_grad, gradient="x")
+arrows(8.95, 0.3, 9.2, 0.3, length=0.075)
+text(8.1,0.3, "Higher scenario")
+
+#   -----------------------------------------------------------------------
+# a) Sea-level rise probability density function low scenarios
+par(mgp=c(1.5,.5,0), mar=c(3.5,1.5,1,0.5))
+plot_SLRcompare_PDF(year = 2030, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), panel = "a.")
+
+points(parris_etal_2012$t_2030[1], 6.5, col=parris12_col[4], pch=19)
+points(usace2014$t_2030[1], 6, col=usace14_col[1], pch=19)
+points(hall_etal_2016$t_2030[1], 5.5, col=hall16_col[5], pch=19)
+
+#   -----------------------------------------------------------------------
+# b) Sea-level rise probability density function medium scenarios
+plot_SLRcompare_PDF(year = 2030, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), panel = "b.")
+
+lines(hall_etal_2016$t_2030[2:3], rep(5.5, 2), col=hall16_col[4:3], lwd=1.5, lty=3)
+
+points(parris_etal_2012$t_2030[2], 6.5, col=parris12_col[4], pch=19)
+points(usace2014$t_2030[2], 6, col=usace14_col[2], pch=19)
+points(hall_etal_2016$t_2030[2:3], rep(5.5, 2), col=hall16_col[4:3], pch=19)
+
+#   -----------------------------------------------------------------------
+# c) Sea-level rise probability density function high scenarios
+par(mgp=c(1.5,0.5,0), mar=c(3.5,1.5,1,1))
+plot_SLRcompare_PDF(year = 2030, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), panel = "c.")
+
+lines(parris_etal_2012$t_2030[3:4], rep(6.5, 2), col=parris12_col[2:1], lwd=1.5, lty=3)
+lines(hall_etal_2016$t_2030[4:5], rep(5.5, 2), col=hall16_col[2:1], lwd=1.5, lty=3)
+
+points(parris_etal_2012$t_2030[3:4], rep(6.5, 2), col=parris12_col[2:1], pch=19)
+points(usace2014$t_2030[3], 6, col=usace14_col[1], pch=19)
+points(hall_etal_2016$t_2030[4:5], rep(5.5, 2), col=hall16_col[2:1], pch=19)
 
 #---------------------------- 2050 -----------------------------------
-pdf(file="../Figures/SLR_2050a.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=14)
-layout(matrix(c(1,1,1,
-                2,3,4,
-                2,3,4), 3, 3, byrow = TRUE))
-# Add legend
-par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
-plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
-legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
-                           "Wong & Keller\n2017 no FD", "Tebaldi et al. 2012\nexpected value", "Sweet et al. 2017", 
-                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
-                           "Zervas 2013\n 95% CI", "Observations"),
-       lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
-       col=c(RdBu[9], sunyellow[2], PRGn[3], tebaldi_gold[1], sweet_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
-       bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
-gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
-arrows(8.75, 1.5, 9, 1.5, length=0.075)
-text(8,1.5, "Higher scenario")
+# d) Sea-level rise probability density function low scenarios
+par(mgp=c(1.5,.5,0), mar=c(3.5,1.5,1,0.5))
+plot_SLRcompare_PDF(year = 2050, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), panel = "d.")
+
+points(parris_etal_2012$t_2050[1], 3.25, col=parris12_col[4], pch=19)
+points(usace2014$t_2050[1], 3, col=usace14_col[1], pch=19)
+points(hall_etal_2016$t_2050[1], 2.75, col=hall16_col[5], pch=19)
 
 #   -----------------------------------------------------------------------
-# a) Sea-level rise probability density function
-par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
-plot(density(kopp14_rcp85$t_2050), xlab="Projected sea level in 2050 (ft)", ylab="Probability density", yaxt="n", 
-     main="", col=kopp14_col[1], lwd=2, xlim=c(-0.2,4), ylim = c(0, 3.5), bty="l")
-title(main="a.", adj=0)
-# lines(density(kopp14_rcp60$t_2050), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45$t_2050), col=kopp14_col[2], lwd=2)
-lines(density(kopp14_rcp26$t_2050), col=kopp14_col[3], lwd=2)
+# e) Sea-level rise probability density function medium scenarios
+plot_SLRcompare_PDF(year = 2050, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), panel = "e.")
 
-lines(density(kopp17_DP16_SEW_rcp85$t_2050), col=kopp17_DP16_col[1], lwd=2)
-# lines(density(kopp17_DP16_SEW_rcp60$t_2050), col=Greens[6], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp45$t_2050), col=kopp17_DP16_col[2], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp26$t_2050), col=kopp17_DP16_col[3], lwd=2)
+lines(hall_etal_2016$t_2050[2:3], rep(2.75, 2), col=hall16_col[4:3], lwd=1.5, lty=3)
 
-lines(density(brickfd_rcp85$t_2050), col=brickfd_col[1], lwd=2)
-# lines(density(brickfd_rcp60$t_2050), col=RdBu[10], lwd=2)
-lines(density(brickfd_rcp45$t_2050), col=brickfd_col[2], lwd=2)
-lines(density(brickfd_rcp26$t_2050), col=brickfd_col[3], lwd=2)
-
-lines(density(NO_fdft_rcp85$t_2050), col=NO_fd_col[1], lwd=2)
-# lines(density(NO_fdft_rcp60$t_2050), col=PRGn[3], lwd=2)
-lines(density(NO_fdft_rcp45$t_2050), col=NO_fd_col[2], lwd=2)
-lines(density(NO_fdft_rcp26$t_2050), col=NO_fd_col[3], lwd=2)
-
-lines(density(Ras18_SEW_2p5deg$t_2050), col=Ras18_col[1], lwd=2)
-lines(density(Ras18_SEW_2p0deg$t_2050), col=Ras18_col[2], lwd=2)
-lines(density(Ras18_SEW_1p5deg$t_2050), col=Ras18_col[3], lwd=2)
-
-lines(density(sweet17_03$X2050), col=sweet17_col[6], lwd=2)
-lines(density(sweet17_05$X2050), col=sweet17_col[5], lwd=2)
-lines(density(sweet17_10$X2050), col=sweet17_col[4], lwd=2)
-lines(density(sweet17_15$X2050, na.rm=TRUE), col=sweet17_col[3], lwd=2)
-lines(density(sweet17_20$X2050, na.rm=TRUE), col=sweet17_col[2], lwd=2)
-lines(density(sweet17_25$X2050, na.rm=TRUE), col=sweet17_col[1], lwd=2)
-
-lines(parris_etal_2012$t_2050, rep(3.25, 4), col=parris12_col[4:1], lwd=2, lty=3)
-lines(usace2014$t_2050, rep(3, 3), col=usace14_col[3:1], lwd=2, lty=3)
-lines(hall_etal_2016$t_2050, rep(2.75, 5), col=hall16_col[5:1], lwd=2, lty=3)
-lines(sweet2017$t_2050, rep(2.5, length(sweet2017$t_2050)), col=sweet17_col[6:1], lwd=1.5, lty=3)
-
-points(parris_etal_2012$t_2050, rep(3.25, 4), col=parris12_col[4:1], pch=19)
-points(usace2014$t_2050, rep(3, 3), col=usace14_col[3:1], pch=19)
-points(hall_etal_2016$t_2050, rep(2.75, 5), col=hall16_col[5:1], pch=19)
-points(sweet2017$t_2050, rep(2.5, length(sweet2017$t_2050)), col=sweet17_col[6:1], pch=19)
+points(parris_etal_2012$t_2050[2], 3.25, col=parris12_col[4], pch=19)
+points(usace2014$t_2050[2], 3, col=usace14_col[2], pch=19)
+points(hall_etal_2016$t_2050[2:3], rep(2.75, 2), col=hall16_col[4:3], pch=19)
 
 #   -----------------------------------------------------------------------
-# b) Storm surge return period 
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
-     ylim = c(2.85, 18), 
-     xaxt = 'n', cex=1, bty="l",
-     xlab = "Return period (years)", 
-     ylab = "Storm surge (ft MSL)")
-title(main="b.", adj=0)
-axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
+# f) Sea-level rise probability density function high scenarios
+par(mgp=c(1.5,0.5,0), mar=c(3.5,1.5,1,1))
+plot_SLRcompare_PDF(year = 2050, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), panel = "f.")
 
-SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
-SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
-polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
-        x = c(1/SF_Srikrishnan_stationary25$sf, rev(1/SF_Srikrishnan_stationary975$sf)), col = trans_srikrishnan_col[5], border = NA)
+lines(parris_etal_2012$t_2050[3:4], rep(3.25, 2), col=parris12_col[2:1], lwd=1.5, lty=3)
+lines(hall_etal_2016$t_2050[4:5], rep(2.75, 2), col=hall16_col[2:1], lwd=1.5, lty=3)
 
-polygon(y = c(Ras18_CBBT_SS_q025$height, rev(Ras18_CBBT_SS_q975$height)), 
-        x = c(1/Ras18_CBBT_SS_q025$freq, rev(1/Ras18_CBBT_SS_q975$freq)), col = trans_Ras18_col[2], border = NA)
-
-polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
-        x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi12_col[2], border = NA)
-
-polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])), 
-        x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_zervas13_col[2], border = NA)
-points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19, col=obs_col)
-
-SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
-lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=srikrishnan_col[2], lwd=2)
-
-lines(1/Ras18_CBBT_SS_q50$freq, Ras18_CBBT_SS_q50$height, lwd=2, col=Ras18_col[2])
-lines(1/Ras18_CBBT_SS_parun$freq, Ras18_CBBT_SS_parun$height, lwd=2, col=Ras18_col[1])
-
-lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=zervas13_col[2])
-lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi12_col[2])
-points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=usace14_col[2])
-
-#   -----------------------------------------------------------------------
-# c) Combined sea level and storm surge return period 
-par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
-     ylim = c(2.85, 18), 
-     xaxt = 'n', cex=1, bty="l",
-     xlab = "Return period (years)", 
-     ylab = "Projected sea+surge level (ft MSL)")
-title(main="c.", adj=0)
-axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
-
-SF_k14_r85_2050_SS = plot.sf(k14_r85_SS$t_2050, make.plot=FALSE)
-# SF_k14_r60_2050_SS = plot.sf(k14_r60_SS$t_2050, make.plot=FALSE)
-SF_k14_r45_2050_SS = plot.sf(k14_r45_SS$t_2050, make.plot=FALSE)
-SF_k14_r26_2050_SS = plot.sf(k14_r26_SS$t_2050, make.plot=FALSE)
-lines(1/SF_k14_r85_2050_SS$sf, SF_k14_r85_2050_SS$sf.num, col=kopp14_col[1], lwd=1.5)
-# lines(1/SF_k14_r60_2050_SS$sf, SF_k14_r60_2050_SS$sf.num, col=RdGy[2], lwd=1.5)
-lines(1/SF_k14_r45_2050_SS$sf, SF_k14_r45_2050_SS$sf.num, col=kopp14_col[2], lwd=1.5)
-lines(1/SF_k14_r26_2050_SS$sf, SF_k14_r26_2050_SS$sf.num, col=kopp14_col[3], lwd=1.5)
-
-SF_k17_DP16_SEW_r85_2050_SS = plot.sf(k17_DP16_SEW_r85_SS$t_2050, make.plot=FALSE)
-# SF_k17_DP16_SEW_r60_2050_SS = plot.sf(k17_DP16_SEW_r60_SS$t_2050, make.plot=FALSE)
-SF_k17_DP16_SEW_r45_2050_SS = plot.sf(k17_DP16_SEW_r45_SS$t_2050, make.plot=FALSE)
-SF_k17_DP16_SEW_r26_2050_SS = plot.sf(k17_DP16_SEW_r26_SS$t_2050, make.plot=FALSE)
-lines(1/SF_k17_DP16_SEW_r85_2050_SS$sf, SF_k17_DP16_SEW_r85_2050_SS$sf.num, col=kopp17_DP16_col[1], lwd=1.5)
-# lines(1/SF_k17_DP16_SEW_r60_2050_SS$sf, SF_k17_DP16_SEW_r60_2050_SS$sf.num, col=Greens[6], lwd=1.5)
-lines(1/SF_k17_DP16_SEW_r45_2050_SS$sf, SF_k17_DP16_SEW_r45_2050_SS$sf.num, col=kopp17_DP16_col[2], lwd=1.5)
-lines(1/SF_k17_DP16_SEW_r26_2050_SS$sf, SF_k17_DP16_SEW_r26_2050_SS$sf.num, col=kopp17_DP16_col[3], lwd=1.5)
-
-SF_bfd_r85_2050_SS = plot.sf(bfd_r85_SS$t_2050, make.plot=FALSE)
-# SF_bfd_r60_2050_SS = plot.sf(bfd_r60_SS$t_2050, make.plot=FALSE)
-SF_bfd_r45_2050_SS = plot.sf(bfd_r45_SS$t_2050, make.plot=FALSE)
-SF_bfd_r26_2050_SS = plot.sf(bfd_r26_SS$t_2050, make.plot=FALSE)
-lines(1/SF_bfd_r85_2050_SS$sf, SF_bfd_r85_2050_SS$sf.num, col=brickfd_col[1], lwd=1.5)
-# lines(1/SF_bfd_r60_2050_SS$sf, SF_bfd_r60_2050_SS$sf.num, col=RdBu[10], lwd=1.5)
-lines(1/SF_bfd_r45_2050_SS$sf, SF_bfd_r45_2050_SS$sf.num, col=brickfd_col[2], lwd=1.5)
-lines(1/SF_bfd_r26_2050_SS$sf, SF_bfd_r26_2050_SS$sf.num, col=brickfd_col[3], lwd=1.5)
-
-SF_NOfd_r85_2050_SS = plot.sf(NOfd_r85_SS$t_2050, make.plot=FALSE)
-# SF_NOfd_r60_2050_SS = plot.sf(NOfd_r60_SS$t_2050, make.plot=FALSE)
-SF_NOfd_r45_2050_SS = plot.sf(NOfd_r45_SS$t_2050, make.plot=FALSE)
-SF_NOfd_r26_2050_SS = plot.sf(NOfd_r26_SS$t_2050, make.plot=FALSE)
-lines(1/SF_NOfd_r85_2050_SS$sf, SF_NOfd_r85_2050_SS$sf.num, col=NO_fd_col[1], lwd=1.5)
-# lines(1/SF_NOfd_r60_2050_SS$sf, SF_NOfd_r60_2050_SS$sf.num, col=PRGn[3], lwd=1.5)
-lines(1/SF_NOfd_r45_2050_SS$sf, SF_NOfd_r45_2050_SS$sf.num, col=NO_fd_col[2], lwd=1.5)
-lines(1/SF_NOfd_r26_2050_SS$sf, SF_NOfd_r26_2050_SS$sf.num, col=NO_fd_col[3], lwd=1.5)
-
-dev.off()
+points(parris_etal_2012$t_2050[3:4], rep(3.25, 2), col=parris12_col[2:1], pch=19)
+points(usace2014$t_2050[3], 3, col=usace14_col[1], pch=19)
+points(hall_etal_2016$t_2050[4:5], rep(2.75, 2), col=hall16_col[2:1], pch=19)
 
 #---------------------------- 2070 -----------------------------------
-pdf(file="../Figures/SLR_2070a.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=14)
-layout(matrix(c(1,1,1,
-                2,3,4,
-                2,3,4), 3, 3, byrow = TRUE))
-# Add legend
-par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
-plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
-legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
-                           "Wong & Keller\n2017 no FD", "Tebaldi et al. 2012\nexpected value", "Sweet et al. 2017", 
-                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
-                           "Zervas 2013\n 95% CI", "Observations"),
-       lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
-       col=c(RdBu[9], sunyellow[2], PRGn[3], tebaldi_gold[1], sweet_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
-       bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
-gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
-arrows(8.75, 1.5, 9, 1.5, length=0.075)
-text(8,1.5, "Higher scenario")
+# g) Sea-level rise probability density function low scenarios
+par(mgp=c(1.5,.5,0), mar=c(3.5,1.5,1,0.5))
+plot_SLRcompare_PDF(year = 2070, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), panel = "g.")
+
+points(parris_etal_2012$t_2070[1], 2.75, col=parris12_col[4], pch=19)
+points(usace2014$t_2070[1], 2.5, col=usace14_col[1], pch=19)
+points(hall_etal_2016$t_2070[1], 2.25, col=hall16_col[5], pch=19)
 
 #   -----------------------------------------------------------------------
-# a) Sea-level rise probability density function
-par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
-plot(density(kopp14_rcp85$t_2070), xlab="Projected sea level in 2070 (ft)", ylab="Probability density", yaxt="n",
-     main="", col=kopp14_col[1], lwd=2, xlim=c(-0.3,8), ylim = c(0, 3), bty="l")
-title(main="a.", adj=0)
-# lines(density(kopp14_rcp60$t_2070), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45$t_2070), col=kopp14_col[2], lwd=2)
-lines(density(kopp14_rcp26$t_2070), col=kopp14_col[3], lwd=2)
+# h) Sea-level rise probability density function medium scenarios
+plot_SLRcompare_PDF(year = 2070, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), panel = "h.")
 
-lines(density(kopp17_DP16_SEW_rcp85$t_2070), col=kopp17_DP16_col[1], lwd=2)
-# lines(density(kopp17_DP16_SEW_rcp60$t_2070), col=Greens[6], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp45$t_2070), col=kopp17_DP16_col[2], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp26$t_2070), col=kopp17_DP16_col[3], lwd=2)
+lines(hall_etal_2016$t_2070[2:3], rep(2.25, 2), col=hall16_col[4:3], lwd=1.5, lty=3)
 
-lines(density(brickfd_rcp85$t_2070), col=brickfd_col[1], lwd=2)
-# lines(density(brickfd_rcp60$t_2070), col=RdBu[10], lwd=2)
-lines(density(brickfd_rcp45$t_2070), col=brickfd_col[2], lwd=2)
-lines(density(brickfd_rcp26$t_2070), col=brickfd_col[3], lwd=2)
-
-lines(density(NO_fdft_rcp85$t_2070), col=NO_fd_col[1], lwd=2)
-# lines(density(NO_fdft_rcp60$t_2070), col=PRGn[3], lwd=2)
-lines(density(NO_fdft_rcp45$t_2070), col=NO_fd_col[2], lwd=2)
-lines(density(NO_fdft_rcp26$t_2070), col=NO_fd_col[3], lwd=2)
-
-lines(density(Ras18_SEW_2p5deg$t_2070), col=Ras18_col[1], lwd=2)
-lines(density(Ras18_SEW_2p0deg$t_2070), col=Ras18_col[2], lwd=2)
-lines(density(Ras18_SEW_1p5deg$t_2070), col=Ras18_col[3], lwd=2)
-
-lines(density(sweet17_03$X2070), col=sweet17_col[6], lwd=2)
-lines(density(sweet17_05$X2070), col=sweet17_col[5], lwd=2)
-lines(density(sweet17_10$X2070), col=sweet17_col[4], lwd=2)
-lines(density(sweet17_15$X2070, na.rm=TRUE), col=sweet17_col[3], lwd=2)
-lines(density(sweet17_20$X2070, na.rm=TRUE), col=sweet17_col[2], lwd=2)
-lines(density(sweet17_25$X2070, na.rm=TRUE), col=sweet17_col[1], lwd=2)
-
-lines(parris_etal_2012$t_2070, rep(2.75, 4), col=parris12_col[4:1], lwd=2, lty=3)
-lines(usace2014$t_2070, rep(2.5, 3), col=usace14_col[3:1], lwd=2, lty=3)
-lines(hall_etal_2016$t_2070, rep(2.25, 5), col=hall16_col[5:1], lwd=2, lty=3)
-lines(sweet2017$t_2070, rep(2, length(sweet2017$t_2070)), col=sweet17_col[6:1], lwd=1.5, lty=3)
-
-points(parris_etal_2012$t_2070, rep(2.75, 4), col=parris12_col[4:1], pch=19)
-points(usace2014$t_2070, rep(2.5, 3), col=usace14_col[3:1], pch=19)
-points(hall_etal_2016$t_2070, rep(2.25, 5), col=hall16_col[5:1], pch=19)
-points(sweet2017$t_2070, rep(2, length(sweet2017$t_2070)), col=sweet17_col[6:1], pch=19)
+points(parris_etal_2012$t_2070[2], 2.75, col=parris12_col[4], pch=19)
+points(usace2014$t_2070[2], 2.5, col=usace14_col[2], pch=19)
+points(hall_etal_2016$t_2070[2:3], rep(2.25, 2), col=hall16_col[4:3], pch=19)
 
 #   -----------------------------------------------------------------------
-# b) Storm surge return period 
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
-     ylim = c(2.85, 18), 
-     xaxt = 'n', cex=1, bty="l",
-     xlab = "Return period (years)", 
-     ylab = "Storm surge (ft MSL)")
-title(main="b.", adj=0)
-axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
+# i) Sea-level rise probability density function high scenarios
+par(mgp=c(1.5,0.5,0), mar=c(3.5,1.5,1,1))
+plot_SLRcompare_PDF(year = 2070, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), panel = "i.")
 
-SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
-SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
-polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
-        x = c(1/SF_Srikrishnan_stationary25$sf, rev(1/SF_Srikrishnan_stationary975$sf)), col = trans_srikrishnan_col[5], border = NA)
+lines(parris_etal_2012$t_2070[3:4], rep(2.75, 2), col=parris12_col[2:1], lwd=1.5, lty=3)
+lines(hall_etal_2016$t_2070[4:5], rep(2.25, 2), col=hall16_col[2:1], lwd=1.5, lty=3)
 
-polygon(y = c(Ras18_CBBT_SS_q025$height, rev(Ras18_CBBT_SS_q975$height)), 
-        x = c(1/Ras18_CBBT_SS_q025$freq, rev(1/Ras18_CBBT_SS_q975$freq)), col = trans_Ras18_col[2], border = NA)
-
-polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
-        x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi12_col[2], border = NA)
-
-polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])), 
-        x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_zervas13_col[2], border = NA)
-points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19, col=obs_col)
-
-SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
-lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=srikrishnan_col[2], lwd=2)
-
-lines(1/Ras18_CBBT_SS_q50$freq, Ras18_CBBT_SS_q50$height, lwd=2, col=Ras18_col[2])
-lines(1/Ras18_CBBT_SS_parun$freq, Ras18_CBBT_SS_parun$height, lwd=2, col=Ras18_col[1])
-
-lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=zervas13_col[2])
-lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi12_col[2])
-points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=usace14_col[2])
-
-#   -----------------------------------------------------------------------
-# c) Combined sea level and storm surge return period 
-par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
-     ylim = c(2.85, 18), 
-     xaxt = 'n', cex=1, bty="l",
-     xlab = "Return period (years)", 
-     ylab = "Projected sea+surge level (ft MSL)")
-title(main="c.", adj=0)
-axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
-
-SF_k14_r85_2070_SS = plot.sf(k14_r85_SS$t_2070, make.plot=FALSE)
-# SF_k14_r60_2070_SS = plot.sf(k14_r60_SS$t_2070, make.plot=FALSE)
-SF_k14_r45_2070_SS = plot.sf(k14_r45_SS$t_2070, make.plot=FALSE)
-SF_k14_r26_2070_SS = plot.sf(k14_r26_SS$t_2070, make.plot=FALSE)
-lines(1/SF_k14_r85_2070_SS$sf, SF_k14_r85_2070_SS$sf.num, col=kopp14_col[1], lwd=1.5)
-# lines(1/SF_k14_r60_2070_SS$sf, SF_k14_r60_2070_SS$sf.num, col=RdGy[2], lwd=1.5)
-lines(1/SF_k14_r45_2070_SS$sf, SF_k14_r45_2070_SS$sf.num, col=kopp14_col[2], lwd=1.5)
-lines(1/SF_k14_r26_2070_SS$sf, SF_k14_r26_2070_SS$sf.num, col=kopp14_col[3], lwd=1.5)
-
-SF_k17_DP16_SEW_r85_2070_SS = plot.sf(k17_DP16_SEW_r85_SS$t_2070, make.plot=FALSE)
-# SF_k17_DP16_SEW_r60_2070_SS = plot.sf(k17_DP16_SEW_r60_SS$t_2070, make.plot=FALSE)
-SF_k17_DP16_SEW_r45_2070_SS = plot.sf(k17_DP16_SEW_r45_SS$t_2070, make.plot=FALSE)
-SF_k17_DP16_SEW_r26_2070_SS = plot.sf(k17_DP16_SEW_r26_SS$t_2070, make.plot=FALSE)
-lines(1/SF_k17_DP16_SEW_r85_2070_SS$sf, SF_k17_DP16_SEW_r85_2070_SS$sf.num, col=kopp17_DP16_col[1], lwd=1.5)
-# lines(1/SF_k17_DP16_SEW_r60_2070_SS$sf, SF_k17_DP16_SEW_r60_2070_SS$sf.num, col=Greens[6], lwd=1.5)
-lines(1/SF_k17_DP16_SEW_r45_2070_SS$sf, SF_k17_DP16_SEW_r45_2070_SS$sf.num, col=kopp17_DP16_col[2], lwd=1.5)
-lines(1/SF_k17_DP16_SEW_r26_2070_SS$sf, SF_k17_DP16_SEW_r26_2070_SS$sf.num, col=kopp17_DP16_col[3], lwd=1.5)
-
-SF_bfd_r85_2070_SS = plot.sf(bfd_r85_SS$t_2070, make.plot=FALSE)
-# SF_bfd_r60_2070_SS = plot.sf(bfd_r60_SS$t_2070, make.plot=FALSE)
-SF_bfd_r45_2070_SS = plot.sf(bfd_r45_SS$t_2070, make.plot=FALSE)
-SF_bfd_r26_2070_SS = plot.sf(bfd_r26_SS$t_2070, make.plot=FALSE)
-lines(1/SF_bfd_r85_2070_SS$sf, SF_bfd_r85_2070_SS$sf.num, col=brickfd_col[1], lwd=1.5)
-# lines(1/SF_bfd_r60_2070_SS$sf, SF_bfd_r60_2070_SS$sf.num, col=RdBu[10], lwd=1.5)
-lines(1/SF_bfd_r45_2070_SS$sf, SF_bfd_r45_2070_SS$sf.num, col=brickfd_col[2], lwd=1.5)
-lines(1/SF_bfd_r26_2070_SS$sf, SF_bfd_r26_2070_SS$sf.num, col=brickfd_col[3], lwd=1.5)
-
-SF_NOfd_r85_2070_SS = plot.sf(NOfd_r85_SS$t_2070, make.plot=FALSE)
-# SF_NOfd_r60_2070_SS = plot.sf(NOfd_r60_SS$t_2070, make.plot=FALSE)
-SF_NOfd_r45_2070_SS = plot.sf(NOfd_r45_SS$t_2070, make.plot=FALSE)
-SF_NOfd_r26_2070_SS = plot.sf(NOfd_r26_SS$t_2070, make.plot=FALSE)
-lines(1/SF_NOfd_r85_2070_SS$sf, SF_NOfd_r85_2070_SS$sf.num, col=NO_fd_col[1], lwd=1.5)
-# lines(1/SF_NOfd_r60_2070_SS$sf, SF_NOfd_r60_2070_SS$sf.num, col=PRGn[3], lwd=1.5)
-lines(1/SF_NOfd_r45_2070_SS$sf, SF_NOfd_r45_2070_SS$sf.num, col=NO_fd_col[2], lwd=1.5)
-lines(1/SF_NOfd_r26_2070_SS$sf, SF_NOfd_r26_2070_SS$sf.num, col=NO_fd_col[3], lwd=1.5)
-
-dev.off()
+points(parris_etal_2012$t_2070[3:4], rep(2.75, 2), col=parris12_col[2:1], pch=19)
+points(usace2014$t_2070[3], 2.5, col=usace14_col[1], pch=19)
+points(hall_etal_2016$t_2070[4:5], rep(2.25, 2), col=hall16_col[2:1], pch=19)
 
 #---------------------------- 2100 -----------------------------------
-pdf(file="../Figures/SLR_2100a.pdf", family="Times", width=full_page_width, height=single_panel_height, pointsize=14)
-layout(matrix(c(1,1,1,
-                2,3,4,
-                2,3,4), 3, 3, byrow = TRUE))
-# Add legend
-par(mgp=c(1.5,.5,0), mar=c(0,4,1,1))
-plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
-legend("topleft", legend=c("Wong & Keller\n2017 FD", "Kopp et al. 2014", 
-                           "Wong & Keller\n2017 no FD", "Tebaldi et al. 2012\nexpected value", "Sweet et al. 2017", 
-                           "Parris et al. 2012","Tebaldi et al. 2012\n95% CI", "USACE 2014", 
-                           "Srikrishnan et al.\nin prep. 95% CI", "Zervas 2013\nexpected value", "Hall et al. 2016", "Srikrishnan et al.\nin prep.",
-                           "Zervas 2013\n 95% CI", "Observations"),
-       lty=c(1,1,1,1,NA,NA,NA,NA,NA,1,NA,1,NA, NA), lwd=c(2,2,2,2,NA,NA,NA,NA,NA,2,NA,2,NA, NA), pch=c(NA,NA,NA,NA,19,19,22,19,22,NA,19,NA,22,19), 
-       col=c(RdBu[9], sunyellow[2], PRGn[3], tebaldi_gold[1], sweet_cols[5], BrBG[2],"black", BrBG[9], "black", BrBG[2], RdGy[9], RdBu[11], "black", "black"),
-       bty='n', ncol=5, pt.bg=c(NA,NA,NA,NA,NA,NA,tebaldi_gold[2],NA,trans_RdBu[9],NA,NA,NA, trans_BrBG[2],NA), pt.cex = c(NA,NA,NA,NA,1,1,2,1,2,NA,1,NA,2, 1))
-gradient.rect(7,2.5,9,4, col=col_grad, gradient="x")
-arrows(8.75, 1.5, 9, 1.5, length=0.075)
-text(8,1.5, "Higher scenario")
+# j) Sea-level rise probability density function low scenarios
+par(mgp=c(1.5,.5,0), mar=c(3.5,1.5,1,0.5))
+plot_SLRcompare_PDF(year = 2100, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), panel = "j.")
+
+points(parris_etal_2012$t_2100[1], 1.45, col=parris12_col[4], pch=19)
+points(usace2014$t_2100[1], 1.3, col=usace14_col[1], pch=19)
+points(hall_etal_2016$t_2100[1], 1.15, col=hall16_col[5], pch=19)
 
 #   -----------------------------------------------------------------------
-# a) Sea-level rise probability density function
-par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
-plot(density(kopp14_rcp85$t_2100), xlab="Projected sea level in 2100 (ft)", ylab="Probability density", yaxt="n", 
-     main="", col=kopp14_col[1], lwd=2, xlim=c(-0.5,15), ylim = c(0, 1.5), bty="l")
-title(main="a.", adj=0)
-# lines(density(kopp14_rcp60$t_2100), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45$t_2100), col=kopp14_col[2], lwd=2)
-lines(density(kopp14_rcp26$t_2100), col=kopp14_col[3], lwd=2)
+# k) Sea-level rise probability density function medium scenarios
+plot_SLRcompare_PDF(year = 2100, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), panel = "k.")
 
-lines(density(kopp17_DP16_SEW_rcp85$t_2100), col=kopp17_DP16_col[1], lwd=2)
-# lines(density(kopp17_DP16_SEW_rcp60$t_2100), col=Greens[6], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp45$t_2100), col=kopp17_DP16_col[2], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp26$t_2100), col=kopp17_DP16_col[3], lwd=2)
+lines(hall_etal_2016$t_2100[2:3], rep(1.15, 2), col=hall16_col[4:3], lwd=1.5, lty=3)
 
-lines(density(brickfd_rcp85$t_2100), col=brickfd_col[1], lwd=2)
-# lines(density(brickfd_rcp60$t_2100), col=RdBu[10], lwd=2)
-lines(density(brickfd_rcp45$t_2100), col=brickfd_col[2], lwd=2)
-lines(density(brickfd_rcp26$t_2100), col=brickfd_col[3], lwd=2)
-
-lines(density(NO_fdft_rcp85$t_2100), col=NO_fd_col[1], lwd=2)
-# lines(density(NO_fdft_rcp60$t_2100), col=PRGn[3], lwd=2)
-lines(density(NO_fdft_rcp45$t_2100), col=NO_fd_col[2], lwd=2)
-lines(density(NO_fdft_rcp26$t_2100), col=NO_fd_col[3], lwd=2)
-
-lines(density(Ras18_SEW_2p5deg$t_2100), col=Ras18_col[1], lwd=2)
-lines(density(Ras18_SEW_2p0deg$t_2100), col=Ras18_col[2], lwd=2)
-lines(density(Ras18_SEW_1p5deg$t_2100), col=Ras18_col[3], lwd=2)
-
-lines(density(sweet17_03$X2100), col=sweet17_col[6], lwd=2)
-lines(density(sweet17_05$X2100), col=sweet17_col[5], lwd=2)
-lines(density(sweet17_10$X2100), col=sweet17_col[4], lwd=2)
-lines(density(sweet17_15$X2100, na.rm=TRUE), col=sweet17_col[3], lwd=2)
-lines(density(sweet17_20$X2100, na.rm=TRUE), col=sweet17_col[2], lwd=2)
-lines(density(sweet17_25$X2100, na.rm=TRUE), col=sweet17_col[1], lwd=2)
-
-lines(parris_etal_2012$t_2100, rep(1.45, 4), col=parris12_col[4:1], lwd=2, lty=3)
-lines(usace2014$t_2100, rep(1.3, 3), col=usace14_col[3:1], lwd=2, lty=3)
-lines(hall_etal_2016$t_2100, rep(1.15, 5), col=hall16_col[5:1], lwd=2, lty=3)
-lines(sweet2017$t_2100, rep(1, length(sweet2017$t_2100)), col=sweet17_col[6:1], lwd=1.5, lty=3)
-
-points(parris_etal_2012$t_2100, rep(1.45, 4), col=parris12_col[4:1], pch=19)
-points(usace2014$t_2100, rep(1.3, 3), col=usace14_col[3:1], pch=19)
-points(hall_etal_2016$t_2100, rep(1.15, 5), col=hall16_col[5:1], pch=19)
-points(sweet2017$t_2100, rep(1, length(sweet2017$t_2100)), col=sweet17_col[6:1], pch=19)
+points(parris_etal_2012$t_2100[2], 1.45, col=parris12_col[4], pch=19)
+points(usace2014$t_2100[2], 1.3, col=usace14_col[2], pch=19)
+points(hall_etal_2016$t_2100[2:3], rep(1.15, 2), col=hall16_col[4:3], pch=19)
 
 #   -----------------------------------------------------------------------
-# b) Storm surge return period 
+# l) Sea-level rise probability density function high scenarios
+par(mgp=c(1.5,0.5,0), mar=c(3.5,1.5,1,1))
+plot_SLRcompare_PDF(year = 2100, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), panel = "l.")
+
+lines(parris_etal_2012$t_2100[3:4], rep(1.45, 2), col=parris12_col[2:1], lwd=1.5, lty=3)
+lines(hall_etal_2016$t_2100[4:5], rep(1.15, 2), col=hall16_col[2:1], lwd=1.5, lty=3)
+
+points(parris_etal_2012$t_2100[3:4], rep(1.45, 2), col=parris12_col[2:1], pch=19)
+points(usace2014$t_2100[3], 1.3, col=usace14_col[1], pch=19)
+points(hall_etal_2016$t_2100[4:5], rep(1.15, 2), col=hall16_col[2:1], pch=19)
+
+#   -----------------------------------------------------------------------
+mtext(text="Probability density",side=2,line=0,outer=TRUE)
+mtext(text="Projected sea level (ft)",side=1,line=0,outer=TRUE)
+
+dev.off()
+#   -----------------------------------------------------------------------
+
+##=========================== MULTIPLE YEAR SLR DENSITY & PROJECTION PLOT ===================================
+# Create functions to estimate projection or hindcast value associated with a quantile for each year
+# This can be used to create credible intervals. There a two functions dependents on wheather to 
+# loop through rows or columns.
+percentile_projection_col = function(years, data, percentile){ # loop through the columns
+  percent_proj = rep(NA, length(years))
+  for(i in 1:length(years)){
+    percent_proj[i] <- quantile(data[,i], percentile, na.rm=TRUE)
+  }
+  return(percent_proj)
+}
+
+percentile_projection_row = function(years, data, percentile){ # loop through the rows
+  percent_proj = rep(NA, length(years))
+  for(i in 1:length(years)){
+    percent_proj[i] <- quantile(data[i, ], percentile, na.rm=TRUE)
+  }
+  return(percent_proj)
+}
+
+# Extract 90% CI
+k14_26_5 = percentile_projection_col(k14_years, convert_cm_to_ft(kopp14_rcp26_dat), 0.05)
+k14_45_5 = percentile_projection_col(k14_years, convert_cm_to_ft(kopp14_rcp45_dat), 0.05)
+k14_85_5 = percentile_projection_col(k14_years, convert_cm_to_ft(kopp14_rcp85_dat), 0.05)
+k14_26_95 = percentile_projection_col(k14_years, convert_cm_to_ft(kopp14_rcp26_dat), 0.95)
+k14_45_95 = percentile_projection_col(k14_years, convert_cm_to_ft(kopp14_rcp45_dat), 0.95)
+k14_85_95 = percentile_projection_col(k14_years, convert_cm_to_ft(kopp14_rcp85_dat), 0.95)
+
+k17_DP16_SEW_26_5 = percentile_projection_col(k17_DP16_SEW_years, convert_cm_to_ft(kopp17_DP16_SEW_rcp26_dat), 0.05)
+k17_DP16_SEW_45_5 = percentile_projection_col(k17_DP16_SEW_years, convert_cm_to_ft(kopp17_DP16_SEW_rcp45_dat), 0.05)
+k17_DP16_SEW_85_5 = percentile_projection_col(k17_DP16_SEW_years, convert_cm_to_ft(kopp17_DP16_SEW_rcp85_dat), 0.05)
+k17_DP16_SEW_26_95 = percentile_projection_col(k17_DP16_SEW_years, convert_cm_to_ft(kopp17_DP16_SEW_rcp26_dat), 0.95)
+k17_DP16_SEW_45_95 = percentile_projection_col(k17_DP16_SEW_years, convert_cm_to_ft(kopp17_DP16_SEW_rcp45_dat), 0.95)
+k17_DP16_SEW_85_95 = percentile_projection_col(k17_DP16_SEW_years, convert_cm_to_ft(kopp17_DP16_SEW_rcp85_dat), 0.95)
+
+lsl_fdyn_26_5 = percentile_projection_row(t.time, lsl_fdyn_rcp26_sub, 0.05)
+lsl_fdyn_45_5 = percentile_projection_row(t.time, lsl_fdyn_rcp45_sub, 0.05)
+lsl_fdyn_85_5 = percentile_projection_row(t.time, lsl_fdyn_rcp85_sub, 0.05)
+lsl_fdyn_26_95 = percentile_projection_row(t.time, lsl_fdyn_rcp26_sub, 0.95)
+lsl_fdyn_45_95 = percentile_projection_row(t.time, lsl_fdyn_rcp45_sub, 0.95)
+lsl_fdyn_85_95 = percentile_projection_row(t.time, lsl_fdyn_rcp85_sub, 0.95)
+
+NO_fdyn_26_5 = percentile_projection_row(t.time, NO_fdyn_rcp26_sub, 0.05)
+NO_fdyn_45_5 = percentile_projection_row(t.time, NO_fdyn_rcp45_sub, 0.05)
+NO_fdyn_85_5 = percentile_projection_row(t.time, NO_fdyn_rcp85_sub, 0.05)
+NO_fdyn_26_95 = percentile_projection_row(t.time, NO_fdyn_rcp26_sub, 0.95)
+NO_fdyn_45_95 = percentile_projection_row(t.time, NO_fdyn_rcp45_sub, 0.95)
+NO_fdyn_85_95 = percentile_projection_row(t.time, NO_fdyn_rcp85_sub, 0.95)
+
+GSIC_rcp26_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp26), 0.05)
+GIS_rcp26_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp26), 0.05)
+GSIC_rcp45_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp45), 0.05)
+GIS_rcp45_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp45), 0.05)
+GSIC_rcp85_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp85), 0.05)
+GIS_rcp85_5 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp85), 0.05)
+GSIC_rcp26_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp26), 0.95)
+GIS_rcp26_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp26), 0.95)
+GSIC_rcp45_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp45), 0.95)
+GIS_rcp45_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp45), 0.95)
+GSIC_rcp85_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GSIC_rcp85), 0.95)
+GIS_rcp85_95 = percentile_projection_row(ice_proj, convert_m_to_ft(GIS_rcp85), 0.95)
+
+Ras18_SEW_2p5deg_5 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_2p5deg_dat), 0.05)
+Ras18_SEW_2p0deg_5 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_2p0deg_dat), 0.05)
+Ras18_SEW_1p5deg_5 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_1p5deg_dat), 0.05)
+Ras18_SEW_2p5deg_95 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_2p5deg_dat), 0.95) 
+Ras18_SEW_2p0deg_95 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_2p0deg_dat), 0.95)
+Ras18_SEW_1p5deg_95 = percentile_projection_col(Ras18_SEW_years, convert_cm_to_ft(Ras18_SEW_1p5deg_dat), 0.95)
+
+sweet17_03_5 = percentile_projection_col(sweet17_10[1,], sweet17_03, 0.05)
+sweet17_05_5 = percentile_projection_col(sweet17_10[1,], sweet17_05, 0.05)
+sweet17_10_5 = percentile_projection_col(sweet17_10[1,], sweet17_10, 0.05)
+sweet17_15_5 = percentile_projection_col(sweet17_10[1,], sweet17_15, 0.05)
+sweet17_20_5 = percentile_projection_col(sweet17_10[1,], sweet17_20, 0.05)
+sweet17_25_5 = percentile_projection_col(sweet17_10[1,], sweet17_25, 0.05)
+sweet17_03_95 = percentile_projection_col(sweet17_10[1,], sweet17_03, 0.95)
+sweet17_05_95 = percentile_projection_col(sweet17_10[1,], sweet17_05, 0.95)
+sweet17_10_95 = percentile_projection_col(sweet17_10[1,], sweet17_10, 0.95)
+sweet17_15_95 = percentile_projection_col(sweet17_10[1,], sweet17_15, 0.95)
+sweet17_20_95 = percentile_projection_col(sweet17_10[1,], sweet17_20, 0.95)
+sweet17_25_95 = percentile_projection_col(sweet17_10[1,], sweet17_25, 0.95)
+
+#   -----------------------------------------------------------------------
+pdf(file="../Figures/2018-f03.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
+par(oma=c(0,0,0,0), mfrow=c(3, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,1.5))
+
+# a) Sea-level rise projections
+plot(0, type="n",xlab="Year", ylab="Projected sea level (ft)", ylim=c(0,13), xlim=c(2010, 2098), xaxt="n")
+fig_label("a.", region="figure", pos="topleft", cex=1.5)
+axis(1, lwd = 1, at=seq(2010,2100, 10), label=seq(2010,2100, 10))
+
+# Only plot RCP 8.5; those with Fast dynamic plot solid with border
+polygon(y = c(sweet17_25_5, rev(sweet17_25_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = sweet17_col[1], border = "black", lty=2, lwd=2)
+polygon(y = c(sweet17_20_5, rev(sweet17_20_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = trans_sweet17_col[5], border = NA)
+polygon(y = c(k17_DP16_SEW_85_5, rev(k17_DP16_SEW_85_95)), x = c(k17_DP16_SEW_years, rev(k17_DP16_SEW_years)), col = kopp17_DP16_col[1], border = "black", lty=2, lwd=2)
+
+polygon(y = c(k14_85_5, rev(k14_85_95)), x = c(k14_years, rev(k14_years)), col = trans_kopp14_col[3], border = NA)
+polygon(y = c(lsl_fdyn_85_5, rev(lsl_fdyn_85_95)), x = c(t.time, rev(t.time)), col = brickfd_col[1], border = "black", lty=2, lwd=2)
+polygon(y = c(NO_fdyn_85_5, rev(NO_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_NO_fd_col[3], border = NA)
+
+arrows(2102.5, sweet17_20_95[11]+0.3, 2102.5, sweet17_25_95[11]+0.5, xpd = TRUE, lwd=1.5, length = 0.05, col = sweet17_col[1])
+arrows(2102.5, k14_85_95[which(k14_years==2100)], 2102.5, k17_DP16_SEW_85_95[which(k14_years==2100)]+0.25, xpd = TRUE, lwd=1.5, 
+       length = 0.05, col = kopp17_DP16_col[1])
+arrows(2103, NO_fdyn_85_95[which(t.time == 2100)], 2103, lsl_fdyn_85_95[which(t.time == 2100)], xpd = TRUE, lwd=1.5, length = 0.05, col = brickfd_col[1])
+
+legend("topleft", legend = c("Incorporates ice sheet feedback proccesses", 
+                             "Wong & Keller [2017] no FD RCP85 90% CI", "Wong & Keller [2017] FD RCP85 90% CI", 
+                             #"Rasmussen et al. [2018] 2.5 90% CI", 
+                             "Kopp et al. [2017] RCP85 90% CI", 
+                             "Kopp et al. [2014] RCP85 90% CI", "Sweet et al. [2017] 2.5 90% CI", 
+                             "Sweet et al. [2017] 2.0 90% CI"), pch = c(NA, rep(22, 7)), 
+       bty='n', pt.bg = c(NA, trans_NO_fd_col[3], brickfd_col[1], 
+                          #trans_Ras18_col[3], 
+                          kopp17_DP16_col[1], trans_kopp14_col[3], 
+                          sweet17_col[1], trans_sweet17_col[5]), pt.cex = 2, lty=c(2, rep(0, 6)), lwd=c(1.5, rep(1, 6)))
+#   -----------------------------------------------------------------------
+# b) Projection timescale version project design life
+sweet_years = seq(2000, 2200, 10)
+project_years = data.frame(kopp14 = c(min(k14_years), max(k14_years)), kopp17 = c(min(k17_DP16_SEW_years), max(k17_DP16_SEW_years)), 
+                           wong17 = c(min(t.time), max(t.time)), rasumussen18 = c(min(Ras18_SEW_years), max(Ras18_SEW_years)), 
+                           usace = c(min(SL_calculator_ref2000[,"Year"]), max(SL_calculator_ref2000[,"Year"])), 
+                           parris12 = c(min(SL_calculator_ref2000[,"Year"]), max(SL_calculator_ref2000[,"Year"])), 
+                           hall16 = c(min(SL_calculator_ref2000[,"Year"]), max(SL_calculator_ref2000[,"Year"])), 
+                           sweet17 = c(min(sweet_years), max(sweet_years)))
+
+par(mgp=c(1.5,.5,0), mar=c(3,10,0.5,0.5))
+plot(c(min(project_years), max(project_years)), c(1,ncol(project_years)+2), type = "n", yaxt="n", 
+     xlab="Sea-level rise projection year", ylab="")
+fig_label("b.", region="figure", pos="topleft", cex=1.5)
+
+rect(2020, 0, 2400, 20, col="gray99", border=NA)
+rect(2020, 0, 2120, 20, col="gray85", border=NA)
+text(2070, 9.75, "Design life of 100 yrs")
+text(2200, 9.75, "Continued operation and maintenance")
+arrows(2275, 9.75, 2285, 9.75, length=0.075)
+
+rect(project_years$kopp14[1], 0.75, project_years$kopp14[2], 1.25, col=kopp14_col[2], border=NA)
+rect(project_years$kopp17[1], 1.75, project_years$kopp17[2], 2.25, col=kopp17_DP16_col[2], border=NA)
+rect(project_years$wong17[1], 2.75, project_years$wong17[2], 3.25, col=NO_fd_col[2], border=NA)
+rect(project_years$wong17[1], 3.75, project_years$wong17[2], 4.25, col=brickfd_col[2], border=NA)
+rect(project_years$rasumussen18[1], 4.75, project_years$rasumussen18[2], 5.25, col=Ras18_col[2], border=NA)
+rect(project_years$usace[1], 5.75, project_years$usace[2], 6.25, col=usace14_col[2], border=NA)
+rect(project_years$parris12[1], 6.75, project_years$parris12[2], 7.25, col=parris12_col[2], border=NA)
+rect(project_years$hall16[1], 7.75, project_years$hall16[2], 8.25, col=hall16_col[2], border=NA)
+rect(project_years$sweet17[1], 8.75, project_years$sweet17[2], 9.25, col=sweet17_col[2], border=NA)
+
+axis(2, lwd = 1, at=1:9, label=c("Kopp et al. [2014]", "Kopp et al. [2017]", "Wong & Keller\n[2017] no FD", 
+                                 "Wong & Keller [2017] FD", "Rasmussen et al.\n[2018]", "USACE [2014]", 
+                                 "Parris et al. [2012]", "Hall et al. [2016]", "Sweet et al. [2017]"), las=1)
+
+box()
+#   -----------------------------------------------------------------------
+# c) Storm surge return period 
+par(mgp=c(1.5,.5,0), mar=c(3,3,0.5,0.5))
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
-     ylim = c(2.85, 18), 
-     xaxt = 'n', cex=1, bty="l",
+     ylim = c(2.85, 17), 
+     xaxt = 'n', cex=1, #bty="l",
      xlab = "Return period (years)", 
      ylab = "Storm surge (ft MSL)")
-title(main="b.", adj=0)
 axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
+fig_label("c.", region="figure", pos="topleft", cex=1.5)
 
-SF_Srikrishnan_stationary25 = plot.sf(stat_gev25, make.plot=FALSE)
-SF_Srikrishnan_stationary975 = plot.sf(stat_gev975, make.plot=FALSE)
-polygon(y = c(SF_Srikrishnan_stationary25$sf.num, rev(SF_Srikrishnan_stationary975$sf.num)), 
-        x = c(1/SF_Srikrishnan_stationary25$sf, rev(1/SF_Srikrishnan_stationary975$sf)), col = trans_srikrishnan_col[5], border = NA)
-
-polygon(y = c(Ras18_CBBT_SS_q025$height, rev(Ras18_CBBT_SS_q975$height)), 
-        x = c(1/Ras18_CBBT_SS_q025$freq, rev(1/Ras18_CBBT_SS_q975$freq)), col = trans_Ras18_col[2], border = NA)
+polygon(y = c(gev_stat_025, rev(gev_stat_975)), 
+        x = c(1/probs[order(1/probs)], 1/probs), col = trans_srikrishnan_col[5], border = NA)
 
 polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi12_col[2], border = NA)
 
 polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])), 
         x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_zervas13_col[2], border = NA)
-points(NOAA_methodGEV$return_obs, NOAA_methodGEV$obs, pch = 19, col=obs_col)
 
-SF_Srikrishnan_stationary = plot.sf(stat_gev, make.plot=FALSE)
-lines(1/SF_Srikrishnan_stationary$sf, SF_Srikrishnan_stationary$sf.num, col=srikrishnan_col[2], lwd=2)
-
-lines(1/Ras18_CBBT_SS_q50$freq, Ras18_CBBT_SS_q50$height, lwd=2, col=Ras18_col[2])
-lines(1/Ras18_CBBT_SS_parun$freq, Ras18_CBBT_SS_parun$height, lwd=2, col=Ras18_col[1])
-
+lines(1/probs[order(1/probs)], gev_stat_50, col=srikrishnan_col[2], lwd=2)
 lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=zervas13_col[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi12_col[2])
-points(USACE_rp, USACE_EWL$feet[8:14], pch = 20, col=usace14_col[2])
+points(rp_ABM, blockMax, pch = 19, col=obs_col)
+points(USACE_rp, USACE_EWL$feet[8:14], pch = 19, col=usace14_col[2])
 
-#   -----------------------------------------------------------------------
-# c) Combined sea level and storm surge return period 
-par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
-     ylim = c(2.85, 18), 
-     xaxt = 'n', cex=1, bty="l",
-     xlab = "Return period (years)", 
-     ylab = "Projected sea+surge level (ft MSL)")
-title(main="c.", adj=0)
-axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
+points(c(rp_h, rp_l), rep(NLIH_1821, 2), pch="|", col=burntorange[1])
+lines(c(rp_h, rp_l), rep(NLIH_1821, 2), lty=2, col=burntorange[1])
+points(rp_m, NLIH_1821, pch=19, col=burntorange[1])
 
-SF_k14_r85_2100_SS = plot.sf(k14_r85_SS$t_2100, make.plot=FALSE)
-# SF_k14_r60_2100_SS = plot.sf(k14_r60_SS$t_2100, make.plot=FALSE)
-SF_k14_r45_2100_SS = plot.sf(k14_r45_SS$t_2100, make.plot=FALSE)
-SF_k14_r26_2100_SS = plot.sf(k14_r26_SS$t_2100, make.plot=FALSE)
-lines(1/SF_k14_r85_2100_SS$sf, SF_k14_r85_2100_SS$sf.num, col=kopp14_col[1], lwd=1.5)
-# lines(1/SF_k14_r60_2100_SS$sf, SF_k14_r60_2100_SS$sf.num, col=RdGy[2], lwd=1.5)
-lines(1/SF_k14_r45_2100_SS$sf, SF_k14_r45_2100_SS$sf.num, col=kopp14_col[2], lwd=1.5)
-lines(1/SF_k14_r26_2100_SS$sf, SF_k14_r26_2100_SS$sf.num, col=kopp14_col[3], lwd=1.5)
-
-SF_k17_DP16_SEW_r85_2100_SS = plot.sf(k17_DP16_SEW_r85_SS$t_2100, make.plot=FALSE)
-# SF_k17_DP16_SEW_r60_2100_SS = plot.sf(k17_DP16_SEW_r60_SS$t_2100, make.plot=FALSE)
-SF_k17_DP16_SEW_r45_2100_SS = plot.sf(k17_DP16_SEW_r45_SS$t_2100, make.plot=FALSE)
-SF_k17_DP16_SEW_r26_2100_SS = plot.sf(k17_DP16_SEW_r26_SS$t_2100, make.plot=FALSE)
-lines(1/SF_k17_DP16_SEW_r85_2100_SS$sf, SF_k17_DP16_SEW_r85_2100_SS$sf.num, col=kopp17_DP16_col[1], lwd=1.5)
-# lines(1/SF_k17_DP16_SEW_r60_2100_SS$sf, SF_k17_DP16_SEW_r60_2100_SS$sf.num, col=Greens[6], lwd=1.5)
-lines(1/SF_k17_DP16_SEW_r45_2100_SS$sf, SF_k17_DP16_SEW_r45_2100_SS$sf.num, col=kopp17_DP16_col[2], lwd=1.5)
-lines(1/SF_k17_DP16_SEW_r26_2100_SS$sf, SF_k17_DP16_SEW_r26_2100_SS$sf.num, col=kopp17_DP16_col[3], lwd=1.5)
-
-SF_bfd_r85_2100_SS = plot.sf(bfd_r85_SS$t_2100, make.plot=FALSE)
-# SF_bfd_r60_2100_SS = plot.sf(bfd_r60_SS$t_2100, make.plot=FALSE)
-SF_bfd_r45_2100_SS = plot.sf(bfd_r45_SS$t_2100, make.plot=FALSE)
-SF_bfd_r26_2100_SS = plot.sf(bfd_r26_SS$t_2100, make.plot=FALSE)
-lines(1/SF_bfd_r85_2100_SS$sf, SF_bfd_r85_2100_SS$sf.num, col=brickfd_col[1], lwd=1.5)
-# lines(1/SF_bfd_r60_2100_SS$sf, SF_bfd_r60_2100_SS$sf.num, col=RdBu[10], lwd=1.5)
-lines(1/SF_bfd_r45_2100_SS$sf, SF_bfd_r45_2100_SS$sf.num, col=brickfd_col[2], lwd=1.5)
-lines(1/SF_bfd_r26_2100_SS$sf, SF_bfd_r26_2100_SS$sf.num, col=brickfd_col[3], lwd=1.5)
-
-SF_NOfd_r85_2100_SS = plot.sf(NOfd_r85_SS$t_2100, make.plot=FALSE)
-# SF_NOfd_r60_2100_SS = plot.sf(NOfd_r60_SS$t_2100, make.plot=FALSE)
-SF_NOfd_r45_2100_SS = plot.sf(NOfd_r45_SS$t_2100, make.plot=FALSE)
-SF_NOfd_r26_2100_SS = plot.sf(NOfd_r26_SS$t_2100, make.plot=FALSE)
-lines(1/SF_NOfd_r85_2100_SS$sf, SF_NOfd_r85_2100_SS$sf.num, col=NO_fd_col[1], lwd=1.5)
-# lines(1/SF_NOfd_r60_2100_SS$sf, SF_NOfd_r60_2100_SS$sf.num, col=PRGn[3], lwd=1.5)
-lines(1/SF_NOfd_r45_2100_SS$sf, SF_NOfd_r45_2100_SS$sf.num, col=NO_fd_col[2], lwd=1.5)
-lines(1/SF_NOfd_r26_2100_SS$sf, SF_NOfd_r26_2100_SS$sf.num, col=NO_fd_col[3], lwd=1.5)
+legend("topleft", legend=c("Our model 95% CI", "Our model MLE",
+                           "Tebaldi et al. [2012] 95% CI", "Tebaldi et al. [2012] MLE",
+                           "Zervas [2013] 95% CI", "Zervas [2013] MLE", 
+                           "USACE [2014]", "Observations", "1821 Norfolk-Long Island Hurricane"),
+       lty=c(NA,1,NA,1,NA,1,NA,NA,NA), lwd=c(NA,2,NA,2,NA,2,NA,NA,NA), pch=c(22,NA,22,NA,22,NA,19,19,19), 
+       col=c("black", srikrishnan_col[2], "black", tebaldi12_col[2], "black", zervas13_col[2], usace14_col[2], obs_col, burntorange[1]),
+       bty='n', pt.bg=c(trans_srikrishnan_col[5],NA,trans_tebaldi12_col[2],NA,trans_zervas13_col[2],NA,NA,NA,NA), pt.cex = c(2,NA,2,NA,2,NA,1,1,1))
 
 dev.off()
+#   -----------------------------------------------------------------------
 
-##=========================== MULTIPLE YEAR SLR DENSITY & PROJECTION PLOT ===================================
-# Extract 90% CI
-k14_26_5 =
-k14_45_5 =
-# k14_60_5 =
-k14_85_5 =
-k14_26_95 =
-k14_45_95 =
-# k14_60_95 =
-k14_85_95 = rep(NA, length(k14_years))
-for(i in 1:length(k14_years)){
-  k14_26_5[i] <- quantile(convert_cm_to_ft(kopp14_rcp26_dat[,i]), 0.05)
-  k14_45_5[i] <- quantile(convert_cm_to_ft(kopp14_rcp45_dat[,i]), 0.05)
-  # k14_60_5[i] <- quantile(convert_cm_to_ft(kopp14_rcp60_dat[,i]), 0.05, na.rm=TRUE) #goes to 2100
-  k14_85_5[i] <- quantile(convert_cm_to_ft(kopp14_rcp85_dat[,i]), 0.05)
-  
-  k14_26_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp26_dat[,i]), 0.95)
-  k14_45_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp45_dat[,i]), 0.95)
-  # k14_60_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp60_dat[,i]), 0.95, na.rm=TRUE) #goes to 2100
-  k14_85_95[i] <- quantile(convert_cm_to_ft(kopp14_rcp85_dat[,i]), 0.95)
-}
-k17_DP16_SEW_26_5 =
-  k17_DP16_SEW_45_5 =
-  # k17_DP16_SEW_60_5 =
-  k17_DP16_SEW_85_5 =
-  k17_DP16_SEW_26_95 =
-  k17_DP16_SEW_45_95 =
-  # k17_DP16_SEW_60_95 =
-  k17_DP16_SEW_85_95 = rep(NA, length(k17_DP16_SEW_years))
-for(i in 1:length(k17_DP16_SEW_years)){
-  k17_DP16_SEW_26_5[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp26_dat[,i]), 0.05)
-  k17_DP16_SEW_45_5[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp45_dat[,i]), 0.05)
-  # k17_DP16_SEW_60_5[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp60_dat[,i]), 0.05, na.rm=TRUE) #goes to 2100
-  k17_DP16_SEW_85_5[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp85_dat[,i]), 0.05)
-  
-  k17_DP16_SEW_26_95[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp26_dat[,i]), 0.95)
-  k17_DP16_SEW_45_95[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp45_dat[,i]), 0.95)
-  # k17_DP16_SEW_60_95[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp60_dat[,i]), 0.95, na.rm=TRUE) #goes to 2100
-  k17_DP16_SEW_85_95[i] <- quantile(convert_cm_to_ft(kopp17_DP16_SEW_rcp85_dat[,i]), 0.95)
-}
-  lsl_fdyn_26_5 =  
-  lsl_fdyn_45_5 =
-  # lsl_fdyn_60_5 =
-  lsl_fdyn_85_5 =
-  lsl_fdyn_26_95 =
-  lsl_fdyn_45_95 =
-  # lsl_fdyn_60_95 =
-  lsl_fdyn_85_95 = 
-    NO_fdyn_26_5 =
-    NO_fdyn_45_5 =
-    # NO_fdyn_60_5 =
-    NO_fdyn_85_5 =
-    NO_fdyn_26_95 =
-    NO_fdyn_45_95 =
-    # NO_fdyn_60_95 =
-    NO_fdyn_85_95 = rep(NA, length(t.time))
-for(i in 1:length(t.time)){
-  lsl_fdyn_26_5[i] <- quantile(lsl_fdyn_rcp26_sub[i,], 0.05)
-  lsl_fdyn_45_5[i] <- quantile(lsl_fdyn_rcp45_sub[i,], 0.05)
-  # lsl_fdyn_60_5[i] <- quantile(lsl_fdyn_rcp60_sub[i,], 0.05) 
-  lsl_fdyn_85_5[i] <- quantile(lsl_fdyn_rcp85_sub[i,], 0.05)
-  
-  lsl_fdyn_26_95[i] <- quantile(lsl_fdyn_rcp26_sub[i,], 0.95)
-  lsl_fdyn_45_95[i] <- quantile(lsl_fdyn_rcp45_sub[i,], 0.95)
-  # lsl_fdyn_60_95[i] <- quantile(lsl_fdyn_rcp60_sub[i,], 0.95) 
-  lsl_fdyn_85_95[i] <- quantile(lsl_fdyn_rcp85_sub[i,], 0.95)
-  
-  NO_fdyn_26_5[i] <- quantile(NO_fdyn_rcp26_sub[i,], 0.05)
-  NO_fdyn_45_5[i] <- quantile(NO_fdyn_rcp45_sub[i,], 0.05)
-  # NO_fdyn_60_5[i] <- quantile(NO_fdyn_rcp60_sub[i,], 0.05) 
-  NO_fdyn_85_5[i] <- quantile(NO_fdyn_rcp85_sub[i,], 0.05)
-  
-  NO_fdyn_26_95[i] <- quantile(NO_fdyn_rcp26_sub[i,], 0.95)
-  NO_fdyn_45_95[i] <- quantile(NO_fdyn_rcp45_sub[i,], 0.95)
-  # NO_fdyn_60_95[i] <- quantile(NO_fdyn_rcp60_sub[i,], 0.95) 
-  NO_fdyn_85_95[i] <- quantile(NO_fdyn_rcp85_sub[i,], 0.95)
-}
-  Ras18_SEW_2p5deg_5 =  
-    Ras18_SEW_2p0deg_5 =
-    Ras18_SEW_1p5deg_5 =
-    Ras18_SEW_2p5deg_95 =  
-    Ras18_SEW_2p0deg_95 =
-    Ras18_SEW_1p5deg_95 = rep(NA, length(Ras18_SEW_years))
-  for(i in 1:length(Ras18_SEW_years)){
-    Ras18_SEW_2p5deg_5[i] <- quantile(convert_cm_to_ft(Ras18_SEW_2p5deg_dat[,i]), 0.05)
-    Ras18_SEW_2p0deg_5[i] <- quantile(convert_cm_to_ft(Ras18_SEW_2p0deg_dat[,i]), 0.05)
-    Ras18_SEW_1p5deg_5[i] <- quantile(convert_cm_to_ft(Ras18_SEW_1p5deg_dat[,i]), 0.05)
-    
-    Ras18_SEW_2p5deg_95[i] <- quantile(convert_cm_to_ft(Ras18_SEW_2p5deg_dat[,i]), 0.95)
-    Ras18_SEW_2p0deg_95[i] <- quantile(convert_cm_to_ft(Ras18_SEW_2p0deg_dat[,i]), 0.95)
-    Ras18_SEW_1p5deg_95[i] <- quantile(convert_cm_to_ft(Ras18_SEW_1p5deg_dat[,i]), 0.95)
-  }
-  sweet17_03_5 =  
-    sweet17_05_5 =
-    sweet17_10_5 =
-    sweet17_15_5 =  
-    sweet17_20_5 =
-    sweet17_25_5 =
-    sweet17_03_95 =  
-    sweet17_05_95 =
-    sweet17_10_95 =
-    sweet17_15_95 =  
-    sweet17_20_95 =
-    sweet17_25_95 =rep(NA, ncol(sweet17_10))
-  for(i in 1:ncol(sweet17_10)){
-    sweet17_03_5[i] <- quantile(sweet17_03[,i], 0.05, na.rm=TRUE)
-    sweet17_05_5[i] <- quantile(sweet17_05[,i], 0.05, na.rm=TRUE)
-    sweet17_10_5[i] <- quantile(sweet17_10[,i], 0.05, na.rm=TRUE)
-    sweet17_15_5[i] <- quantile(sweet17_15[,i], 0.05, na.rm=TRUE)
-    sweet17_20_5[i] <- quantile(sweet17_20[,i], 0.05, na.rm=TRUE)
-    sweet17_25_5[i] <- quantile(sweet17_25[,i], 0.05, na.rm=TRUE)
-    
-    sweet17_03_95[i] <- quantile(sweet17_03[,i], 0.95, na.rm=TRUE)
-    sweet17_05_95[i] <- quantile(sweet17_05[,i], 0.95, na.rm=TRUE)
-    sweet17_10_95[i] <- quantile(sweet17_10[,i], 0.95, na.rm=TRUE)
-    sweet17_15_95[i] <- quantile(sweet17_15[,i], 0.95, na.rm=TRUE)
-    sweet17_20_95[i] <- quantile(sweet17_20[,i], 0.95, na.rm=TRUE)
-    sweet17_25_95[i] <- quantile(sweet17_25[,i], 0.95, na.rm=TRUE)
-  }
+##=========================== RETURN PERIOD PLOTS OF COMBINED STORM SURGE AND SLR ===================================
+pdf(file="../Figures/2018-f04.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
+layout(matrix(c(1,1,1,
+                2,3,4,
+                2,3,4,
+                5,6,7,
+                5,6,7,
+                8,9,10,
+                8,9,10,
+                11,12,13,
+                11,12,13), 9, 3, byrow = TRUE))
+# Add legend
+par(oma=c(1.5,1.5,0,0), mgp=c(1.5,.5,0), mar=c(0,3,1,1))
+plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
 
-pdf(file="../Figures/SLR_proj_pdfa.pdf", family="Times", width=text_column_width, height=full_page_height, pointsize=12)
-layout(matrix(c(1,1,
-                2,3,
-                4,5), 3, 2, byrow = TRUE))
-par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
-plot(k14_years, k14_85_95, type="n",xlab="Year", ylab="Projected sea level (ft)",
-     ylim=c(0,13), xlim=c(2010, 2098), xaxt="n")
-title(main="a.", adj=0)
-axis(1, lwd = 1, at=seq(2010,2100, 10), label=seq(2010,2100, 10))
+legend("topleft", legend=c("95% CI Wong & Keller [2017] no FD","95% CI Wong & Keller [2017] FD", 
+                           "95% CI Kopp et al. [2017]", "95% CI Kopp et al. [2014]", "95% CI Rasmussen et al. [2018]", "95% CI Sweet et al. [2017]"), ncol=2, 
+       pch=15, pt.cex = 2, col=c(NO_fd_col[2], brickfd_col[2], kopp17_DP16_col[2], kopp14_col[2], Ras18_col[2], sweet17_col[3]), bty='n')
 
-# Only plot RCP 8.5
-polygon(y = c(sweet17_25_5, rev(sweet17_25_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = trans_sweet17_col[1], border = NA)
-polygon(y = c(sweet17_20_5, rev(sweet17_20_95)), x = c(seq(2000, 2200, 10), rev(seq(2000, 2200, 10))), col = trans_sweet17_col[2], border = NA)
-polygon(y = c(k14_85_5, rev(k14_85_95)), x = c(k14_years, rev(k14_years)), col = trans_kopp14_col[1], border = NA)
-polygon(y = c(k17_DP16_SEW_85_5, rev(k17_DP16_SEW_85_95)), x = c(k17_DP16_SEW_years, rev(k17_DP16_SEW_years)), col = trans_kopp17_DP16_col[1], border = NA)
-polygon(y = c(Ras18_SEW_2p5deg_5, rev(Ras18_SEW_2p5deg_95)), x = c(Ras18_SEW_years, rev(Ras18_SEW_years)), col = trans_Ras18_col[1], border = NA)
-polygon(y = c(lsl_fdyn_85_5, rev(lsl_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_brickfd_col[1], border = NA)
-polygon(y = c(NO_fdyn_85_5, rev(NO_fdyn_85_95)), x = c(t.time, rev(t.time)), col = trans_NO_fd_col[1], border = NA)
-
-legend("topleft", legend=c("Wong & Keller 2017 FD RCP85 90% CI", "Wong & Keller 2017 no FD RCP85 90% CI", "Kopp et al. 2014 RCP85 90% CI",
-                           "Wong & Keller 2017 FD", "Wong & Keller 2017 no FD", "Kopp et al. 2014", "Sweet et al. 2017",
-                           "Parris et al. 2012",
-                           "USACE 2014", "Hall et al. 2016"),
-       lty=c(NA,NA,NA,1,1,1,NA,NA,NA,NA), lwd=c(NA,NA,NA,2,2,2,NA,NA,NA,NA), pch=c(22,22,22,NA,NA,NA,19,19,19,19),
-       col=c("black", "black", "black", RdBu[9], PRGn[3], sunyellow[2], sweet_cols[5], BrBG[2], BrBG[9], RdGy[9]),
-       bty='n', pt.bg=c(trans_RdBu[10], trans_PRGn[2], trans_sunyellow[1],NA,NA,NA,NA,NA,NA,NA), pt.cex = c(2,2,2,NA,NA,NA,1,1,1,1))
-gradient.rect(2008,2,2012,2.25, col=col_grad, gradient="x")
-arrows(2028.5, 2.12, 2030.5, 2.12, length=0.075)
-text(2020.5,2.12, "Higher scenario")
-
-#--------------------------
-# b) Sea-level rise probability density function 2030
-plot(density(kopp14_rcp85$t_2030), xlab="Projected sea level in 2030 (ft)", ylab="Probability density", yaxt="n", 
-     main="",col=kopp14_col[1], lwd=2, xlim=c(-0.2,2), ylim = c(0, 6.75), bty="l")
-title(main="b.", adj=0)
-# lines(density(kopp14_rcp60$t_2030), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45$t_2030), col=kopp14_col[2], lwd=2)
-lines(density(kopp14_rcp26$t_2030), col=kopp14_col[3], lwd=2)
-
-lines(density(kopp17_DP16_SEW_rcp85$t_2030), col=kopp17_DP16_col[1], lwd=2)
-# lines(density(kopp17_DP16_SEW_rcp60$t_2030), col=Greens[6], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp45$t_2030), col=kopp17_DP16_col[2], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp26$t_2030), col=kopp17_DP16_col[3], lwd=2)
-
-lines(density(brickfd_rcp85$t_2030), col=brickfd_col[1], lwd=2)
-# lines(density(brickfd_rcp60$t_2030), col=RdBu[10], lwd=2)
-lines(density(brickfd_rcp45$t_2030), col=brickfd_col[2], lwd=2)
-lines(density(brickfd_rcp26$t_2030), col=brickfd_col[3], lwd=2)
-
-lines(density(NO_fdft_rcp85$t_2030), col=NO_fd_col[1], lwd=2)
-# lines(density(NO_fdft_rcp60$t_2030), col=PRGn[3], lwd=2)
-lines(density(NO_fdft_rcp45$t_2030), col=NO_fd_col[2], lwd=2)
-lines(density(NO_fdft_rcp26$t_2030), col=NO_fd_col[3], lwd=2)
-
-lines(density(Ras18_SEW_2p5deg$t_2030), col=Ras18_col[1], lwd=2)
-lines(density(Ras18_SEW_2p0deg$t_2030), col=Ras18_col[2], lwd=2)
-lines(density(Ras18_SEW_1p5deg$t_2030), col=Ras18_col[3], lwd=2)
-
-lines(density(sweet17_03$X2030), col=sweet17_col[6], lwd=2)
-lines(density(sweet17_05$X2030), col=sweet17_col[5], lwd=2)
-lines(density(sweet17_10$X2030), col=sweet17_col[4], lwd=2)
-lines(density(sweet17_15$X2030, na.rm=TRUE), col=sweet17_col[3], lwd=2)
-lines(density(sweet17_20$X2030, na.rm=TRUE), col=sweet17_col[2], lwd=2)
-lines(density(sweet17_25$X2030, na.rm=TRUE), col=sweet17_col[1], lwd=2)
-
-lines(parris_etal_2012$t_2030, rep(6.5, 4), col=parris12_col[4:1], lwd=1.5, lty=3)
-lines(usace2014$t_2030, rep(6, 3), col=usace14_col[3:1], lwd=1.5, lty=3)
-lines(hall_etal_2016$t_2030, rep(5.5, 5), col=hall16_col[5:1], lwd=1.5, lty=3)
-lines(sweet2017$t_2030, rep(5, length(sweet2017$t_2030)), col=sweet17_col[6:1], lwd=1.5, lty=3)
-
-points(parris_etal_2012$t_2030, rep(6.5, 4), col=parris12_col[4:1], pch=19)
-points(usace2014$t_2030, rep(6, 3), col=usace14_col[3:1], pch=19)
-points(hall_etal_2016$t_2030, rep(5.5, 5), col=hall16_col[5:1], pch=19)
-points(sweet2017$t_2030, rep(5, length(sweet2017$t_2030)), col=sweet17_col[6:1], pch=19)
+gradient.rect(8.35,7.5,10.1,9, col=col_grad, gradient="x")
+arrows(9.95, 6.3, 10.2, 6.3, length=0.075)
+text(9.1,6.3, "Higher scenario")
 
 #   -----------------------------------------------------------------------
-# c) Sea-level rise probability density function 2050
-par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-plot(density(kopp14_rcp85$t_2050), xlab="Projected sea level in 2050 (ft)", ylab="Probability density", yaxt="n", 
-     main="", col=kopp14_col[1], lwd=2, xlim=c(-0.2,4), ylim = c(0, 3.5), bty="l")
-title(main="c.", adj=0)
-# lines(density(kopp14_rcp60$t_2050), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45$t_2050), col=kopp14_col[2], lwd=2)
-lines(density(kopp14_rcp26$t_2050), col=kopp14_col[3], lwd=2)
-
-lines(density(kopp17_DP16_SEW_rcp85$t_2050), col=kopp17_DP16_col[1], lwd=2)
-# lines(density(kopp17_DP16_SEW_rcp60$t_2050), col=Greens[6], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp45$t_2050), col=kopp17_DP16_col[2], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp26$t_2050), col=kopp17_DP16_col[3], lwd=2)
-
-lines(density(brickfd_rcp85$t_2050), col=brickfd_col[1], lwd=2)
-# lines(density(brickfd_rcp60$t_2050), col=RdBu[10], lwd=2)
-lines(density(brickfd_rcp45$t_2050), col=brickfd_col[2], lwd=2)
-lines(density(brickfd_rcp26$t_2050), col=brickfd_col[3], lwd=2)
-
-lines(density(NO_fdft_rcp85$t_2050), col=NO_fd_col[1], lwd=2)
-# lines(density(NO_fdft_rcp60$t_2050), col=PRGn[3], lwd=2)
-lines(density(NO_fdft_rcp45$t_2050), col=NO_fd_col[2], lwd=2)
-lines(density(NO_fdft_rcp26$t_2050), col=NO_fd_col[3], lwd=2)
-
-lines(density(Ras18_SEW_2p5deg$t_2050), col=Ras18_col[1], lwd=2)
-lines(density(Ras18_SEW_2p0deg$t_2050), col=Ras18_col[2], lwd=2)
-lines(density(Ras18_SEW_1p5deg$t_2050), col=Ras18_col[3], lwd=2)
-
-lines(density(sweet17_03$X2050), col=sweet17_col[6], lwd=2)
-lines(density(sweet17_05$X2050), col=sweet17_col[5], lwd=2)
-lines(density(sweet17_10$X2050), col=sweet17_col[4], lwd=2)
-lines(density(sweet17_15$X2050, na.rm=TRUE), col=sweet17_col[3], lwd=2)
-lines(density(sweet17_20$X2050, na.rm=TRUE), col=sweet17_col[2], lwd=2)
-lines(density(sweet17_25$X2050, na.rm=TRUE), col=sweet17_col[1], lwd=2)
-
-lines(parris_etal_2012$t_2050, rep(3.25, 4), col=parris12_col[4:1], lwd=2, lty=3)
-lines(usace2014$t_2050, rep(3, 3), col=usace14_col[3:1], lwd=2, lty=3)
-lines(hall_etal_2016$t_2050, rep(2.75, 5), col=hall16_col[5:1], lwd=2, lty=3)
-lines(sweet2017$t_2050, rep(2.5, length(sweet2017$t_2050)), col=sweet17_col[6:1], lwd=1.5, lty=3)
-
-points(parris_etal_2012$t_2050, rep(3.25, 4), col=parris12_col[4:1], pch=19)
-points(usace2014$t_2050, rep(3, 3), col=usace14_col[3:1], pch=19)
-points(hall_etal_2016$t_2050, rep(2.75, 5), col=hall16_col[5:1], pch=19)
-points(sweet2017$t_2050, rep(2.5, length(sweet2017$t_2050)), col=sweet17_col[6:1], pch=19)
+# a) low scenarios
+par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
+plot_SLRandStormSurge_CI(year = 2030, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "a.")
 
 #   -----------------------------------------------------------------------
-# d) Sea-level rise probability density function 2070
-par(mgp=c(1.5,.5,0), mar=c(3.5,4,1,1))
-plot(density(kopp14_rcp85$t_2070), xlab="Projected sea level in 2070 (ft)", ylab="Probability density", yaxt="n",
-     main="", col=kopp14_col[1], lwd=2, xlim=c(-0.3,8), ylim = c(0, 3), bty="l")
-title(main="d.", adj=0)
-# lines(density(kopp14_rcp60$t_2070), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45$t_2070), col=kopp14_col[2], lwd=2)
-lines(density(kopp14_rcp26$t_2070), col=kopp14_col[3], lwd=2)
-
-lines(density(kopp17_DP16_SEW_rcp85$t_2070), col=kopp17_DP16_col[1], lwd=2)
-# lines(density(kopp17_DP16_SEW_rcp60$t_2070), col=Greens[6], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp45$t_2070), col=kopp17_DP16_col[2], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp26$t_2070), col=kopp17_DP16_col[3], lwd=2)
-
-lines(density(brickfd_rcp85$t_2070), col=brickfd_col[1], lwd=2)
-# lines(density(brickfd_rcp60$t_2070), col=RdBu[10], lwd=2)
-lines(density(brickfd_rcp45$t_2070), col=brickfd_col[2], lwd=2)
-lines(density(brickfd_rcp26$t_2070), col=brickfd_col[3], lwd=2)
-
-lines(density(NO_fdft_rcp85$t_2070), col=NO_fd_col[1], lwd=2)
-# lines(density(NO_fdft_rcp60$t_2070), col=PRGn[3], lwd=2)
-lines(density(NO_fdft_rcp45$t_2070), col=NO_fd_col[2], lwd=2)
-lines(density(NO_fdft_rcp26$t_2070), col=NO_fd_col[3], lwd=2)
-
-lines(density(Ras18_SEW_2p5deg$t_2070), col=Ras18_col[1], lwd=2)
-lines(density(Ras18_SEW_2p0deg$t_2070), col=Ras18_col[2], lwd=2)
-lines(density(Ras18_SEW_1p5deg$t_2070), col=Ras18_col[3], lwd=2)
-
-lines(density(sweet17_03$X2070), col=sweet17_col[6], lwd=2)
-lines(density(sweet17_05$X2070), col=sweet17_col[5], lwd=2)
-lines(density(sweet17_10$X2070), col=sweet17_col[4], lwd=2)
-lines(density(sweet17_15$X2070, na.rm=TRUE), col=sweet17_col[3], lwd=2)
-lines(density(sweet17_20$X2070, na.rm=TRUE), col=sweet17_col[2], lwd=2)
-lines(density(sweet17_25$X2070, na.rm=TRUE), col=sweet17_col[1], lwd=2)
-
-lines(parris_etal_2012$t_2070, rep(2.75, 4), col=parris12_col[4:1], lwd=2, lty=3)
-lines(usace2014$t_2070, rep(2.5, 3), col=usace14_col[3:1], lwd=2, lty=3)
-lines(hall_etal_2016$t_2070, rep(2.25, 5), col=hall16_col[5:1], lwd=2, lty=3)
-lines(sweet2017$t_2070, rep(2, length(sweet2017$t_2070)), col=sweet17_col[6:1], lwd=1.5, lty=3)
-
-points(parris_etal_2012$t_2070, rep(2.75, 4), col=parris12_col[4:1], pch=19)
-points(usace2014$t_2070, rep(2.5, 3), col=usace14_col[3:1], pch=19)
-points(hall_etal_2016$t_2070, rep(2.25, 5), col=hall16_col[5:1], pch=19)
-points(sweet2017$t_2070, rep(2, length(sweet2017$t_2070)), col=sweet17_col[6:1], pch=19)
+# b) medium scenarios
+plot_SLRandStormSurge_CI(year = 2030, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "b.")
 
 #   -----------------------------------------------------------------------
-par(mgp=c(1.5,0.5,0), mar=c(3.5,3.5,1,1))
-# e) Sea-level rise probability density function 2100
-plot(density(kopp14_rcp85$t_2100), xlab="Projected sea level in 2100 (ft)", ylab="Probability density", yaxt="n", 
-     main="", col=kopp14_col[1], lwd=2, xlim=c(-0.5,15), ylim = c(0, 1.5), bty="l")
-title(main="e.", adj=0)
-# lines(density(kopp14_rcp60$t_2100), col=RdGy[2], lwd=2)
-lines(density(kopp14_rcp45$t_2100), col=kopp14_col[2], lwd=2)
-lines(density(kopp14_rcp26$t_2100), col=kopp14_col[3], lwd=2)
+# c) high scenarios
+par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
+plot_SLRandStormSurge_CI(year = 2030, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "c.")
 
-lines(density(kopp17_DP16_SEW_rcp85$t_2100), col=kopp17_DP16_col[1], lwd=2)
-# lines(density(kopp17_DP16_SEW_rcp60$t_2100), col=Greens[6], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp45$t_2100), col=kopp17_DP16_col[2], lwd=2)
-lines(density(kopp17_DP16_SEW_rcp26$t_2100), col=kopp17_DP16_col[3], lwd=2)
+#---------------------------- 2050 -----------------------------------
+# d) low scenarios
+par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
+plot_SLRandStormSurge_CI(year = 2050, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "d.")
 
-lines(density(brickfd_rcp85$t_2100), col=brickfd_col[1], lwd=2)
-# lines(density(brickfd_rcp60$t_2100), col=RdBu[10], lwd=2)
-lines(density(brickfd_rcp45$t_2100), col=brickfd_col[2], lwd=2)
-lines(density(brickfd_rcp26$t_2100), col=brickfd_col[3], lwd=2)
+#   -----------------------------------------------------------------------
+# e) medium scenarios
+plot_SLRandStormSurge_CI(year = 2050, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "e.")
 
-lines(density(NO_fdft_rcp85$t_2100), col=NO_fd_col[1], lwd=2)
-# lines(density(NO_fdft_rcp60$t_2100), col=PRGn[3], lwd=2)
-lines(density(NO_fdft_rcp45$t_2100), col=NO_fd_col[2], lwd=2)
-lines(density(NO_fdft_rcp26$t_2100), col=NO_fd_col[3], lwd=2)
+#   -----------------------------------------------------------------------
+# f) high scenarios
+par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
+plot_SLRandStormSurge_CI(year = 2050, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "f.")
 
-lines(density(Ras18_SEW_2p5deg$t_2100), col=Ras18_col[1], lwd=2)
-lines(density(Ras18_SEW_2p0deg$t_2100), col=Ras18_col[2], lwd=2)
-lines(density(Ras18_SEW_1p5deg$t_2100), col=Ras18_col[3], lwd=2)
+#---------------------------- 2070 -----------------------------------
+# g) low scenarios
+par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
+plot_SLRandStormSurge_CI(year = 2070, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "g.")
 
-lines(density(sweet17_03$X2100), col=sweet17_col[6], lwd=2)
-lines(density(sweet17_05$X2100), col=sweet17_col[5], lwd=2)
-lines(density(sweet17_10$X2100), col=sweet17_col[4], lwd=2)
-lines(density(sweet17_15$X2100, na.rm=TRUE), col=sweet17_col[3], lwd=2)
-lines(density(sweet17_20$X2100, na.rm=TRUE), col=sweet17_col[2], lwd=2)
-lines(density(sweet17_25$X2100, na.rm=TRUE), col=sweet17_col[1], lwd=2)
+#   -----------------------------------------------------------------------
+# h) medium scenarios
+plot_SLRandStormSurge_CI(year = 2070, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "h.")
 
-lines(parris_etal_2012$t_2100, rep(1.45, 4), col=parris12_col[4:1], lwd=2, lty=3)
-lines(usace2014$t_2100, rep(1.3, 3), col=usace14_col[3:1], lwd=2, lty=3)
-lines(hall_etal_2016$t_2100, rep(1.15, 5), col=hall16_col[5:1], lwd=2, lty=3)
-lines(sweet2017$t_2100, rep(1, length(sweet2017$t_2100)), col=sweet17_col[6:1], lwd=1.5, lty=3)
+#   -----------------------------------------------------------------------
+# i) high scenarios
+par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
+plot_SLRandStormSurge_CI(year = 2070, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "i.")
 
-points(parris_etal_2012$t_2100, rep(1.45, 4), col=parris12_col[4:1], pch=19)
-points(usace2014$t_2100, rep(1.3, 3), col=usace14_col[3:1], pch=19)
-points(hall_etal_2016$t_2100, rep(1.15, 5), col=hall16_col[5:1], pch=19)
-points(sweet2017$t_2100, rep(1, length(sweet2017$t_2100)), col=sweet17_col[6:1], pch=19)
+#---------------------------- 2100 -----------------------------------
+# j) low scenarios
+par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
+plot_SLRandStormSurge_CI(year = 2100, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "j.")
+
+#   -----------------------------------------------------------------------
+# k) medium scenarios
+plot_SLRandStormSurge_CI(year = 2100, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "k.")
+
+#   -----------------------------------------------------------------------
+# l) high scenarios
+par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
+plot_SLRandStormSurge_CI(year = 2100, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "l.")
+
+#   -----------------------------------------------------------------------
+mtext(text="Projected sea+surge level (ft MSL)",side=2,line=0,outer=TRUE)
+mtext(text="Return period (years)",side=1,line=0,outer=TRUE)
+
+dev.off()
+#   -----------------------------------------------------------------------
+
+
+##=========================== RETURN PERIOD PLOTS OF COMBINED STORM SURGE AND SLR ===================================
+# Median and 90% credible intervals for initial ice mass volume from the BRICK model 
+# using the gamma priors for the fast dynamics. 
+# See: https://static-content.springer.com/esm/art%3A10.1007%2Fs10584-017-2039-4/MediaObjects/10584_2017_2039_MOESM2_ESM.pdf
+median.gsic = convert_m_to_ft(0.3958)
+lower.5.gsic = convert_m_to_ft(0.3097)
+upper.95.gsic = convert_m_to_ft(0.4908)
+
+median.gis = convert_m_to_ft(7.352)
+lower.5.gis = convert_m_to_ft(7.177)
+upper.95.gis = convert_m_to_ft(7.539)
+
+pdf(file="../Figures/2018-sf01.pdf", family="Times", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+
+par(oma=c(0,0,0,0), mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,1.5))
+plot(0, type="n",xlab="Year", ylab="Projected GSIC melt (ft SLE)", ylim=c(0,1.7), xlim=c(2010, 2193), xaxt="n")
+axis(1, lwd = 1, at=seq(2010,2200, 10), label=seq(2010,2200, 10))
+polygon(y = c(GSIC_rcp85_5, rev(GSIC_rcp85_95)), x = c(ice_proj, rev(ice_proj)), col = trans_Ras18_col[1], border = NA)
+polygon(y = c(GSIC_rcp45_5, rev(GSIC_rcp45_95)), x = c(ice_proj, rev(ice_proj)), col = trans_brickfd_col[1], border = NA)
+polygon(y = c(GSIC_rcp26_5, rev(GSIC_rcp26_95)), x = c(ice_proj, rev(ice_proj)), col = trans_kopp17_DP16_col[1], border = NA)
+
+abline(h=c(bound.lower.gsic, bound.upper.gsic), lty=3)
+
+plot(0, type="n",xlab="Year", ylab="Projected GIS melt (ft SLE)", ylim=c(0,25), xlim=c(2010, 2193), xaxt="n")
+axis(1, lwd = 1, at=seq(2010,2200, 10), label=seq(2010,2200, 10))
+polygon(y = c(GIS_rcp26_5, rev(GIS_rcp26_95)), x = c(ice_proj, rev(ice_proj)), col = trans_kopp17_DP16_col[1], border = NA)
+polygon(y = c(GIS_rcp45_5, rev(GIS_rcp45_95)), x = c(ice_proj, rev(ice_proj)), col = trans_brickfd_col[1], border = NA)
+polygon(y = c(GIS_rcp85_5, rev(GIS_rcp85_95)), x = c(ice_proj, rev(ice_proj)), col = trans_Ras18_col[1], border = NA)
+
+abline(h=c(bound.lower.gis, bound.upper.gis), lty=3)
+
+legend("left", legend = c("RCP85 90% CI", "RCP45 90% CI", 
+                             "RCP26 90% CI", "Initial ice mass\nvolume 90% CI"), pch = c(rep(22, 3), NA), 
+       bty='n', pt.bg = c(trans_Ras18_col[1], trans_brickfd_col[1], trans_kopp17_DP16_col[1], NA), lty = c(NA,NA,NA,3),
+       pt.cex = 2)
 
 dev.off()
 
 ##==============================================================================
 ## End
 ##==============================================================================
+

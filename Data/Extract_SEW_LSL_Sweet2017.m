@@ -1,10 +1,37 @@
+% Edits by Kelsey Ruckert (klr324@psu.edu) April 2018
+% with the purpose of extracting SLR data
+% for Norfolk (Sewells Point).
+
+% Copyright (C) 2017 by Robert E. Kopp
+
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 % Last updated by Robert Kopp, robert-dot-kopp-at-rutgers-dot-edu, Thu Jan 26 16:57:11 EST 2017
 
 addpath(pwd);
-selectedSite = 299;
+selectedSite = 299; % PSMSL ID for Sewells Point, VA: http://www.psmsl.org/data/obtaining/stations/299.php
 
 % runSeaLevelConditionalDistributions
 % Last updated by Robert Kopp, robert-dot-kopp-at-rutgers-dot-edu, Tue Nov 01 19:05:24 EDT 2016
+
+% Download Sweet et al. 2017 code and data. 
+% git clone https://github.com/bobkopp/LocalizeSL.git
+
+% set up path 
+% rootdir=[pwd, '/LocalizeSL'];
+c% d(rootdir)
+% addpath(fullfile(rootdir,'MFILES'));
 
 addpath(pwd)
 workdir='workdir-161102';
@@ -17,6 +44,8 @@ rootdir=[pwd,'/../../..'];
 %rootdir='~/Dropbox/Code/LocalizeSL';
 addpath(fullfile(rootdir,'MFILES'));
 
+% Load the corefile for the data set of interest. In this case, we will use
+% the corefile from Sweet et al. 2017.
 savefilecore=fullfile(rootdir,'IFILES/SLRProjections161027GRIDDEDcore.mat');
 p=load(savefilecore);
 
