@@ -60,7 +60,7 @@ As stated above, all of the data needed to run the analysis and create the plots
 * Wong and Keller (2017; [view online](https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1002/2017EF000607)) extended to 2200
 	* RCP2.6, 4.5, and 8.5 sea-level rise distributions WITH fast dynamics
 	* RCP2.6, 4.5, and 8.5 sea-level rise distributions WITHOUT fast dynamics  
-	We reran the analysis in Wong and Keller (2017) using the code from the [BRICK repository](https://github.com/scrim-network/BRICK) and modify the code to project to 2200 rather than 2100. In their paper, they downscale projections locally to New Orleans. Following their steps, we modify their code to extract local projections at the Sewell's Point tide gauge using the `Data/Calculate_BRICK_SewellsPoint_LSL.R` script.
+	We reran the analysis in Wong and Keller (2017) using the code from the [BRICK repository](https://github.com/scrim-network/BRICK) and modify the code to project to 2200 rather than 2100. In their paper, they downscale projections locally to New Orleans. Following their steps, we modify their code to extract local projections at the Sewell's Point tide gauge using the `Data/Calculate_BRICK_SewellsPoint_LSL.R` script. The .nc file listed in the code is too large to place on Github, so contact us if you don't have this file. The file will be available on DataCommons.
 	
 * Kopp et al. (2017; [view online](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2017EF000663))
 	* RCP2.6, 4.5, and 8.5 sea-level rise distributions.  
