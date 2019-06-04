@@ -35,6 +35,13 @@ library(fields)
 # Read in conversion functions
 source("Helper_scripts/conversion_functions.R")
 
+# Read in a function that returns a vector of the median return periods for an input vector of block maxima observations
+source("Helper_scripts/Empirical_probability_calculator.R")
+
+# Function to calculate the inverse of a survivial function with the option to consider known probabilities
+# That is if the the values are not equally spaced out (i.e., 2-yr, 50-yr, 100-yr, 500-yr)
+source("Helper_scripts/inv_sf_prob.r")
+
 ################################### SEA-LEVEL DATA ##################################
 ##=========================== READ KOPP ET AL. 2014 DATA ===================================
 # Kopp et al. 2014 Local sea-level rise data at Sewell's point tide gauge
@@ -293,9 +300,6 @@ NOAA_methodGEV = read.csv("../Data/NOAA_method_stormsurge_sewellspoint.csv")
 NOAA_methodGEV[,c(3,4,5,6,9)] = convert_m_to_ft(NOAA_methodGEV[,c(3,4,5,6,9)])
 
 ABM_with_years = read.csv("../Data/AnnualBlockMax_sewellspoint.csv")
-
-# Read in a function that returns a vector of the median return periods for an input vector of block maxima observations
-source("Helper_scripts/Empirical_probability_calculator.R")
 
 # Snag the annual block maxima observations and remove the NAs from the vector
 blockMax = as.numeric(na.omit(NOAA_methodGEV$obs))
@@ -776,8 +780,6 @@ for(i in 1:nrow(bfd_r26_SS_t_2030)){
   NOfd_r85_SS_975$t_2100[i] = quantile(NOfd_r85_SS_t_2100[i, ],0.975)
 }
 #--------------------------- Calculate new 100-yr return levels from combined storm surge and SLR --------------------------
-source("Helper_scripts/inv_sf_prob.r")
-
 run.srikrishnan.stat = FALSE # Change to true if to run the analysis
 
 if(run.srikrishnan.stat){
