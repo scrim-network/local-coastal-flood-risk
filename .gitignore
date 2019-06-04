@@ -2,6 +2,9 @@
 .Rhistory
 .Rapp.history
 
+# Desktop Services Store files created on macOS
+.DS_Store
+
 # .nc Data files, which tend to be large in size
 Data/*.nc
 
