@@ -3,7 +3,10 @@
 This directory contains the code used to generate the analysis found in Ruckert et al. (in review). Analysis codes are predomintely written in R with a few files written in Matlab (which extract data from other studies).
 
 Full Citation:
-> Ruckert, K. L., V. Srikrishnan, and K. Keller (in review), Characterizing the deep uncertainties surrounding coastal flood hazard projections: A case study for Norfolk, VA, *Scientific Reports*, ...
+
+> Ruckert, K. L., Srikrishnan, V., and Keller, K. (in review). Characterizing the deep uncertainties surrounding coastal flood hazard projections: A case study for Norfolk, VA. *Scientific Reports*, ...
+
+> Ruckert, K. L., Srikrishnan, V., and Keller, K. (2018). Characterizing the deep uncertainties surrounding coastal flood hazard projections: A case study for Norfolk, VA. arXiv preprint. arXiv: [1812.04673v2](https://arxiv.org/abs/1812.04673v2).
 
 ## Analysis overview
 
