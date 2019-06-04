@@ -21,6 +21,7 @@
 ## along with this file.  If not, see <http://www.gnu.org/licenses/>.
 ##==============================================================================
 # setwd('/Users/klr324/Documents/GitHub/local-coastal-flood-risk/R')
+# install.packages("svglite")
 
 library(ncdf4)
 library(extRemes)
@@ -31,6 +32,7 @@ library(fields)
 library(diagram)
 library(DEoptim)
 library(stringr)
+library(svglite) # XQuartz is required to use Cairo
 
 # Source survival function, function.
 source("Helper_scripts/plot_SLRcompare_PDF.R")
@@ -88,6 +90,9 @@ trans_zervas13_col = makeTransparent(zervas13_col, 150)
 # Full page = 190 mm x 230 mm (7.48031 x 9.05512 in)
 inches_to_dpi = function(inch){ inch * 300 }
 mm_to_inches = function(mm){ mm * 0.0393701 }
+
+# For most journals the figures should be 39 mm, 84 mm, 129 mm, or 174 mm wide and not higher than 234 mm.
+# For books and book-sized journals, the figures should be 80 mm or 122 mm wide and not higher than 198 mm.
 
 quart_width = mm_to_inches(95)
 quart_height = mm_to_inches(115)
@@ -217,7 +222,9 @@ lab_rect = c("Accounts\nfor ice\nsheet\nfeedback\nprocesses",
              "4\nscenarios",
              "3\nscenarios")
 
-pdf(file="../Figures/2018-f01.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*2, pointsize=10)
+# pdf(file="../Figures/2018-f01.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*2, pointsize=10)
+cairo_ps(filename = "../Figures/2019-f01.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=single_panel_height*2, pointsize=10)
 par(mar = c(0, 0, 0, 0))
 openplotmat()
 
@@ -265,7 +272,9 @@ dev.off()
 
 ##=========================== SLR PDF PLOTS ===================================
 #---------------------------- 2030 -----------------------------------
-pdf(file="../Figures/2018-f02.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*2, pointsize=10)
+# pdf(file="../Figures/2018-f02.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*2, pointsize=10)
+cairo_ps(filename = "../Figures/2019-f02.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=single_panel_height*2, pointsize=10)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
@@ -283,7 +292,7 @@ plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt
 legend("topleft", legend=c("Wong & Keller [2017] FD", "Wong & Keller [2017] no FD", "Kopp et al. [2014]", "Kopp et al. [2017]", "Sweet et al. [2017]",
                            "Rasmussen et al. [2018]", "Parris et al. [2012]", "USACE [2014]", "Hall et al. [2016]"),
        lty=c(1,1,1,1,NA,1,NA,NA,NA), lwd=c(2,2,2,2,NA,2,NA,NA,NA), pch=c(NA,NA,NA,NA,15,NA,19,19,19),
-       pt.cex=c(NA,NA,NA,NA,2,NA,1,1,1), bty='n', ncol=3, cex=1.25,
+       pt.cex=c(NA,NA,NA,NA,2,NA,1,1,1), bty='n', ncol=3, cex=1.2,
        col=c(brickfd_col[1], NO_fd_col[1], kopp14_col[1], kopp17_DP16_col[1], sweet17_col[1],
              Ras18_col[1], parris12_col[2], usace14_col[1], hall16_col[1]))
 
@@ -505,7 +514,9 @@ sweet17_20_95 = percentile_projection_col(sweet17_10[1,], sweet17_20, 0.95)
 sweet17_25_95 = percentile_projection_col(sweet17_10[1,], sweet17_25, 0.95)
 
 #   -----------------------------------------------------------------------
-pdf(file="../Figures/2018-f03.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+# pdf(file="../Figures/2018-f03.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+cairo_ps(filename = "../Figures/2019-f03.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=single_panel_height*1.5, pointsize=10)
 par(oma=c(0,0,0,0), mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,1.5))
 
 # a) Sea-level rise projections
@@ -581,7 +592,9 @@ storm_df = data.frame(studies = c("Tebaldi et al.\n[2012]", "Wong [2018]", "Zerv
                       values = c(tebaldi12$rl_50[which(tebaldi12$rp==100)], wong_18$rl[1], zervas_2013$NOAA_rl_feet[which(zervas_2013$NOAA_rp==100)], 
                                  wong_18$rl[2], gev_stat_50[which.min(abs(1/probs[order(1/probs)] - 100))], wong_18$rl[-1:-2]))
 
-pdf(file="../Figures/2018-f04.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+# pdf(file="../Figures/2018-f04.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+cairo_ps(filename = "../Figures/2019-f04.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=single_panel_height*1.5, pointsize=10)
 # c) Storm surge return period 
 par(mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,0.5))
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
@@ -613,16 +626,18 @@ points(USACE_rp, USACE_EWL$feet[8:14], pch = 19, col=usace14_col[2])
 
 points(c(rp_h, rp_l), rep(NLIH_1821, 2), pch="|", col=burntorange[1])
 lines(c(rp_h, rp_l), rep(NLIH_1821, 2), lty=2, col=burntorange[1])
-points(rp_m, NLIH_1821, pch=19, col=burntorange[1])
+points(rp_m, NLIH_1821, pch=19, col=burntorange[1], cex=1)
+
+points(rp_1749, Storm_of_1749, pch=19, col="darkred", cex=1)
 
 legend("topleft", legend=c("This study 95% CI", "This study MLE",
                            "Tebaldi et al. [2012] 95% CI", "Tebaldi et al. [2012] MLE",
                            "Zervas [2013] 95% CI", "Zervas [2013] MLE", 
                            "Wong [2018] 95% CI", "Wong [2018] MLE",
-                           "1821 Norfolk-Long Island Hurricane", "USACE [2014]", "Observations"),
-       lty=c(NA,1,NA,1,NA,1,NA,1,NA,NA,NA), lwd=c(NA,2,NA,2,NA,2,NA,2,NA,NA,NA), pch=c(22,NA,22,NA,22,NA,22,NA,19,19,19), 
-       col=c("black", srikrishnan_col[2], "black", tebaldi12_col[2], "black", zervas13_col[2], "black", wong_18$color[3], burntorange[1], usace14_col[2], obs_col),
-       bty='n', pt.bg=c(trans_srikrishnan_col[5],NA,trans_tebaldi12_col[2],NA,trans_zervas13_col[2],NA,trans_wong18_col[3],NA,NA,NA,NA), pt.cex = c(2,NA,2,NA,2,NA,2,NA,1,1,1))
+                           "1821 Norfolk-Long Island Hurricane", "The Storm of 1749", "USACE [2014]", "Observations"), cex=0.95,
+       lty=c(NA,1,NA,1,NA,1,NA,1,NA,NA,NA,NA), lwd=c(NA,2,NA,2,NA,2,NA,2,NA,NA,NA,NA), pch=c(22,NA,22,NA,22,NA,22,NA,19,19,19,19), 
+       col=c("black", srikrishnan_col[2], "black", tebaldi12_col[2], "black", zervas13_col[2], "black", wong_18$color[3], burntorange[1], "darkred", usace14_col[2], obs_col),
+       bty='n', pt.bg=c(trans_srikrishnan_col[5],NA,trans_tebaldi12_col[2],NA,trans_zervas13_col[2],NA,trans_wong18_col[3],NA,NA,NA,NA, NA), pt.cex = c(2,NA,2,NA,2,NA,2,NA,1, 1,1,1))
 
 # timelineS plot
 # par(oma=c(0,0,0,0), mgp=c(1.5,.5,0), mar=c(3,0.5,0.5,0.5))
@@ -662,7 +677,9 @@ wongstormSLR_r85 = data.frame(studies = c("Wong [2018]\nBMA + FD SLR", "Wong [20
                                           "Wong [2018] + FD SLR", "Wong [2018]\n + SLR"), values = c(bma_fd_r85_SS_2065_100, bma_NOfd_r85_SS_2065_100,
                                                                                                      stat_fd_r85_SS_2065_100, stat_NOfd_r85_SS_2065_100))
 
-pdf(file="../Figures/2018-f05.pdf", family="Helvetica", width=text_column_width, height=(single_panel_height*1.5)/2, pointsize=10)
+# pdf(file="../Figures/2018-f05.pdf", family="Helvetica", width=text_column_width, height=(single_panel_height*1.5)/2, pointsize=10)
+cairo_ps(filename = "../Figures/2019-f05.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=(single_panel_height*1.5)/2, pointsize=10)
 par(mfrow=c(1,1), mgp=c(1.5,0.75,0), mar=c(0.5,0,0.5,0.5))
 plot(NA, xlim = c(-0.9, 0.7), ylim = c(8.5,10), ann = FALSE, axes = FALSE)
 
@@ -713,15 +730,16 @@ median.gis = convert_m_to_ft(7.352)
 lower.5.gis = convert_m_to_ft(7.177)
 upper.95.gis = convert_m_to_ft(7.539)
 
-pdf(file="../Figures/2018-sf01.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
-
+# pdf(file="../Figures/2019-sf01.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+cairo_ps(filename = "../Figures/2019-sf01.eps", family="Helvetica", fallback_resolution = 1200,
+         width=text_column_width, height=single_panel_height*1.5, pointsize=10)
 par(oma=c(0,0,0,0), mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,1.5))
 plot(0, type="n",xlab="Year", ylab="Projected GSIC melt (ft SLE)", ylim=c(0,1.7), xlim=c(2010, 2193), xaxt="n")
 axis(1, lwd = 1, at=seq(2010,2200, 10), label=seq(2010,2200, 10))
 polygon(y = c(GSIC_rcp85_5, rev(GSIC_rcp85_95)), x = c(ice_proj, rev(ice_proj)), col = trans_Ras18_col[1], border = NA)
 polygon(y = c(GSIC_rcp45_5, rev(GSIC_rcp45_95)), x = c(ice_proj, rev(ice_proj)), col = trans_brickfd_col[1], border = NA)
 polygon(y = c(GSIC_rcp26_5, rev(GSIC_rcp26_95)), x = c(ice_proj, rev(ice_proj)), col = trans_kopp17_DP16_col[1], border = NA)
-
+fig_label("a.", region="figure", pos="topleft", cex=1.5)
 abline(h=c(lower.5.gsic, upper.95.gsic), lty=3)
 
 plot(0, type="n",xlab="Year", ylab="Projected GIS melt (ft SLE)", ylim=c(0,25), xlim=c(2010, 2193), xaxt="n")
@@ -729,7 +747,7 @@ axis(1, lwd = 1, at=seq(2010,2200, 10), label=seq(2010,2200, 10))
 polygon(y = c(GIS_rcp26_5, rev(GIS_rcp26_95)), x = c(ice_proj, rev(ice_proj)), col = trans_kopp17_DP16_col[1], border = NA)
 polygon(y = c(GIS_rcp45_5, rev(GIS_rcp45_95)), x = c(ice_proj, rev(ice_proj)), col = trans_brickfd_col[1], border = NA)
 polygon(y = c(GIS_rcp85_5, rev(GIS_rcp85_95)), x = c(ice_proj, rev(ice_proj)), col = trans_Ras18_col[1], border = NA)
-
+fig_label("b.", region="figure", pos="topleft", cex=1.5)
 abline(h=c(lower.5.gis, upper.95.gis), lty=3)
 
 legend("left", legend = c("RCP85 90% CI", "RCP45 90% CI", 
@@ -739,6 +757,21 @@ legend("left", legend = c("RCP85 90% CI", "RCP45 90% CI",
 
 dev.off()
 
+##=========================== STORM SURGE OBSERVATION PLOT ===================================
+# pdf(file="../Figures/2018-sf02.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+cairo_ps(filename = "../Figures/2019-sf02.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+par(mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,0.5))
+plot(ABM_with_years$index_yr, convert_m_to_ft(ABM_with_years$abm), pch=20, type = "b", col = "black",#, xaxs = 'i',
+     ylab = "Annual block maxima (ft MSL)", xlab = "Year", lwd=1.5)
+fig_label("a.", region="figure", pos="topleft", cex=1.5)
+
+plot(rp_ABM, blockMax, log = "x", pch = 19, col=obs_col, xaxt = 'n', cex=1, xlab = "Return period (years)", 
+     ylab = "Storm surge (ft MSL)")
+axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
+fig_label("b.", region="figure", pos="topleft", cex=1.5)
+
+dev.off()
 ##==============================================================================
 ## End
 ##==============================================================================
