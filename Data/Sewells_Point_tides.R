@@ -129,6 +129,7 @@ aep = 1-q[1:storm_surgeL]
 # max_return_period should be the maximum number of years returned 
 # e.g. 10^4 for a 1/10,000 year return level)
 block_maxima = coredata(year.res.max)/100
+year.block_maxima = index(year.res.max)
 max_return_period = 10^4
   
 fit.obj <- gev.fit(block_maxima, show = FALSE)
@@ -165,6 +166,8 @@ framed = data.frame(return_period = return_pf, min_level = min_f, mle_level = ml
                     obs = obs, return_obs = return_p, aep = aep, return_level = return_level)
 
 write.csv(framed, file="NOAA_method_stormsurge_sewellspoint.csv")
+
+write.csv(data.frame(index_yr = year.block_maxima, abm = block_maxima), file="AnnualBlockMax_sewellspoint.csv", row.names = FALSE)
 
 ## QUICK TEST PLOTS ##
 # ------------------------------

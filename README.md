@@ -1,23 +1,23 @@
 # Code for "Characterizing the deep uncertainties surrounding coastal flood hazard projections: A case study for Norfolk, VA"
-## THIS REPO IS UNDER CONSTRUCTION
 
-This directory contains the code used to generate the analysis found in Ruckert et al. (in prep.). Analysis codes are predomintely written in R with a few files written in Matlab (which extract data from other studies).
+This directory contains the code used to generate the analysis found in Ruckert et al. (in review). Analysis codes are predomintely written in R with a few files written in Matlab (which extract data from other studies).
 
 Full Citation:
+
+> Ruckert, K. L., Srikrishnan, V., and Keller, K. (in review). Characterizing the deep uncertainties surrounding coastal flood hazard projections: A case study for Norfolk, VA. *Scientific Reports*, ...
+
 > Ruckert, K. L., Srikrishnan, V., and Keller, K. (2018). Characterizing the deep uncertainties surrounding coastal flood hazard projections: A case study for Norfolk, VA. arXiv preprint. arXiv: [1812.04673v2](https://arxiv.org/abs/1812.04673v2).
 
 ## Analysis overview
 
-In this analysis, we examine the differences in published flood hazard projections (sea-level rise and storm surge) with an emphasis on Norfolk, VA. Our analysis compares flood hazard projections by 1) extracting code or datasets available online or through personal communication, 2) identifying background conditions/ assumptions/ methodology (e.g., units of measurements, water level datum, baseline year(s), localization method), and 3) converting data for comparibility.
+In this analysis, we examine the differences in published coastal flood hazard projections (sea-level rise and storm surge) with an emphasis on Norfolk, VA. Our analysis compares flood hazard projections by 1) extracting code or datasets available online or through personal communication, 2) identifying background conditions/ assumptions/ methodology (e.g., units of measurements, water level datum, baseline year(s), localization method), and 3) converting data for comparibility.
 
 ## Running the analysis
 This directory includes everything needed to reproduce the work described in Ruckert et al. (in prep.). The data files that correspond to the paper are available in the `Data/` directory. However, we also include the code and details to obtain the data in the following section and therefore invite any user to reproduce our data collection methods. Some of the data files are zipped (i.e., `Data/BRICK_NOfastDynamics_SP_20Nov2018.nc` and `Data/BRICK_SewellsPoint_FastDynamics_20Nov2018.nc`) to reduce file size. These files need to be unzipped before running the analysis, otherwise R will complain.
 
-Once you have obtained all the code and data, you can open R, install the relevant R packages, and run the analysis. Note that if these packages are already installed and/ or loaded in R, R will throw error messages with a request to restart R before proceeding with package updates.
+Once you have obtained all the code and data, you can open R, install the relevant R packages, and run the analysis. Note that if these packages are already installed and/ or loaded in R, R will throw error messages with a request to restart R before proceeding with package updates. Additionally, the package `svglite` requires [XQuartz](https://www.xquartz.org) to save files with semi-transparent colors as .eps. To save files as pdfs without this function simply comment out `library(svglite)`, comment out all the `cairo()` code snippets, and uncomment the `pdf()` code snippets.
 
-```
-R  
-
+```R  
 install.packages("ncdf4")
 install.packages("extRemes")
 install.packages("RColorBrewer")
@@ -29,20 +29,23 @@ install.packages("ismev")
 install.packages("lubridate")
 install.packages("zoo")
 install.packages("diagram")
+install.packages("DEoptim")
+install.packages("stringr")
+install.packages("svglite") # XQuartz is required to use Cairo
 
-setwd("local-coastal-flood-risk/R")  
+setwd("PATH_TO_DIRECTORY/local-coastal-flood-risk/R")  
 source("Plot_LocalSeaLevel_StormSurge.R")
 ```
 
-The script `R/Plot_LocalSeaLevel_StormSurge.R` calls the script that runs the analysis, calls additional helper scripts, and creates the figures. The script that runs the analysis is called `R/ReadAnalysis_LocalSeaLevel_StormSurge.R`. The file `R/ReadAnalysis_LocalSeaLevel_StormSurge.R` reads in all the data and converts all data to the same background conditions (i.e., feet, local mean sea-level, anomalies with respect to 2000, incorporating local subsidence). Additionally, the analysis combines sea-level rise and storm surge distributions.
+The script `R/Plot_LocalSeaLevel_StormSurge.R` calls the script that runs the analysis, calls additional helper scripts, and creates the figures. The script that runs the analysis is called `R/ReadAnalysis_LocalSeaLevel_StormSurge.R`. The file `R/ReadAnalysis_LocalSeaLevel_StormSurge.R` reads in all the data and converts all data to the same background conditions (i.e., feet, local mean sea-level, anomalies with respect to 2000, incorporating local subsidence). Additionally, the analysis combines sea-level rise and storm surge distributions accounting for uncertainty.
 
 ## Obtaining the data (optional)
-As stated. above, all of the data needed to run the analysis and create the plots are provided in the `Data/` directory. However, we also include the scripts used to extract the data or state how we extract the data for reproducibility. If you do not wish to rerun the scripts, you can skip this part and just run the analysis and plot the figures.
+As stated above, all of the data needed to run the analysis and create the plots are provided in the `Data/` directory. However, we also include the scripts used to extract the data or state how we extracted the data for reproducibility. If you do not wish to rerun the data collection scripts, you can skip this part and just run the analysis and plot the figures.
 
 ### Sea-level projections
 
 * USACE ([2011](http://www.corpsclimate.us/docs/EC_1165-2-212%20-Final_10_Nov_2011.pdf); [2013](http://www.publications.usace.army.mil/Portals/76/Publications/EngineerRegulations/ER_1100-2-8162.pdf); [2014](http://www.publications.usace.army.mil/Portals/76/Publications/EngineerTechnicalLetters/ETL_1100-2-1.pdf))
-	* 3 sea-level rise scenarios
+	* 3 sea-level rise scenarios   
 	We obtained this data from the [USACE Sea-level Change Curve Calculator](http://corpsmapu.usace.army.mil/rccinfo/slc/slcc_calc.html) on Apr. 4th, 2108. The data is obtained by setting the guage to "Sewells Point, VA", scenario source to "USACE 2013", output units to "Feet", SLC rate to "NOAA 2006 Rates", output datum to "LMSL", interval year to "1", and keeping all other options the same. Since all of the details to reproduce the scenarios are provided, we also include the `Data/Calculate_USACE_Parris_Hall_SLR_data.R` script (for easier reproducibility), which reproduces the scenarios using the coded model. The values are changed to be relative to the year 2000 in the script reading in the data for the analysis (`R/ReadAnalysis_LocalSeaLevel_StormSurge.R`).
 
 * Parris et al. (2012; [view online](https://cpo.noaa.gov/sites/cpo/Reports/2012/NOAA_SLR_r3.pdf))
@@ -60,7 +63,7 @@ As stated. above, all of the data needed to run the analysis and create the plot
 * Wong and Keller (2017; [view online](https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1002/2017EF000607)) extended to 2200
 	* RCP2.6, 4.5, and 8.5 sea-level rise distributions WITH fast dynamics
 	* RCP2.6, 4.5, and 8.5 sea-level rise distributions WITHOUT fast dynamics  
-	We reran the analysis in Wong and Keller (2017) using the code from the [BRICK repository](https://github.com/scrim-network/BRICK) and modify the code to project to 2200 rather than 2100. In their paper, they downscale projections locally to New Orleans. Following their steps, we modify their code to extract local projections at the Sewell's Point tide gauge using the `Data/Calculate_BRICK_SewellsPoint_LSL.R` script.
+	We reran the analysis in Wong and Keller (2017) using the code from the [BRICK repository](https://github.com/scrim-network/BRICK) and modify the code to project to 2200 rather than 2100. In their paper, they downscale projections locally to New Orleans. Following their steps, we modify their code to extract local projections at the Sewell's Point tide gauge using the `Data/Calculate_BRICK_SewellsPoint_LSL.R` script. The .nc file listed in the code is too large to place on Github, so contact us if you don't have this file. The file will be available on DataCommons.
 	
 * Kopp et al. (2017; [view online](https://agupubs.onlinelibrary.wiley.com/doi/10.1002/2017EF000663))
 	* RCP2.6, 4.5, and 8.5 sea-level rise distributions.  
@@ -87,6 +90,10 @@ As stated. above, all of the data needed to run the analysis and create the plot
 * USACE (2014; [view online](http://www.publications.usace.army.mil/Portals/76/Publications/EngineerTechnicalLetters/ETL_1100-2-1.pdf))
 	* Maximum likelihood estimates of storm surge  
 	We obtained this data from the [USACE Sea-level Change Curve Calculator](http://corpsmapu.usace.army.mil/rccinfo/slc/slcc_calc.html) on Feb. 13th, 2018. The data was obtained by setting the gauge to "Sewells Point, VA", output units to "Feet", output datum to "LMSL", EWL type to "Highs", EWL source to "USACE (Percentile)", and keeping all other options the same.
+	
+* Wong (2018; [view online](https://www.adv-stat-clim-meteorol-oceanogr.net/4/53/2018/))
+	* Distributions of stationary and non-stationary storm surge estimates in 2065 
+	The maximum likelihood estimates, 95% confidence interval estimates, and median 100-yr return levels of stationary and non stationary values in 2065 are approximated in the `R/ReadAnalysis_LocalSeaLevel_StormSurge.R` file. The data and analysis codes are located at [https://github.com/tonyewong/covariates).
 	 
 * Our historical observation analysis
 	* Annual block maxima  

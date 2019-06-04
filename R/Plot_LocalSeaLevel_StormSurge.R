@@ -21,6 +21,7 @@
 ## along with this file.  If not, see <http://www.gnu.org/licenses/>.
 ##==============================================================================
 # setwd('/Users/klr324/Documents/GitHub/local-coastal-flood-risk/R')
+# install.packages("svglite")
 
 library(ncdf4)
 library(extRemes)
@@ -30,10 +31,11 @@ library(ash)
 library(fields)
 library(diagram)
 library(DEoptim)
+library(stringr)
+library(svglite) # XQuartz is required to use Cairo
 
 # Source survival function, function.
 source("Helper_scripts/plot_SLRcompare_PDF.R")
-source("Helper_scripts/plot_SLRandStormSurge_CI.R")
 
 # Source Conversion functions.
 source("Helper_scripts/conversion_functions.R")
@@ -78,6 +80,7 @@ trans_usace14_col = makeTransparent(usace14_col, 150)
 
 trans_tebaldi12_col = makeTransparent(tebaldi12_col, 150)
 trans_srikrishnan_col = makeTransparent(srikrishnan_col, 150)
+trans_wong18_col = makeTransparent(wong_18$color, 150)
 trans_zervas13_col = makeTransparent(zervas13_col, 150)
 
 ##=========================== PUBLICATION FIGURE SIZES ===================================
@@ -86,6 +89,9 @@ trans_zervas13_col = makeTransparent(zervas13_col, 150)
 # Full page = 190 mm x 230 mm (7.48031 x 9.05512 in)
 inches_to_dpi = function(inch){ inch * 300 }
 mm_to_inches = function(mm){ mm * 0.0393701 }
+
+# For most journals the figures should be 39 mm, 84 mm, 129 mm, or 174 mm wide and not higher than 234 mm.
+# For books and book-sized journals, the figures should be 80 mm or 122 mm wide and not higher than 198 mm.
 
 quart_width = mm_to_inches(95)
 quart_height = mm_to_inches(115)
@@ -215,7 +221,9 @@ lab_rect = c("Accounts\nfor ice\nsheet\nfeedback\nprocesses",
              "4\nscenarios",
              "3\nscenarios")
 
-pdf(file="../Figures/2018-f01.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
+# pdf(file="../Figures/2018-f01.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*2, pointsize=10)
+cairo_ps(filename = "../Figures/2019-f01.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=single_panel_height*2, pointsize=10)
 par(mar = c(0, 0, 0, 0))
 openplotmat()
 
@@ -263,7 +271,9 @@ dev.off()
 
 ##=========================== SLR PDF PLOTS ===================================
 #---------------------------- 2030 -----------------------------------
-pdf(file="../Figures/2018-f02.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
+# pdf(file="../Figures/2018-f02.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*2, pointsize=10)
+cairo_ps(filename = "../Figures/2019-f02.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=single_panel_height*2, pointsize=10)
 layout(matrix(c(1,1,1,
                 2,3,4,
                 2,3,4,
@@ -281,13 +291,13 @@ plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt
 legend("topleft", legend=c("Wong & Keller [2017] FD", "Wong & Keller [2017] no FD", "Kopp et al. [2014]", "Kopp et al. [2017]", "Sweet et al. [2017]",
                            "Rasmussen et al. [2018]", "Parris et al. [2012]", "USACE [2014]", "Hall et al. [2016]"),
        lty=c(1,1,1,1,NA,1,NA,NA,NA), lwd=c(2,2,2,2,NA,2,NA,NA,NA), pch=c(NA,NA,NA,NA,15,NA,19,19,19),
-       pt.cex=c(NA,NA,NA,NA,2,NA,1,1,1), bty='n', ncol=3, 
+       pt.cex=c(NA,NA,NA,NA,2,NA,1,1,1), bty='n', ncol=3, cex=1.2,
        col=c(brickfd_col[1], NO_fd_col[1], kopp14_col[1], kopp17_DP16_col[1], sweet17_col[1],
              Ras18_col[1], parris12_col[2], usace14_col[1], hall16_col[1]))
 
 gradient.rect(7.35,1.5,9.1,3, col=col_grad, gradient="x")
-arrows(8.95, 0.3, 9.2, 0.3, length=0.075)
-text(8.1,0.3, "Higher scenario")
+arrows(9.2, 0.3, 9.45, 0.3, length=0.075)
+text(8.1,0.3, "Higher scenario", cex=1.25)
 
 #   -----------------------------------------------------------------------
 # a) Sea-level rise probability density function low scenarios
@@ -503,8 +513,10 @@ sweet17_20_95 = percentile_projection_col(sweet17_10[1,], sweet17_20, 0.95)
 sweet17_25_95 = percentile_projection_col(sweet17_10[1,], sweet17_25, 0.95)
 
 #   -----------------------------------------------------------------------
-pdf(file="../Figures/2018-f03.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
-par(oma=c(0,0,0,0), mfrow=c(3, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,1.5))
+# pdf(file="../Figures/2018-f03.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+cairo_ps(filename = "../Figures/2019-f03.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+par(oma=c(0,0,0,0), mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,1.5))
 
 # a) Sea-level rise projections
 plot(0, type="n",xlab="Year", ylab="Projected sea level (ft)", ylim=c(0,13), xlim=c(2010, 2098), xaxt="n")
@@ -552,9 +564,9 @@ fig_label("b.", region="figure", pos="topleft", cex=1.5)
 
 rect(2020, 0, 2400, 20, col="gray99", border=NA)
 rect(2020, 0, 2120, 20, col="gray85", border=NA)
-text(2070, 9.75, "Design life of 100 yrs")
-text(2200, 9.75, "Continued operation and maintenance")
-arrows(2275, 9.75, 2285, 9.75, length=0.075)
+text(2070, 9.75, "Design life of 100 yrs", cex=0.8)
+text(2210, 9.75, "Continued operation & maintenance", cex=0.8)
+arrows(2297, 9.75, 2307, 9.75, length=0.075)
 
 rect(project_years$kopp14[1], 0.75, project_years$kopp14[2], 1.25, col=kopp14_col[2], border=NA)
 rect(project_years$kopp17[1], 1.75, project_years$kopp17[2], 2.25, col=kopp17_DP16_col[2], border=NA)
@@ -569,21 +581,34 @@ rect(project_years$sweet17[1], 8.75, project_years$sweet17[2], 9.25, col=sweet17
 axis(2, lwd = 1, at=1:9, label=c("Kopp et al. [2014]", "Kopp et al. [2017]", "Wong & Keller\n[2017] no FD", 
                                  "Wong & Keller [2017] FD", "Rasmussen et al.\n[2018]", "USACE [2014]", 
                                  "Parris et al. [2012]", "Hall et al. [2016]", "Sweet et al. [2017]"), las=1)
-
 box()
 #   -----------------------------------------------------------------------
+dev.off()
+
+##=========================== STORM SURGE PLOT ===================================
+storm_df = data.frame(studies = c("Tebaldi et al.\n[2012]", "Wong [2018]", "Zervas [2013]", "Wong [2018]\nNAO", "This study MLE",  
+                                  "Wong [2018]\nTime", "Wong [2018]\nTemp.", "Wong [2018]\nBMA", "Wong [2018]\nSea level"),
+                      values = c(tebaldi12$rl_50[which(tebaldi12$rp==100)], wong_18$rl[1], zervas_2013$NOAA_rl_feet[which(zervas_2013$NOAA_rp==100)], 
+                                 wong_18$rl[2], gev_stat_50[which.min(abs(1/probs[order(1/probs)] - 100))], wong_18$rl[-1:-2]))
+
+# pdf(file="../Figures/2018-f04.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+cairo_ps(filename = "../Figures/2019-f04.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=single_panel_height*1.5, pointsize=10)
 # c) Storm surge return period 
-par(mgp=c(1.5,.5,0), mar=c(3,3,0.5,0.5))
+par(mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,0.5))
 plot(1/NOAA_methodGEV$aep, NOAA_methodGEV$return_level, log = "x", type = "n", xlim = c(1, 500),
      ylim = c(2.85, 17), 
      xaxt = 'n', cex=1, #bty="l",
      xlab = "Return period (years)", 
      ylab = "Storm surge (ft MSL)")
 axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
-fig_label("c.", region="figure", pos="topleft", cex=1.5)
+fig_label("a.", region="figure", pos="topleft", cex=1.5)
 
 polygon(y = c(gev_stat_025, rev(gev_stat_975)), 
         x = c(1/probs[order(1/probs)], 1/probs), col = trans_srikrishnan_col[5], border = NA)
+
+polygon(y = c(wong18_stat_025, rev(wong18_stat_975)), 
+        x = c(wong18_rl_years, rev(wong18_rl_years)), col = trans_wong18_col[3], border = NA)
 
 polygon(y = c(tebaldi12$rl_025, rev(tebaldi12$rl_975)), 
         x = c(tebaldi12$rp, rev(tebaldi12$rp)), col = trans_tebaldi12_col[2], border = NA)
@@ -592,6 +617,7 @@ polygon(y = c(zervas_2013$min_95[1:4], rev(zervas_2013$max_95[1:4])),
         x = c(1/zervas_2013$aep[1:4], rev(1/zervas_2013$aep[1:4])), col = trans_zervas13_col[2], border = NA)
 
 lines(1/probs[order(1/probs)], gev_stat_50, col=srikrishnan_col[2], lwd=2)
+lines(wong18_rl_years, wong18_stat_50, col=wong_18$color[3], lwd=2)
 lines(zervas_2013$NOAA_rp, zervas_2013$NOAA_rl_feet, lwd=2, col=zervas13_col[2])
 lines(tebaldi12$rp, tebaldi12$rl_50, lty = 1, lwd = 2, col= tebaldi12_col[2])
 points(rp_ABM, blockMax, pch = 19, col=obs_col)
@@ -599,107 +625,99 @@ points(USACE_rp, USACE_EWL$feet[8:14], pch = 19, col=usace14_col[2])
 
 points(c(rp_h, rp_l), rep(NLIH_1821, 2), pch="|", col=burntorange[1])
 lines(c(rp_h, rp_l), rep(NLIH_1821, 2), lty=2, col=burntorange[1])
-points(rp_m, NLIH_1821, pch=19, col=burntorange[1])
+points(rp_m, NLIH_1821, pch=19, col=burntorange[1], cex=1)
 
-legend("topleft", legend=c("Our model 95% CI", "Our model MLE",
+points(rp_1749, Storm_of_1749, pch=19, col="darkred", cex=1)
+
+legend("topleft", legend=c("This study 95% CI", "This study MLE",
                            "Tebaldi et al. [2012] 95% CI", "Tebaldi et al. [2012] MLE",
                            "Zervas [2013] 95% CI", "Zervas [2013] MLE", 
-                           "USACE [2014]", "Observations", "1821 Norfolk-Long Island Hurricane"),
-       lty=c(NA,1,NA,1,NA,1,NA,NA,NA), lwd=c(NA,2,NA,2,NA,2,NA,NA,NA), pch=c(22,NA,22,NA,22,NA,19,19,19), 
-       col=c("black", srikrishnan_col[2], "black", tebaldi12_col[2], "black", zervas13_col[2], usace14_col[2], obs_col, burntorange[1]),
-       bty='n', pt.bg=c(trans_srikrishnan_col[5],NA,trans_tebaldi12_col[2],NA,trans_zervas13_col[2],NA,NA,NA,NA), pt.cex = c(2,NA,2,NA,2,NA,1,1,1))
+                           "Wong [2018] 95% CI", "Wong [2018] MLE",
+                           "1821 Norfolk-Long Island Hurricane", "The Storm of 1749", "USACE [2014]", "Observations"), cex=0.95,
+       lty=c(NA,1,NA,1,NA,1,NA,1,NA,NA,NA,NA), lwd=c(NA,2,NA,2,NA,2,NA,2,NA,NA,NA,NA), pch=c(22,NA,22,NA,22,NA,22,NA,19,19,19,19), 
+       col=c("black", srikrishnan_col[2], "black", tebaldi12_col[2], "black", zervas13_col[2], "black", wong_18$color[3], burntorange[1], "darkred", usace14_col[2], obs_col),
+       bty='n', pt.bg=c(trans_srikrishnan_col[5],NA,trans_tebaldi12_col[2],NA,trans_zervas13_col[2],NA,trans_wong18_col[3],NA,NA,NA,NA, NA), pt.cex = c(2,NA,2,NA,2,NA,2,NA,1, 1,1,1))
+
+# timelineS plot
+# par(oma=c(0,0,0,0), mgp=c(1.5,.5,0), mar=c(3,0.5,0.5,0.5))
+par(mgp=c(0.5,.5,0), mar=c(2,1,0.5,0.5))
+plot(NA, xlim = c(-1, 1), ylim = c(6.5,8), ann = FALSE, axes = FALSE)
+fig_label("b.", region="figure", pos="topleft", cex=1.5)
+
+d = 1
+v = -0.75
+
+points <- rep_len(d * c(0.4, 0.7), length.out = nrow(storm_df))
+segments(y0 = storm_df[[2]], x0 = v, y1 = storm_df[[2]], x1 = points + v, col = "gray44")
+
+axis(2, at = seq(from = 6, to = 8, by = 0.5), cex.axis = 1, pos = v, lwd.tick = 2, col = "gray44", font = 2, las = 1)
+abline(v = v, lwd = 5, col = "gray44")
+
+points(y = storm_df[[2]], x = points + v, pch = 21, cex = 1.75, lwd=2,
+       bg = c("white","white","white", "darkred", "white", "darkred", "darkred", "darkred", "darkred"))
+
+text(x = points +v+0.1, y = storm_df[[2]], labels = rev(c("a", "b", "c", "d", "e", "f", "g", "h", "i")), font=2)
+
+text(x = v-0.15, y = 7.25, labels = "100-yr median storm surge in 2065\n(ft MSL)", srt=90)
+legend("topright", legend = c("Stationary", "Non-stationary"), pch = 21, pt.bg = c(NA, "darkred"), pt.cex=1.75, bty="n")
+legend("bottomright", legend = rev(str_replace_all(storm_df[[1]], "([\n])", " ")), pch = c("a", "b", "c", "d", "e", "f", "g", "h", "i"), bty="n")
 
 dev.off()
-#   -----------------------------------------------------------------------
+##=========================== 100-YR COMBINED STORM SURGE AND SLR ===================================
+wongstormSLR_r26 = data.frame(studies = c("Wong [2018]\nBMA + FD SLR", "Wong [2018]\nBMA + SLR", 
+                                          "Wong [2018] + FD SLR", "Wong [2018]\n + SLR"), values = c(bma_fd_r26_SS_2065_100, bma_NOfd_r26_SS_2065_100, 
+                                                                                                     stat_fd_r26_SS_2065_100, stat_NOfd_r26_SS_2065_100))
 
-##=========================== RETURN PERIOD PLOTS OF COMBINED STORM SURGE AND SLR ===================================
-pdf(file="../Figures/2018-f04.pdf", family="Times", width=text_column_width, height=single_panel_height*2, pointsize=10)
-layout(matrix(c(1,1,1,
-                2,3,4,
-                2,3,4,
-                5,6,7,
-                5,6,7,
-                8,9,10,
-                8,9,10,
-                11,12,13,
-                11,12,13), 9, 3, byrow = TRUE))
-# Add legend
-par(oma=c(1.5,1.5,0,0), mgp=c(1.5,.5,0), mar=c(0,3,1,1))
-plot(1, type="n", xlab="", ylab="", xlim=c(0, 10), ylim=c(0, 10), yaxt="n", xaxt="n", bty="n")
+wongstormSLR_r45 = data.frame(studies = c("Wong [2018]\nBMA + FD SLR", "Wong [2018]\nBMA + SLR", 
+                                          "Wong [2018] + FD SLR", "Wong [2018]\n + SLR"), values = c(bma_fd_r45_SS_2065_100, bma_NOfd_r45_SS_2065_100,  
+                                                                                                     stat_fd_r45_SS_2065_100, stat_NOfd_r45_SS_2065_100))
 
-legend("topleft", legend=c("95% CI Wong & Keller [2017] no FD","95% CI Wong & Keller [2017] FD", 
-                           "95% CI Kopp et al. [2017]", "95% CI Kopp et al. [2014]", "95% CI Rasmussen et al. [2018]", "95% CI Sweet et al. [2017]"), ncol=2, 
-       pch=15, pt.cex = 2, col=c(NO_fd_col[2], brickfd_col[2], kopp17_DP16_col[2], kopp14_col[2], Ras18_col[2], sweet17_col[3]), bty='n')
+wongstormSLR_r85 = data.frame(studies = c("Wong [2018]\nBMA + FD SLR", "Wong [2018]\nBMA + SLR", 
+                                          "Wong [2018] + FD SLR", "Wong [2018]\n + SLR"), values = c(bma_fd_r85_SS_2065_100, bma_NOfd_r85_SS_2065_100,
+                                                                                                     stat_fd_r85_SS_2065_100, stat_NOfd_r85_SS_2065_100))
 
-gradient.rect(8.35,7.5,10.1,9, col=col_grad, gradient="x")
-arrows(9.95, 6.3, 10.2, 6.3, length=0.075)
-text(9.1,6.3, "Higher scenario")
+# pdf(file="../Figures/2018-f05.pdf", family="Helvetica", width=text_column_width, height=(single_panel_height*1.5)/2, pointsize=10)
+cairo_ps(filename = "../Figures/2019-f05.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=(single_panel_height*1.5)/2, pointsize=10)
+par(mfrow=c(1,1), mgp=c(1.5,0.75,0), mar=c(0.5,0,0.5,0.5))
+plot(NA, xlim = c(-0.9, 0.7), ylim = c(8.5,10), ann = FALSE, axes = FALSE)
 
-#   -----------------------------------------------------------------------
-# a) low scenarios
-par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
-plot_SLRandStormSurge_CI(year = 2030, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "a.")
+d = 0
+v = -0.7
 
-#   -----------------------------------------------------------------------
-# b) medium scenarios
-plot_SLRandStormSurge_CI(year = 2030, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "b.")
+points <- rep_len(d + c(0.4, 0.7), length.out = nrow(wongstormSLR_r26))
+segments(y0 = wongstormSLR_r26[[2]], x0 = d+v, y1 = wongstormSLR_r26[[2]], x1 = points + v, col = "gray44")
 
-#   -----------------------------------------------------------------------
-# c) high scenarios
-par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
-plot_SLRandStormSurge_CI(year = 2030, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "c.")
+axis(2, at = c(8.5, 9, 9.5, 10), cex.axis = 1, pos = d+v, lwd.tick = 2, col = "gray44", font = 2, las = 1,
+     labels = c("8.5", "9", "9.5", "10"))
+abline(v = d+v, lwd = 5, col = "gray44")
 
-#---------------------------- 2050 -----------------------------------
-# d) low scenarios
-par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
-plot_SLRandStormSurge_CI(year = 2050, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "d.")
+points(y = wongstormSLR_r26[[2]], x = points + v, pch = 21, cex = 1.75, lwd=2,
+       bg = c("darkred", "#2c7bb6", "white", "white"),
+       col = c("darkred", "#2c7bb6", "darkred", "#2c7bb6"))
+text(x = d+v-0.15, y = 9.25, labels = "100-yr storm surge + SLR in 2065\n(ft MSL)", srt=90, font=1.5)
 
-#   -----------------------------------------------------------------------
-# e) medium scenarios
-plot_SLRandStormSurge_CI(year = 2050, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "e.")
+#-----
+segments(y0 = wongstormSLR_r45[[2]], x0 = d+v, y1 = wongstormSLR_r45[[2]], x1 = points + v, col = "gray44")
+points(y = wongstormSLR_r45[[2]], x = points + v, pch = 22, cex = 1.75, lwd=2,
+       bg = c("darkred", "#2c7bb6", "white", "white"),
+       col = c("darkred", "#2c7bb6", "darkred", "#2c7bb6"))
 
-#   -----------------------------------------------------------------------
-# f) high scenarios
-par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
-plot_SLRandStormSurge_CI(year = 2050, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "f.")
+#-----
+segments(y0 = wongstormSLR_r85[[2]], x0 = d+v, y1 = wongstormSLR_r85[[2]], x1 = points + v, col = "gray44")
+points(y = wongstormSLR_r85[[2]], x = points + v, pch = 24, cex = 1.75, lwd=2,
+       bg = c("darkred", "#2c7bb6", "white", "white"),
+       col = c("darkred", "#2c7bb6", "darkred", "#2c7bb6"))
 
-#---------------------------- 2070 -----------------------------------
-# g) low scenarios
-par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
-plot_SLRandStormSurge_CI(year = 2070, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "g.")
+text(x = -0.3, y = c(wongstormSLR_r85[[2]][1]+0.1, wongstormSLR_r85[[2]][3]+0.1),
+     labels = c("Wong [2018] BMA + SLR", "Wong [2018] + SLR"), font=1)
 
-#   -----------------------------------------------------------------------
-# h) medium scenarios
-plot_SLRandStormSurge_CI(year = 2070, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "h.")
-
-#   -----------------------------------------------------------------------
-# i) high scenarios
-par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
-plot_SLRandStormSurge_CI(year = 2070, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "i.")
-
-#---------------------------- 2100 -----------------------------------
-# j) low scenarios
-par(mgp=c(1.5,.5,0), mar=c(3.5,3,1,0.5))
-plot_SLRandStormSurge_CI(year = 2100, scen = "rcp26", deg = "1p5deg", sweet.scen = c("05", "03"), probs, panel = "j.")
-
-#   -----------------------------------------------------------------------
-# k) medium scenarios
-plot_SLRandStormSurge_CI(year = 2100, scen = "rcp45", deg = "2p0deg", sweet.scen = c("15", "10"), probs, panel = "k.")
-
-#   -----------------------------------------------------------------------
-# l) high scenarios
-par(mgp=c(1.5,0.5,0), mar=c(3.5,3,1,1))
-plot_SLRandStormSurge_CI(year = 2100, scen = "rcp85", deg = "2p5deg", sweet.scen = c("25", "20"), probs, panel = "l.")
-
-#   -----------------------------------------------------------------------
-mtext(text="Projected sea+surge level (ft MSL)",side=2,line=0,outer=TRUE)
-mtext(text="Return period (years)",side=1,line=0,outer=TRUE)
-
+legend("topright", legend = c("Non-stationary", "Stationary", NA, "Fast dynamics", "No fast dynamics", NA, "RCP8.5", "RCP4.5", "RCP2.6"), 
+       pch = c(21, 21, NA, 21, 21, NA, 24, 22, 21), pt.bg = c("black", "white", NA, "darkred", "#2c7bb6", NA, "white", "white", "white"), 
+       col=c("black", "black", NA, "darkred", "#2c7bb6", NA, "black", "black", "black"), pt.cex=1.75, pt.lwd=1.75)
 dev.off()
-#   -----------------------------------------------------------------------
 
-
-##=========================== RETURN PERIOD PLOTS OF COMBINED STORM SURGE AND SLR ===================================
+##=========================== ICE MASS VOLUME PLOT ===================================
 # Median and 90% credible intervals for initial ice mass volume from the BRICK model 
 # using the gamma priors for the fast dynamics. 
 # See: https://static-content.springer.com/esm/art%3A10.1007%2Fs10584-017-2039-4/MediaObjects/10584_2017_2039_MOESM2_ESM.pdf
@@ -711,24 +729,25 @@ median.gis = convert_m_to_ft(7.352)
 lower.5.gis = convert_m_to_ft(7.177)
 upper.95.gis = convert_m_to_ft(7.539)
 
-pdf(file="../Figures/2018-sf01.pdf", family="Times", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
-
+# pdf(file="../Figures/2019-sf01.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+cairo_ps(filename = "../Figures/2019-sf01.eps", family="Helvetica", fallback_resolution = 1200,
+         width=text_column_width, height=single_panel_height*1.5, pointsize=10)
 par(oma=c(0,0,0,0), mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,1.5))
 plot(0, type="n",xlab="Year", ylab="Projected GSIC melt (ft SLE)", ylim=c(0,1.7), xlim=c(2010, 2193), xaxt="n")
 axis(1, lwd = 1, at=seq(2010,2200, 10), label=seq(2010,2200, 10))
 polygon(y = c(GSIC_rcp85_5, rev(GSIC_rcp85_95)), x = c(ice_proj, rev(ice_proj)), col = trans_Ras18_col[1], border = NA)
 polygon(y = c(GSIC_rcp45_5, rev(GSIC_rcp45_95)), x = c(ice_proj, rev(ice_proj)), col = trans_brickfd_col[1], border = NA)
 polygon(y = c(GSIC_rcp26_5, rev(GSIC_rcp26_95)), x = c(ice_proj, rev(ice_proj)), col = trans_kopp17_DP16_col[1], border = NA)
-
-abline(h=c(bound.lower.gsic, bound.upper.gsic), lty=3)
+fig_label("a.", region="figure", pos="topleft", cex=1.5)
+abline(h=c(lower.5.gsic, upper.95.gsic), lty=3)
 
 plot(0, type="n",xlab="Year", ylab="Projected GIS melt (ft SLE)", ylim=c(0,25), xlim=c(2010, 2193), xaxt="n")
 axis(1, lwd = 1, at=seq(2010,2200, 10), label=seq(2010,2200, 10))
 polygon(y = c(GIS_rcp26_5, rev(GIS_rcp26_95)), x = c(ice_proj, rev(ice_proj)), col = trans_kopp17_DP16_col[1], border = NA)
 polygon(y = c(GIS_rcp45_5, rev(GIS_rcp45_95)), x = c(ice_proj, rev(ice_proj)), col = trans_brickfd_col[1], border = NA)
 polygon(y = c(GIS_rcp85_5, rev(GIS_rcp85_95)), x = c(ice_proj, rev(ice_proj)), col = trans_Ras18_col[1], border = NA)
-
-abline(h=c(bound.lower.gis, bound.upper.gis), lty=3)
+fig_label("b.", region="figure", pos="topleft", cex=1.5)
+abline(h=c(lower.5.gis, upper.95.gis), lty=3)
 
 legend("left", legend = c("RCP85 90% CI", "RCP45 90% CI", 
                              "RCP26 90% CI", "Initial ice mass\nvolume 90% CI"), pch = c(rep(22, 3), NA), 
@@ -737,7 +756,21 @@ legend("left", legend = c("RCP85 90% CI", "RCP45 90% CI",
 
 dev.off()
 
+##=========================== STORM SURGE OBSERVATION PLOT ===================================
+# pdf(file="../Figures/2018-sf02.pdf", family="Helvetica", width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+cairo_ps(filename = "../Figures/2019-sf02.eps", family="Helvetica", fallback_resolution = 300,
+         width=text_column_width, height=single_panel_height*1.5, pointsize=10)
+par(mfrow=c(2, 1), mgp=c(1.5,.5,0), mar=c(3,3,0.5,0.5))
+plot(ABM_with_years$index_yr, convert_m_to_ft(ABM_with_years$abm), pch=20, type = "b", col = "black",#, xaxs = 'i',
+     ylab = "Annual block maxima (ft MSL)", xlab = "Year", lwd=1.5)
+fig_label("a.", region="figure", pos="topleft", cex=1.5)
+
+plot(rp_ABM, blockMax, log = "x", pch = 19, col=obs_col, xaxt = 'n', cex=1, xlab = "Return period (years)", 
+     ylab = "Storm surge (ft MSL)")
+axis(1, lwd = 1, at=c(0.1, 1, 10, 100, 250, 500), label=c(0.1, 1, 10, 100, 250, 500))
+fig_label("b.", region="figure", pos="topleft", cex=1.5)
+
+dev.off()
 ##==============================================================================
 ## End
 ##==============================================================================
-

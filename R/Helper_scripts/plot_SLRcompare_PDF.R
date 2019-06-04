@@ -69,7 +69,7 @@ plot_SLRcompare_PDF = function(  year = 2070,
   xl = c(-0.5,15)
   # Create a density plot  
   plot(density(c(1,1)), type = "n", xlab= as.character(year), ylab="", cex.lab=1,
-       yaxt="n", main="", xlim=xl, ylim=yl, bty="l")
+       yaxt="n", main="", xlim=xl, ylim=yl, bty="l", cex.lab = 1.5)
   title(main=panel, adj=0)
 
   # Plot the projections based on the scenario and projection year from the function input

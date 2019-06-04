@@ -22,6 +22,9 @@
 ##==============================================================================
 # setwd('/Users/klr324/Documents/Data_LSL')
 
+
+##=========================== READ KOPP ET AL. 2017 DATA ===================================
+# Kopp et al. 2017 Local sea-level rise data at Sewell's point tide gaugelibrary(ncdf4)
 library(ncdf4)
 library(extRemes)
 library(RColorBrewer)
@@ -31,6 +34,13 @@ library(fields)
 
 # Read in conversion functions
 source("Helper_scripts/conversion_functions.R")
+
+# Read in a function that returns a vector of the median return periods for an input vector of block maxima observations
+source("Helper_scripts/Empirical_probability_calculator.R")
+
+# Function to calculate the inverse of a survivial function with the option to consider known probabilities
+# That is if the the values are not equally spaced out (i.e., 2-yr, 50-yr, 100-yr, 500-yr)
+source("Helper_scripts/inv_sf_prob.r")
 
 ################################### SEA-LEVEL DATA ##################################
 ##=========================== READ KOPP ET AL. 2014 DATA ===================================
@@ -60,8 +70,6 @@ kopp14_subsid_dat = read.csv("../Data/LSLProj_bkgd_299_rcp26.csv")
 kopp14_subsid = convert_cm_to_ft(data.frame(t_2030 = kopp14_subsid_dat$X2030, t_2050 = kopp14_subsid_dat$X2050, 
                                             t_2070 = kopp14_subsid_dat$X2070, t_2100 = kopp14_subsid_dat$X2100))
 
-##=========================== READ KOPP ET AL. 2017 DATA ===================================
-# Kopp et al. 2017 Local sea-level rise data at Sewell's point tide gauge
 # Data is cm above 2000, so 0cm is 2000. Data is projected with RCP26, 45, 60, and 85.
 kopp17_DP16_SEW_rcp26_dat = read.csv("../Data/LSLproj_MC_DP16_SEW_299_rcp26.csv") 
 kopp17_DP16_SEW_rcp26 = convert_cm_to_ft(data.frame(t_2030 = kopp17_DP16_SEW_rcp26_dat$X2030, t_2050 = kopp17_DP16_SEW_rcp26_dat$X2050, 
@@ -204,6 +212,15 @@ for(i in 1:states_w){
   NO_fdyn_rcp85_sub[ ,i] = convert_m_to_ft(NO_fdyn_rcp85[match(2010:2200, year_proj),i]) + subsid.fit[i, ]
 }
 
+# use for SLR + storm surge analysis
+fd_r26_sub_2065 = lsl_fdyn_rcp26_sub[match(2065, t.time), ]
+fd_r45_sub_2065 = lsl_fdyn_rcp45_sub[match(2065, t.time), ]
+fd_r85_sub_2065 = lsl_fdyn_rcp85_sub[match(2065, t.time), ]
+
+Nfd_r26_sub_2065 = NO_fdyn_rcp26_sub[match(2065, t.time), ]
+Nfd_r45_sub_2065 = NO_fdyn_rcp45_sub[match(2065, t.time), ]
+Nfd_r85_sub_2065 = NO_fdyn_rcp85_sub[match(2065, t.time), ]
+
 #------------------------- Add subsidence to Wong & Keller 2017 data --------------------------------
 # Function changing BRICK from m to feet and adding subsidence based on Kopp et al. 2014
 combine_subsid_to_brick = function(out_name, brick_input, y_projection, subsidence){
@@ -282,8 +299,7 @@ tebaldi12[,c(2,4,5)] = convert_mhw_to_msl(convert_m_to_ft(tebaldi12[,c(2,4,5)]))
 NOAA_methodGEV = read.csv("../Data/NOAA_method_stormsurge_sewellspoint.csv")
 NOAA_methodGEV[,c(3,4,5,6,9)] = convert_m_to_ft(NOAA_methodGEV[,c(3,4,5,6,9)])
 
-# Read in a function that returns a vector of the median return periods for an input vector of block maxima observations
-source("Helper_scripts/Empirical_probability_calculator.R")
+ABM_with_years = read.csv("../Data/AnnualBlockMax_sewellspoint.csv")
 
 # Snag the annual block maxima observations and remove the NAs from the vector
 blockMax = as.numeric(na.omit(NOAA_methodGEV$obs))
@@ -303,6 +319,10 @@ rp_l = max(median.rt(vector(mode = 'numeric', length = returnperiod_l)))
 rp_h = max(median.rt(vector(mode = 'numeric', length = returnperiod_h)))
 rp_m = max(median.rt(vector(mode = 'numeric', length = returnperiod_m)))
 
+Storm_of_1749 = 15 # 15 foot storm surge that flooded much of the region
+returnperiod_1749 = 2018 - 1749
+rp_1749 = max(median.rt(vector(mode = 'numeric', length = returnperiod_1749)))
+
 ##=========================== READ ZERVAS 2013 (NOAA) DATA ===================================
 # NOAA MLE (Zervas data just with more points) from the USACE Sea level calculator for Sewell's Point: 
 # http://www.corpsclimate.us/ccaceslcurves.cfm. Feet above MSL;
@@ -313,6 +333,38 @@ zervas_2013 = read.csv("../Data/Zervas_2013_ExtremeWaterLevels_SewellsPoint.csv"
 # Convert the data collected from Table C to ft msl. Other data is already in ft above msl.
 zervas_2013[,7:9] = convert_mhhw_to_msl(convert_m_to_ft(zervas_2013[,7:9]))
 
+##=========================== READ WONG 2018 DATA ===================================
+# Millimeters above mean sea level
+wong18_stormsurge = readRDS("../Data/Wong_2018_norfolk_MCMC_stormsurge.rds")
+wong18_stationary = wong18_stormsurge$time$gpd3
+wong18_rl_years = c(2, 3, 5, 10, 20, 30, 50, 80, 100, 150, 200, 250, 300, 350, 400, 450, 500, 1000)
+
+# Estimate the 97.5 and 2.5% confidence intervals 
+wong18_stat_025 = wong18_stat_50 = wong18_stat_975 = vector(mode = "numeric", length = length(wong18_rl_years))
+for(i in 1:length(wong18_rl_years)){
+  wong18_stat_025[i] = quantile(wong18_stationary[ ,i],0.025)
+  wong18_stat_50[i] = quantile(wong18_stationary[ ,i],0.5)
+  wong18_stat_975[i] = quantile(wong18_stationary[ ,i],0.975)
+}
+
+# Convert values to feet
+wong18_stat_025 = convert_mm_to_ft(wong18_stat_025)
+wong18_stat_50 = convert_mm_to_ft(wong18_stat_50)
+wong18_stat_975 = convert_mm_to_ft(wong18_stat_975)
+
+# Create dataframe of median 100-yr return levels of stationary and non stationary values in 2065
+wong_18 = data.frame(rl = c(quantile(wong18_stationary[ ,match(100, wong18_rl_years)], 0.5),
+                            quantile(wong18_stormsurge$nao$bma[ ,match(100, wong18_rl_years)], 0.5),
+                            quantile(wong18_stormsurge$time$bma[ ,match(100, wong18_rl_years)], 0.5),
+                            quantile(wong18_stormsurge$temp$bma[ ,match(100, wong18_rl_years)], 0.5),
+                            quantile(wong18_stormsurge$bma[ ,match(100, wong18_rl_years)], 0.5),
+                            quantile(wong18_stormsurge$sealevel$bma[ ,match(100, wong18_rl_years)], 0.5)),
+                     rp = rep(100, 6), year = rep(2065, 6), 
+                     covariate_model = c("Stationary", "NAO", "Time", "Temperature", "BMA", "Sea level"), 
+                     color = brewer.pal(9,"Blues")[4:9])
+# Convert values to feet
+wong_18$rl = convert_mm_to_ft(wong_18$rl)
+
 ##=========================== READ SRIKRISHNAN ET AL. IN PREP. DATA ===================================
 # Millimeters above mean sea level
 stationary = readRDS("../Data/Srikrishnan_norfolk_MCMC-stationary.rds")
@@ -322,12 +374,14 @@ burnin = 1:50000
 burn_stationary = stationary[[1]]$samples[-burnin, ]
 
 # Generate GEV functions for each state of the world via the parameter distributions
-# Figure 3 plots just past the 500-yr return period so the 750-yr return period is sufficient to reduce compute time
-probs = seq(0 + 1/750, 1 - 1/750, length.out = 750)
+# Figure 3 plots just past the 500-yr return period so the 1000-yr return period is sufficient to reduce compute time 
+# and still estimate the 100-yr and 500-yr return period
+probs = seq(1/1000, c(1 - 1/1000), length.out = 1000)
 stat_sotw = mat.or.vec(length(probs), nrow(burn_stationary))
 for(i in 1:nrow(burn_stationary)){
 stat_sotw[ ,i] = qevd(probs, loc = burn_stationary[i,1], scale = burn_stationary[i,2], shape = burn_stationary[i,3], type='GEV')
 }
+
 # Estimate the 97.5 and 2.5% confidence intervals 
 gev_stat_025 = gev_stat_50 = gev_stat_975 = vector(mode = "numeric", length = nrow(stat_sotw))
 for(i in 1:nrow(stat_sotw)){
@@ -360,8 +414,46 @@ subsweet17_SEW_length = length(sweet17_03$X2030)
 # Generate a subset of GEV parameter sets
 subsweet17_SEW_stat2 = stat_sotw[ , sample(ncol(stat_sotw), size=subsweet17_SEW_length, replace=FALSE)]
 stationary_sweet17_SEW = convert_mm_to_ft(subsweet17_SEW_stat2)
+
+# Generate ensemble sizes of Wong and Keller 2017 SLR to match Wong 2018 storm surge ensembles
+# non-stationary
+bma_subset_fd_r26 = sample(fd_r26_sub_2065, size=nrow(wong18_stormsurge$bma), replace=FALSE)
+bma_subset_fd_r45 = sample(fd_r45_sub_2065, size=nrow(wong18_stormsurge$bma), replace=FALSE)
+bma_subset_fd_r85 = sample(fd_r85_sub_2065, size=nrow(wong18_stormsurge$bma), replace=FALSE)
+
+bma_subset_Nfd_r26 = sample(Nfd_r26_sub_2065, size=nrow(wong18_stormsurge$bma), replace=FALSE)
+bma_subset_Nfd_r45 = sample(Nfd_r45_sub_2065, size=nrow(wong18_stormsurge$bma), replace=FALSE)
+bma_subset_Nfd_r85 = sample(Nfd_r85_sub_2065, size=nrow(wong18_stormsurge$bma), replace=FALSE)
+
+# stationary
+stat_subset_fd_r26 = sample(fd_r26_sub_2065, size=nrow(wong18_stationary), replace=FALSE)
+stat_subset_fd_r45 = sample(fd_r45_sub_2065, size=nrow(wong18_stationary), replace=FALSE)
+stat_subset_fd_r85 = sample(fd_r85_sub_2065, size=nrow(wong18_stationary), replace=FALSE)
+
+stat_subset_Nfd_r26 = sample(Nfd_r26_sub_2065, size=nrow(wong18_stationary), replace=FALSE)
+stat_subset_Nfd_r45 = sample(Nfd_r45_sub_2065, size=nrow(wong18_stationary), replace=FALSE)
+stat_subset_Nfd_r85 = sample(Nfd_r85_sub_2065, size=nrow(wong18_stationary), replace=FALSE)
   
 #--------------------------- Add distribution of storm surge data to SLR data --------------------------
+# Add stationary and non-stationary storm surge (in 2065) from Wong 2018 to Wong and Keller 2017
+bma_SLR_fd_r26 = bma_SLR_fd_r45 = bma_SLR_fd_r85 = bma_SLR_NOfd_r26 = bma_SLR_NOfd_r45 = bma_SLR_NOfd_r85 = 
+  stat_SLR_fd_r26 = stat_SLR_fd_r45 = stat_SLR_fd_r85 = stat_SLR_NOfd_r26 = stat_SLR_NOfd_r45 = 
+  stat_SLR_NOfd_r85 = mat.or.vec(ncol(wong18_stormsurge$bma), nrow(wong18_stormsurge$bma))
+for(i in 1:nrow(wong18_stormsurge$bma)){
+  bma_SLR_fd_r26[,i] = bma_subset_fd_r26[i] + convert_mm_to_ft(wong18_stormsurge$bma[i, ])
+  bma_SLR_fd_r45[,i] = bma_subset_fd_r45[i] + convert_mm_to_ft(wong18_stormsurge$bma[i, ])
+  bma_SLR_fd_r85[,i] = bma_subset_fd_r85[i] + convert_mm_to_ft(wong18_stormsurge$bma[i, ])
+  bma_SLR_NOfd_r26[,i] = bma_subset_Nfd_r26[i] + convert_mm_to_ft(wong18_stormsurge$bma[i, ])
+  bma_SLR_NOfd_r45[,i] = bma_subset_Nfd_r45[i] + convert_mm_to_ft(wong18_stormsurge$bma[i, ])
+  bma_SLR_NOfd_r85[,i] = bma_subset_Nfd_r85[i] + convert_mm_to_ft(wong18_stormsurge$bma[i, ])
+  stat_SLR_fd_r26[,i] = stat_subset_fd_r26[i] + convert_mm_to_ft(wong18_stationary[i, ])
+  stat_SLR_fd_r45[,i] = stat_subset_fd_r45[i] + convert_mm_to_ft(wong18_stationary[i, ])
+  stat_SLR_fd_r85[,i] = stat_subset_fd_r85[i] + convert_mm_to_ft(wong18_stationary[i, ])
+  stat_SLR_NOfd_r26[,i] = stat_subset_Nfd_r26[i] + convert_mm_to_ft(wong18_stationary[i, ])
+  stat_SLR_NOfd_r45[,i] = stat_subset_Nfd_r45[i] + convert_mm_to_ft(wong18_stationary[i, ])
+  stat_SLR_NOfd_r85[,i] = stat_subset_Nfd_r85[i] + convert_mm_to_ft(wong18_stationary[i, ])
+}
+
 # Add stationary storm surge to Kopp et al. 2014; 2017 and Rasmussen et al. 2018
 k14_r26_SS_t_2030 = k14_r26_SS_t_2050 = k14_r26_SS_t_2070 = k14_r26_SS_t_2100 = 
   k14_r45_SS_t_2030 = k14_r45_SS_t_2050 = k14_r45_SS_t_2070 = k14_r45_SS_t_2100 = 
@@ -593,7 +685,9 @@ bfd_r26_SS_t_2030 = bfd_r26_SS_t_2050 = bfd_r26_SS_t_2070 = bfd_r26_SS_t_2100 =
   bfd_r85_SS_t_2030 = bfd_r85_SS_t_2050 = bfd_r85_SS_t_2070 = bfd_r85_SS_t_2100 = 
   NOfd_r26_SS_t_2030 = NOfd_r26_SS_t_2050 = NOfd_r26_SS_t_2070 = NOfd_r26_SS_t_2100 = 
   NOfd_r45_SS_t_2030 = NOfd_r45_SS_t_2050 = NOfd_r45_SS_t_2070 = NOfd_r45_SS_t_2100 = 
-  NOfd_r85_SS_t_2030 = NOfd_r85_SS_t_2050 = NOfd_r85_SS_t_2070 = NOfd_r85_SS_t_2100 = mat.or.vec(nrow(stationary_brick), ncol(stationary_brick))
+  NOfd_r85_SS_t_2030 = NOfd_r85_SS_t_2050 = NOfd_r85_SS_t_2070 = NOfd_r85_SS_t_2100 = 
+  bfd_r26_SS_2065 = bfd_r45_SS_2065 = bfd_r85_SS_2065 = NOfd_r26_SS_2065 = 
+  NOfd_r45_SS_2065 = NOfd_r85_SS_2065 = mat.or.vec(nrow(stationary_brick), ncol(stationary_brick))
 for(i in 1:ncol(stationary_brick)){
   # Add stationary storm surge to Wong and Keller 2017 fast dynamics
   bfd_r26_SS_t_2030[ ,i] = brickfd_rcp26$t_2030[i] + stationary_brick[ ,i]
@@ -608,6 +702,9 @@ for(i in 1:ncol(stationary_brick)){
   bfd_r85_SS_t_2050[ ,i] = brickfd_rcp85$t_2050[i] + stationary_brick[ ,i]
   bfd_r85_SS_t_2070[ ,i] = brickfd_rcp85$t_2070[i] + stationary_brick[ ,i]
   bfd_r85_SS_t_2100[ ,i] = brickfd_rcp85$t_2100[i] + stationary_brick[ ,i]
+  bfd_r26_SS_2065[ ,i] = fd_r26_sub_2065[i] + stationary_brick[ ,i]
+  bfd_r45_SS_2065[ ,i] = fd_r45_sub_2065[i] + stationary_brick[ ,i]
+  bfd_r85_SS_2065[ ,i] = fd_r85_sub_2065[i] + stationary_brick[ ,i]
   # Add stationary storm surge to Wong and Keller 2017 NO fast dynamics
   NOfd_r26_SS_t_2030[ ,i] = NO_fdft_rcp26$t_2030[i] + stationary_brick[ ,i]
   NOfd_r26_SS_t_2050[ ,i] = NO_fdft_rcp26$t_2050[i] + stationary_brick[ ,i]
@@ -621,6 +718,9 @@ for(i in 1:ncol(stationary_brick)){
   NOfd_r85_SS_t_2050[ ,i] = NO_fdft_rcp85$t_2050[i] + stationary_brick[ ,i]
   NOfd_r85_SS_t_2070[ ,i] = NO_fdft_rcp85$t_2070[i] + stationary_brick[ ,i]
   NOfd_r85_SS_t_2100[ ,i] = NO_fdft_rcp85$t_2100[i] + stationary_brick[ ,i]
+  NOfd_r26_SS_2065[ ,i] = Nfd_r26_sub_2065[i] + stationary_brick[ ,i]
+  NOfd_r45_SS_2065[ ,i] = Nfd_r45_sub_2065[i] + stationary_brick[ ,i]
+  NOfd_r85_SS_2065[ ,i] = Nfd_r85_sub_2065[i] + stationary_brick[ ,i]
 }
 
 bfd_r26_SS_025 = bfd_r26_SS_975 = bfd_r45_SS_025 = bfd_r45_SS_975 = bfd_r85_SS_025 = bfd_r85_SS_975 = 
@@ -679,6 +779,625 @@ for(i in 1:nrow(bfd_r26_SS_t_2030)){
   NOfd_r85_SS_975$t_2070[i] = quantile(NOfd_r85_SS_t_2070[i, ],0.975)
   NOfd_r85_SS_975$t_2100[i] = quantile(NOfd_r85_SS_t_2100[i, ],0.975)
 }
+#--------------------------- Calculate new 100-yr return levels from combined storm surge and SLR --------------------------
+run.srikrishnan.stat = FALSE # Change to true if to run the analysis
+
+if(run.srikrishnan.stat){
+# Data from Vivek's stationary storm surge values
+# BRICK fast dynamics r26
+small.num = round(max(bfd_r26_SS_2065[1,])+0.01, 2)
+end.num = round(mean(fd_r26_sub_2065) + gev_stat_50[which.min(abs(1/probs[order(1/probs)] - 100))], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > bfd_r26_SS_2065[1,]))
+print(all(num.range[100] < bfd_r26_SS_2065[1000,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(length(bfd_r26_SS_2065[1,]), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(bfd_r26_SS_2065, 2, inv.sf, val= num.range[i])
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# max.returnL_fd26 <- which.max(new.returnLevel)
+max.returnL_fd26 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[max.returnL_fd26]) #The probability should be 0.01
+bfd_r26_SS_2065_100 = num.range[max.returnL_fd26]
+
+# BRICK fast dynamics r45
+small.num = round(max(bfd_r45_SS_2065[1,])+0.01, 2)
+end.num = round(mean(fd_r45_sub_2065) + gev_stat_50[which.min(abs(1/probs[order(1/probs)] - 100))], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > bfd_r45_SS_2065[1,]))
+print(all(num.range[100] < bfd_r45_SS_2065[1000,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(length(bfd_r45_SS_2065[1,]), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(bfd_r45_SS_2065, 2, inv.sf, val= num.range[i])
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# max.returnL_fd45 <- which.max(new.returnLevel)
+max.returnL_fd45 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[max.returnL_fd45]) #The probability should be 0.01
+bfd_r45_SS_2065_100 = num.range[max.returnL_fd45]
+
+# BRICK fast dynamics r85
+small.num = round(max(bfd_r85_SS_2065[1,])+0.01, 2)
+end.num = round(mean(fd_r85_sub_2065) + gev_stat_50[which.min(abs(1/probs[order(1/probs)] - 100))], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > bfd_r85_SS_2065[1,]))
+print(all(num.range[100] < bfd_r85_SS_2065[1000,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(length(bfd_r85_SS_2065[1,]), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(bfd_r85_SS_2065, 2, inv.sf, val= num.range[i])
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# max.returnL_fd85 <- which.max(new.returnLevel)
+max.returnL_fd85 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[max.returnL_fd85]) #The probability should be 0.01
+bfd_r85_SS_2065_100 = num.range[max.returnL_fd85]
+
+# BRICK NO fast dynamics r26
+small.num = round(max(NOfd_r26_SS_2065[1,])+0.01, 2)
+end.num = round(mean(Nfd_r26_sub_2065) + gev_stat_50[which.min(abs(1/probs[order(1/probs)] - 100))], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > NOfd_r26_SS_2065[1,]))
+print(all(num.range[100] < NOfd_r26_SS_2065[1000,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(length(NOfd_r26_SS_2065[1,]), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(NOfd_r26_SS_2065, 2, inv.sf, val= num.range[i])
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# max.returnL_NOfd26 <- which.max(new.returnLevel)
+max.returnL_NOfd26 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[max.returnL_NOfd26]) #The probability should be 0.01
+NOfd_r26_SS_2065_100 = num.range[max.returnL_NOfd26]
+
+# BRICK NO fast dynamics r45
+small.num = round(max(NOfd_r45_SS_2065[1,])+0.01, 2)
+end.num = round(mean(Nfd_r45_sub_2065) + gev_stat_50[which.min(abs(1/probs[order(1/probs)] - 100))], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > NOfd_r45_SS_2065[1,]))
+print(all(num.range[100] < NOfd_r45_SS_2065[1000,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(length(NOfd_r45_SS_2065[1,]), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(NOfd_r45_SS_2065, 2, inv.sf, val= num.range[i])
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# max.returnL_NOfd45 <- which.max(new.returnLevel)
+max.returnL_NOfd45 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[max.returnL_NOfd45]) #The probability should be 0.01
+NOfd_r45_SS_2065_100 = num.range[max.returnL_NOfd45]
+
+# BRICK NO fast dynamics r85
+small.num = round(max(NOfd_r85_SS_2065[1,])+0.01, 2)
+end.num = round(mean(Nfd_r85_sub_2065) + gev_stat_50[which.min(abs(1/probs[order(1/probs)] - 100))], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > NOfd_r85_SS_2065[1,]))
+print(all(num.range[100] < NOfd_r85_SS_2065[1000,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(length(NOfd_r85_SS_2065[1,]), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(NOfd_r85_SS_2065, 2, inv.sf, val= num.range[i])
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# max.returnL_NOfd85 <- which.max(new.returnLevel)
+max.returnL_NOfd85 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[max.returnL_NOfd85]) #The probability should be 0.01
+NOfd_r85_SS_2065_100 = num.range[max.returnL_NOfd85]
+}
+# -------------------------------------------------------------------------
+# Data from Wong 2018 nonstationary BMA storm surge values rcp26 fast dynamics
+small.num = round(max(bma_SLR_fd_r26[1,])+0.01, 2)
+end.num = round(mean(bma_subset_fd_r26) + wong_18$rl[5], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > bma_SLR_fd_r26[1,]))
+print(all(num.range[100] < bma_SLR_fd_r26[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(bma_SLR_fd_r26), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(bma_SLR_fd_r26, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# bma_max.returnL_fd26 <- which.max(new.returnLevel)
+bma_max.returnL_fd26 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[bma_max.returnL_fd26]) #The probability should be 0.01
+bma_fd_r26_SS_2065_100 = num.range[bma_max.returnL_fd26]
+
+# Data from Wong 2018 nonstationary BMA storm surge values rcp45 fast dynamics
+small.num = round(max(bma_SLR_fd_r45[1,])+0.01, 2)
+end.num = round(mean(bma_subset_fd_r45) + wong_18$rl[5], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > bma_SLR_fd_r45[1,]))
+print(all(num.range[100] < bma_SLR_fd_r45[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(bma_SLR_fd_r45), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(bma_SLR_fd_r45, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# bma_max.returnL_fd45 <- which.max(new.returnLevel)
+bma_max.returnL_fd45 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[bma_max.returnL_fd45]) #The probability should be 0.01
+bma_fd_r45_SS_2065_100 = num.range[bma_max.returnL_fd45]
+
+# Data from Wong 2018 nonstationary BMA storm surge values rcp85 fast dynamics
+small.num = round(max(bma_SLR_fd_r85[1,])+0.01, 2)
+end.num = round(mean(bma_subset_fd_r85) + wong_18$rl[5], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > bma_SLR_fd_r85[1,]))
+print(all(num.range[100] < bma_SLR_fd_r85[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(bma_SLR_fd_r85), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(bma_SLR_fd_r85, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# bma_max.returnL_fd85 <- which.max(new.returnLevel)
+bma_max.returnL_fd85 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[bma_max.returnL_fd85]) #The probability should be 0.01
+bma_fd_r85_SS_2065_100 = num.range[bma_max.returnL_fd85]
+
+# Data from Wong 2018 nonstationary BMA storm surge values rcp26 NO fast dynamics
+small.num = round(max(bma_SLR_NOfd_r26[1,])+0.01, 2)
+end.num = round(mean(bma_subset_Nfd_r26) + wong_18$rl[5], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > bma_SLR_NOfd_r26[1,]))
+print(all(num.range[100] < bma_SLR_NOfd_r26[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(bma_SLR_NOfd_r26), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(bma_SLR_NOfd_r26, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# bma_max.returnL_NOfd26 <- which.max(new.returnLevel)
+bma_max.returnL_NOfd26 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[bma_max.returnL_NOfd26]) #The probability should be 0.01
+bma_NOfd_r26_SS_2065_100 = num.range[bma_max.returnL_NOfd26]
+
+# Data from Wong 2018 nonstationary BMA storm surge values rcp45 NO fast dynamics
+small.num = round(max(bma_SLR_NOfd_r45[1,])+0.01, 2)
+end.num = round(mean(bma_subset_Nfd_r45) + wong_18$rl[5], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > bma_SLR_NOfd_r45[1,]))
+print(all(num.range[100] < bma_SLR_NOfd_r45[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(bma_SLR_NOfd_r45), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(bma_SLR_NOfd_r45, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# bma_max.returnL_NOfd45 <- which.max(new.returnLevel)
+bma_max.returnL_NOfd45 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[bma_max.returnL_NOfd45]) #The probability should be 0.01
+bma_NOfd_r45_SS_2065_100 = num.range[bma_max.returnL_NOfd45]
+
+# Data from Wong 2018 nonstationary BMA storm surge values rcp85 NO fast dynamics
+small.num = round(max(bma_SLR_NOfd_r85[1,])+0.01, 2)
+end.num = round(mean(bma_subset_Nfd_r85) + wong_18$rl[5], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > bma_SLR_NOfd_r85[1,]))
+print(all(num.range[100] < bma_SLR_NOfd_r85[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(bma_SLR_NOfd_r85), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(bma_SLR_NOfd_r85, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# bma_max.returnL_NOfd85 <- which.max(new.returnLevel)
+bma_max.returnL_NOfd85 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[bma_max.returnL_NOfd85]) #The probability should be 0.01
+bma_NOfd_r85_SS_2065_100 = num.range[bma_max.returnL_NOfd85]
+
+# -------------------------------------------------------------------------
+# Data from Wong 2018 stationary storm surge values rcp26 fast dynamics
+small.num = round(max(stat_SLR_fd_r26[1,])+0.01, 2)
+end.num = round(mean(stat_subset_fd_r26) + wong_18$rl[1], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > stat_SLR_fd_r26[1,]))
+print(all(num.range[100] < stat_SLR_fd_r26[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(stat_SLR_fd_r26), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(stat_SLR_fd_r26, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# stat_max.returnL_fd26 <- which.max(new.returnLevel)
+stat_max.returnL_fd26 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[stat_max.returnL_fd26]) #The probability should be 0.01
+stat_fd_r26_SS_2065_100 = num.range[stat_max.returnL_fd26]
+
+# Data from Wong 2018 stationary storm surge values rcp45 fast dynamics
+small.num = round(max(stat_SLR_fd_r45[1,])+0.01, 2)
+end.num = round(mean(stat_subset_fd_r45) + wong_18$rl[1], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > stat_SLR_fd_r45[1,]))
+print(all(num.range[100] < stat_SLR_fd_r45[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(stat_SLR_fd_r45), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(stat_SLR_fd_r45, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# stat_max.returnL_fd45 <- which.max(new.returnLevel)
+stat_max.returnL_fd45 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[stat_max.returnL_fd45]) #The probability should be 0.01
+stat_fd_r45_SS_2065_100 = num.range[stat_max.returnL_fd45]
+
+# Data from Wong 2018 stationary storm surge values rcp85 fast dynamics
+small.num = round(max(stat_SLR_fd_r85[1,])+0.01, 2)
+end.num = round(mean(stat_subset_fd_r85) + wong_18$rl[1], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > stat_SLR_fd_r85[1,]))
+print(all(num.range[100] < stat_SLR_fd_r85[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(stat_SLR_fd_r85), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(stat_SLR_fd_r85, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# stat_max.returnL_fd85 <- which.max(new.returnLevel)
+stat_max.returnL_fd85 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[stat_max.returnL_fd85]) #The probability should be 0.01
+stat_fd_r85_SS_2065_100 = num.range[stat_max.returnL_fd85]
+
+# Data from Wong 2018 stationary storm surge values rcp26 NO fast dynamics
+small.num = round(max(stat_SLR_NOfd_r26[1,])+0.01, 2)
+end.num = round(mean(stat_subset_Nfd_r26) + wong_18$rl[1], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > stat_SLR_NOfd_r26[1,]))
+print(all(num.range[100] < stat_SLR_NOfd_r26[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(stat_SLR_NOfd_r26), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(stat_SLR_NOfd_r26, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# stat_max.returnL_NOfd26 <- which.max(new.returnLevel)
+stat_max.returnL_NOfd26 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[stat_max.returnL_NOfd26]) #The probability should be 0.01
+stat_NOfd_r26_SS_2065_100 = num.range[stat_max.returnL_NOfd26]
+
+# Data from Wong 2018 stationary storm surge values rcp45 NO fast dynamics
+small.num = round(max(stat_SLR_NOfd_r45[1,])+0.01, 2)
+end.num = round(mean(stat_subset_Nfd_r45) + wong_18$rl[1], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > stat_SLR_NOfd_r45[1,]))
+print(all(num.range[100] < stat_SLR_NOfd_r45[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(stat_SLR_NOfd_r45), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(stat_SLR_NOfd_r45, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# stat_max.returnL_NOfd45 <- which.max(new.returnLevel)
+stat_max.returnL_NOfd45 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[stat_max.returnL_NOfd45]) #The probability should be 0.01
+stat_NOfd_r45_SS_2065_100 = num.range[stat_max.returnL_NOfd45]
+
+# Data from Wong 2018 stationary storm surge values rcp85 NO fast dynamics
+small.num = round(max(stat_SLR_NOfd_r85[1,])+0.01, 2)
+end.num = round(mean(stat_subset_Nfd_r85) + wong_18$rl[1], 2)
+num.range1 = seq(small.num, end.num, length.out=20)
+num.range2 = seq(end.num+0.1, round(end.num + end.num/2, 2), length.out=80)
+num.range = c(num.range1, num.range2)
+
+# Test: The first number in num.range must be larger than the minimum value in each flood frequency curve
+# That way all NAs produced have a frequency smaller than 1:1000.
+print(all(num.range[1] > stat_SLR_NOfd_r85[1,]))
+print(all(num.range[100] < stat_SLR_NOfd_r85[18,]))
+
+# Find the probabilities of the values in the range using all the potential storm surge plus SLR anomalies
+new.probs <- mat.or.vec(ncol(stat_SLR_NOfd_r85), length(num.range))
+for(i in 1:length(num.range)){
+  new.probs[,i] <- apply(stat_SLR_NOfd_r85, 2, inv.sf, val= num.range[i], prob = 1/wong18_rl_years, use.prob = TRUE) # basically apply is doing a for loop of bma_SLR_fd_r26[,i]
+}
+
+any(is.na(new.probs[,1])) # should be FALSE
+# Set all NAs to 0 since they are smaller than 1:1,000. This gives us a conservative estimate.
+new.probs[is.na(new.probs)] <- 0
+# Calculate the average
+average.uncertainty.probs <- rep(NA, length(num.range))
+for(i in 1:length(num.range)){
+  average.uncertainty.probs[i] <- mean(new.probs[,i])
+}
+
+#Find the new 100-yr probability
+# new.returnLevel <- which(average.uncertainty.probs >= 0.01)
+# stat_max.returnL_NOfd85 <- which.max(new.returnLevel)
+stat_max.returnL_NOfd85 <- which.min(abs(0.01 - average.uncertainty.probs))
+print(average.uncertainty.probs[stat_max.returnL_NOfd85]) #The probability should be 0.01
+stat_NOfd_r85_SS_2065_100 = num.range[stat_max.returnL_NOfd85]
+
 ##==============================================================================
 ## End
 ##==============================================================================
