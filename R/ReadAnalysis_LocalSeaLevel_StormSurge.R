@@ -292,6 +292,8 @@ tebaldi12[,c(2,4,5)] = convert_mhw_to_msl(convert_m_to_ft(tebaldi12[,c(2,4,5)]))
 NOAA_methodGEV = read.csv("../Data/NOAA_method_stormsurge_sewellspoint.csv")
 NOAA_methodGEV[,c(3,4,5,6,9)] = convert_m_to_ft(NOAA_methodGEV[,c(3,4,5,6,9)])
 
+ABM_with_years = read.csv("../Data/AnnualBlockMax_sewellspoint.csv")
+
 # Read in a function that returns a vector of the median return periods for an input vector of block maxima observations
 source("Helper_scripts/Empirical_probability_calculator.R")
 
@@ -312,6 +314,10 @@ returnperiod_h = 2018 - 1806 # upper bound
 rp_l = max(median.rt(vector(mode = 'numeric', length = returnperiod_l)))
 rp_h = max(median.rt(vector(mode = 'numeric', length = returnperiod_h)))
 rp_m = max(median.rt(vector(mode = 'numeric', length = returnperiod_m)))
+
+Storm_of_1749 = 15 # 15 foot storm surge that flooded much of the region
+returnperiod_1749 = 2018 - 1749
+rp_1749 = max(median.rt(vector(mode = 'numeric', length = returnperiod_1749)))
 
 ##=========================== READ ZERVAS 2013 (NOAA) DATA ===================================
 # NOAA MLE (Zervas data just with more points) from the USACE Sea level calculator for Sewell's Point: 
