@@ -36,7 +36,6 @@ library(svglite) # XQuartz is required to use Cairo
 
 # Source survival function, function.
 source("Helper_scripts/plot_SLRcompare_PDF.R")
-source("Helper_scripts/plot_SLRandStormSurge_CI.R")
 
 # Source Conversion functions.
 source("Helper_scripts/conversion_functions.R")
