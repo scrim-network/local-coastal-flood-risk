@@ -37,7 +37,7 @@ setwd("PATH_TO_DIRECTORY/local-coastal-flood-risk/R")
 source("Plot_LocalSeaLevel_StormSurge.R")
 ```
 
-The script `R/Plot_LocalSeaLevel_StormSurge.R` calls the script that runs the analysis, calls additional helper scripts, and creates the figures. The script that runs the analysis is called `R/ReadAnalysis_LocalSeaLevel_StormSurge.R`. The file `R/ReadAnalysis_LocalSeaLevel_StormSurge.R` reads in all the data and converts all data to the same background conditions (i.e., feet, local mean sea-level, anomalies with respect to 2000, incorporating local subsidence). Additionally, the analysis combines sea-level rise and storm surge distributions accounting for uncertainty.
+The script `R/Plot_LocalSeaLevel_StormSurge.R` calls the script that runs the analysis, calls additional helper scripts, and creates the figures in a directory called Figures. The script that runs the analysis is called `R/ReadAnalysis_LocalSeaLevel_StormSurge.R`. The file `R/ReadAnalysis_LocalSeaLevel_StormSurge.R` reads in all the data and converts all data to the same background conditions (i.e., feet, local mean sea-level, anomalies with respect to 2000, incorporating local subsidence). Additionally, the analysis combines sea-level rise and storm surge distributions accounting for uncertainty.
 
 ## Obtaining the data (optional)
 As stated above, all of the data needed to run the analysis and create the plots are provided in the `Data/` directory. However, we also include the scripts used to extract the data or state how we extracted the data for reproducibility. If you do not wish to rerun the data collection scripts, you can skip this part and just run the analysis and plot the figures.

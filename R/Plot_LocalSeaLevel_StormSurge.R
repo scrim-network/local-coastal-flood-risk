@@ -104,6 +104,14 @@ full_page_width     = 7.5
 full_page_height    = 8.75
 single_panel_height = 4
 
+# Files are saved to a directory called Figures. Create this directory if it doesn't exist
+if (file.exists("../Figures/")){
+  print("../Figures/ directory exists: do nothing")
+} else {
+  dir.create("../Figures/")
+  print("Created directory: ../Figures/")
+}
+
 ##=========================== FIGURE LABELING ===================================
 # https://www.r-bloggers.com/adding-figure-labels-a-b-c-in-the-top-left-corner-of-the-plotting-region/
 fig_label <- function(text, region="figure", pos="topleft", cex=NULL, ...) {
